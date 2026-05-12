@@ -1,0 +1,14 @@
+# Session / operational notes
+RESUME.md
+conference-update-2026-*.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.env
+
+# OS
+.DS_Store
+Thumbs.db

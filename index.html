@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nous Observatory</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #4f46e5;
+  --accent-bg: #eef2ff;
+  --green: #059669;
+  --yellow: #d97706;
+  --red: #dc2626;
+  color-scheme: light;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+
+/* ── Header ── */
+.hdr { background: #0f172a; color: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 200; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+.hdr-title { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+.hdr-sub { font-size: 12px; color: #94a3b8; }
+.reload-btn { padding: 5px 14px; border-radius: 6px; border: 1px solid #334155; background: transparent; color: #94a3b8; font-size: 12px; cursor: pointer; transition: all .15s; }
+.reload-btn:hover { background: #1e293b; color: #fff; }
+
+/* ── Nav ── */
+.nav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 2px; }
+.ntab { padding: 11px 18px; border: none; background: none; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; }
+.ntab:hover { color: var(--text); }
+.ntab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── Tabs ── */
+.tab { display: none; padding: 28px; max-width: 1400px; margin: 0 auto; }
+.tab.on { display: block; }
+
+/* ── Stats bar ── */
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+.stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+.stat-n { font-size: 30px; font-weight: 700; color: var(--accent); line-height: 1; }
+.stat-l { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-top: 4px; }
+
+/* ── Section header ── */
+.sh { font-size: 15px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+/* ── Entity grid ── */
+.eg { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.ec { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; cursor: pointer; transition: box-shadow .15s, border-color .15s; }
+.ec:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); border-color: #c7d2fe; }
+.ec.open { border-color: var(--accent); box-shadow: 0 4px 16px rgba(79,70,229,.12); }
+.ec-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.ec-name { font-weight: 600; font-size: 14px; }
+.ec-meta { font-size: 12px; color: var(--muted); }
+.ec-traj { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+.ec-count { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.ec-expand { display: none; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+.ec-expand.on { display: block; }
+
+/* ── Milestone items ── */
+.mi { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.mi:last-child { border-bottom: none; }
+.mi-date { font-size: 11px; color: var(--muted); }
+.mi-evt { font-size: 13px; margin: 3px 0; }
+.mi-foot { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; align-items: center; }
+
+/* ── Metrics table ── */
+.metrics-tbl { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+.m-row { display: flex; font-size: 12px; padding: 4px 0; gap: 8px; }
+.m-key { color: var(--muted); flex: 1; }
+.m-val { font-weight: 500; text-align: right; }
+
+/* ── Badges ── */
+.b { display: inline-block; padding: 2px 7px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.b-co { background: #dbeafe; color: #1d4ed8; }
+.b-pe { background: #d1fae5; color: #065f46; }
+.b-dem { background: #dcfce7; color: #166534; }
+.b-ann { background: #dbeafe; color: #1d4ed8; }
+.b-inf { background: #fef9c3; color: #854d0e; }
+.b-con { background: #fee2e2; color: #991b1b; }
+.b-inf-l { background: #f3e8ff; color: #6b21a8; }
+.b-mod { background: #fce7f3; color: #9d174d; }
+.b-plt { background: #d1fae5; color: #065f46; }
+.b-app { background: #dbeafe; color: #1d4ed8; }
+.b-biz { background: #ffedd5; color: #9a3412; }
+
+/* ── Score pips ── */
+.pips { display: flex; gap: 2px; }
+.pip { width: 7px; height: 7px; border-radius: 50%; }
+.pip.f { background: var(--accent); }
+.pip.e { background: #e2e8f0; }
+
+/* ── Signals ── */
+.sg { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.sf { grid-column: 1/-1; }
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.panel-t { font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+
+.sun-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.sun-row:last-child { border-bottom: none; }
+.sun-name { flex: 1; font-weight: 500; }
+.sun-track { width: 120px; height: 6px; background: #f1f5f9; border-radius: 3px; }
+.sun-fill { height: 6px; background: #ef4444; border-radius: 3px; }
+.sun-ct { width: 30px; text-align: right; font-size: 12px; color: var(--muted); }
+
+.hi-item { padding: 11px 0; border-bottom: 1px solid var(--border); }
+.hi-item:last-child { border-bottom: none; }
+.hi-ent { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .5px; }
+.hi-evt { font-size: 13px; margin: 3px 0; }
+.hi-meta { font-size: 11px; color: var(--muted); }
+
+/* ── Search ── */
+.srch-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+.srch-inp { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; }
+.srch-inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+.frow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.fsel { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: #fff; outline: none; cursor: pointer; }
+.fsel:focus { border-color: var(--accent); }
+
+.res-list { display: flex; flex-direction: column; gap: 12px; }
+.rc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+.rc-hdr { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.rc-ent { font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .5px; }
+.rc-date { font-size: 12px; color: var(--muted); }
+.rc-evt { font-size: 14px; font-weight: 500; margin-bottom: 5px; }
+.rc-sig { font-size: 13px; color: #475569; line-height: 1.55; }
+.rc-strat { font-size: 12px; color: #374151; margin-top: 8px; background: #f8fafc; padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--accent); line-height: 1.55; }
+mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
+
+/* ── Loading / empty ── */
+.loader { text-align: center; padding: 80px 20px; color: var(--muted); }
+.spin { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
+
+/* ── Model Feature Matrix ── */
+.mfm-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+.mfm { width: 100%; border-collapse: collapse; font-size: 12px; }
+.mfm th, .mfm td { padding: 7px 11px; border-bottom: 1px solid var(--border); white-space: nowrap; vertical-align: middle; }
+.mfm thead th { background: #f8fafc; font-weight: 600; position: sticky; top: 0; z-index: 10; text-align: center; border-right: 1px solid var(--border); }
+.mfm td:first-child, .mfm thead th:first-child { position: sticky; left: 0; z-index: 15; background: #fff; text-align: left; white-space: normal; max-width: 210px; font-weight: 500; border-right: 1px solid var(--border); }
+.mfm thead th:first-child { background: #f8fafc; z-index: 20; }
+.mfm tbody tr:hover td { background: #f1f5f9 !important; }
+.mfm tbody tr:hover td:first-child { background: #eef2ff !important; }
+.mfm .cat-hdr td { background: var(--accent-bg) !important; color: var(--accent); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .6px; padding: 6px 11px; }
+.mfm td { text-align: center; }
+.mf-true  { color: #059669; font-size: 14px; }
+.mf-false { color: #d1d5db; font-size: 13px; }
+.mf-num   { color: #1d4ed8; font-weight: 600; }
+.mf-enum  { background: #f3e8ff; color: #6b21a8; padding: 1px 6px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+.mf-na    { color: #e2e8f0; }
+.cat-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.cat-pill { padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); font-size: 12px; cursor: pointer; transition: all .12s; }
+.cat-pill:hover { border-color: var(--accent); color: var(--accent); }
+.cat-pill.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+.mhdr-name { font-size: 11px; font-weight: 700; line-height: 1.3; }
+.mhdr-ver  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.tier-pill { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 600; margin-top: 3px; }
+.tp-haiku  { background: #d1fae5; color: #065f46; }
+.tp-sonnet { background: #dbeafe; color: #1d4ed8; }
+.tp-opus   { background: #f3e8ff; color: #6b21a8; }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .sg { grid-template-columns: 1fr; }
+  .sf { grid-column: auto; }
+  .tab { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-title">🔭 Nous Observatory</div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <span class="hdr-sub" id="hdr-meta">Loading…</span>
+    <button class="reload-btn" onclick="reload()">↺ Refresh</button>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="ntab on" onclick="sw(event,'overview')">Overview</button>
+  <button class="ntab" onclick="sw(event,'signals')">Signals</button>
+  <button class="ntab" onclick="sw(event,'search')">Search</button>
+  <button class="ntab" onclick="sw(event,'models')">⚗️ Models</button>
+</nav>
+
+<!-- ── OVERVIEW ── -->
+<div class="tab on" id="t-overview">
+  <div class="loader" id="ov-load"><div class="spin"></div>Fetching graph…</div>
+  <div id="ov" style="display:none">
+    <div class="stats" id="stats"></div>
+    <div class="sh">Entities <span style="font-size:12px;color:var(--muted);font-weight:400">— click to expand milestones & metrics</span></div>
+    <div class="eg" id="eg"></div>
+  </div>
+</div>
+
+<!-- ── SIGNALS ── -->
+<div class="tab" id="t-signals">
+  <div class="loader" id="sg-load"><div class="spin"></div>Analysing signals…</div>
+  <div id="sg-c" style="display:none">
+    <div class="sg">
+      <div class="panel sf">
+        <div class="panel-t">🌅 Sunset Map — who's in the displacement danger zone</div>
+        <div id="sunset"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-t">⚡ Highest-Impact Milestones (score 5)</div>
+        <div id="hi5"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-t">📊 Claim Type Breakdown</div>
+        <canvas id="c-claim"></canvas>
+      </div>
+      <div class="panel">
+        <div class="panel-t">🧱 Stack Layer Distribution</div>
+        <canvas id="c-layer"></canvas>
+      </div>
+      <div class="panel sf">
+        <div class="panel-t">🚩 Contested Milestones</div>
+        <div id="contested"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SEARCH ── -->
+<div class="tab" id="t-search">
+  <div class="srch-box">
+    <input class="srch-inp" id="q" placeholder="Search events, significance, strategic signal…" oninput="search()">
+    <div class="frow">
+      <select class="fsel" id="f-ent" onchange="search()"><option value="">All entities</option></select>
+      <select class="fsel" id="f-ct" onchange="search()">
+        <option value="">All claim types</option>
+        <option>demonstrated</option><option>announced</option><option>inferred</option>
+      </select>
+      <select class="fsel" id="f-sl" onchange="search()">
+        <option value="">All layers</option>
+        <option>infrastructure</option><option>model</option><option>platform</option>
+        <option>application</option><option>business</option>
+      </select>
+      <select class="fsel" id="f-sc" onchange="search()">
+        <option value="">Any score</option>
+        <option value="5">Score 5</option><option value="4">Score 4+</option><option value="3">Score 3+</option>
+      </select>
+      <select class="fsel" id="f-dis" onchange="search()">
+        <option value="">Any displacement</option>
+        <option value="yes">Has displacement targets</option>
+      </select>
+    </div>
+  </div>
+  <div class="res-list" id="results"><div class="empty">Type to search across 299 milestones</div></div>
+</div>
+
+<!-- ── MODELS ── -->
+<div class="tab" id="t-models">
+  <div class="loader" id="mf-load"><div class="spin"></div>Loading feature matrix…</div>
+  <div id="mf-c" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="sh" style="margin-bottom:4px">Model Feature Matrix</div>
+        <div style="font-size:12px;color:var(--muted)" id="mf-subtitle">138 features · 21 models across 3 providers</div>
+      </div>
+      <label style="font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="show-depr" onchange="renderMatrix()"> Show deprecated models
+      </label>
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;margin-bottom:6px">Provider</div>
+      <div class="cat-pills" id="provider-pills"></div>
+    </div>
+    <div style="margin-bottom:4px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;margin-bottom:6px">Feature Category</div>
+    </div>
+    <div class="cat-pills" id="cat-pills"></div>
+    <div class="mfm-wrap"><div id="matrix-wrap"></div></div>
+  </div>
+</div>
+
+<script>
+const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
+const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
+const HDR = { apikey: KEY, Authorization: 'Bearer ' + KEY };
+
+let D = { entities:[], milestones:[], relationships:[], metrics:[] };
+let emap = {};
+
+// ── Fetch helpers ─────────────────────────────────────────────────────────
+async function get(table, qs='') {
+  const r = await fetch(`${SB}/rest/v1/${table}?${qs}`, { headers: HDR });
+  if (!r.ok) throw new Error(`${table} ${r.status}`);
+  return r.json();
+}
+
+async function loadAll() {
+  const [entities, milestones, relationships, metrics] = await Promise.all([
+    get('entities', 'select=*&order=name'),
+    get('milestones', 'select=*&order=date.desc&limit=500'),
+    get('relationships', 'select=*'),
+    get('key_metrics', 'select=*'),
+  ]);
+  D = { entities, milestones, relationships, metrics };
+  emap = {};
+  entities.forEach(e => emap[e.id] = e);
+}
+
+// ── Render helpers ────────────────────────────────────────────────────────
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function badge(label, cls) { return label ? `<span class="b ${cls}">${esc(label)}</span>` : ''; }
+
+function claimB(ct) {
+  const m = { demonstrated:'b-dem', announced:'b-ann', inferred:'b-inf' };
+  return ct ? badge(ct, m[ct]||'b-inf') : '';
+}
+function layerB(sl) {
+  const m = { infrastructure:'b-inf-l', model:'b-mod', platform:'b-plt', application:'b-app', business:'b-biz' };
+  return sl ? badge(sl, m[sl]||'b-inf-l') : '';
+}
+function pips(n) {
+  if (!n) return '';
+  let h = '<div class="pips">';
+  for (let i=1;i<=5;i++) h += `<div class="pip ${i<=n?'f':'e'}"></div>`;
+  return h + '</div>';
+}
+function hl(txt, q) {
+  if (!q || !txt) return esc(txt||'');
+  const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi');
+  return esc(txt).replace(re, '<mark>$1</mark>');
+}
+
+// ── Tab switch (lazy-loads Models on first visit) ─────────────────────────
+async function sw(ev, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b => b.classList.remove('on'));
+  document.getElementById('t-'+id).classList.add('on');
+  ev.target.classList.add('on');
+  if (id === 'models' && !MF.loaded) {
+    try {
+      await loadMF();
+      MF.loaded = true;
+      buildProviderPills();
+      buildCatPills();
+      renderMatrix();
+      document.getElementById('mf-load').style.display = 'none';
+      document.getElementById('mf-c').style.display = 'block';
+    } catch(e) {
+      document.getElementById('mf-load').innerHTML =
+        `<div style="color:var(--red);padding:40px;text-align:center">Failed to load feature matrix: ${e.message}</div>`;
+    }
+  }
+}
+
+// ── Overview ──────────────────────────────────────────────────────────────
+function renderOverview() {
+  const mc = {};
+  D.milestones.forEach(m => mc[m.entity_id] = (mc[m.entity_id]||0)+1);
+
+  document.getElementById('stats').innerHTML = [
+    [D.entities.length, 'Entities'],
+    [D.milestones.length, 'Milestones'],
+    [D.relationships.length, 'Relationships'],
+    [D.metrics.length, 'Key Metrics'],
+  ].map(([n,l]) => `<div class="stat"><div class="stat-n">${n}</div><div class="stat-l">${l}</div></div>`).join('');
+
+  const sorted = [...D.entities].sort((a,b)=>(mc[b.id]||0)-(mc[a.id]||0));
+
+  document.getElementById('eg').innerHTML = sorted.map(e => {
+    const cnt = mc[e.id]||0;
+    const ms  = D.milestones.filter(m=>m.entity_id===e.id).slice(0,6);
+    const mets = D.metrics.filter(m=>m.entity_id===e.id);
+    const tc = e.type==='person'?'b-pe':'b-co';
+    const tl = e.type==='person'?'Person':(e.category||'Company');
+
+    const msHtml = ms.map(m=>`
+      <div class="mi">
+        <div class="mi-date">${(m.date||'').slice(0,7)}</div>
+        <div class="mi-evt">${esc(m.event||'')}</div>
+        <div class="mi-foot">${claimB(m.claim_type)}${layerB(m.stack_layer)}${m.is_contested?badge('contested','b-con'):''}${pips(m.forward_implication_score)}</div>
+      </div>`).join('');
+
+    const metHtml = mets.length ? `<div class="metrics-tbl">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;font-weight:600">Key Metrics</div>
+      ${mets.map(m=>`<div class="m-row"><span class="m-key">${esc(m.metric_name)}</span><span class="m-val">${esc(m.metric_value)}</span></div>`).join('')}
+    </div>` : '';
+
+    const val = e.current_valuation ? ` · ${esc(e.current_valuation)}` : '';
+    const traj = e.trajectory_summary ? `<div class="ec-traj">${esc(e.trajectory_summary.slice(0,130))}…</div>` : '';
+
+    return `<div class="ec" id="ec-${e.id}" onclick="toggleCard('${e.id}')">
+      <div class="ec-hdr"><div class="ec-name">${esc(e.name)}</div>${badge(tl,tc)}</div>
+      <div class="ec-meta">${esc(e.headquarters||'')}${e.founded?' · est. '+e.founded:''}</div>
+      <div class="ec-count">${cnt} milestones${val}</div>
+      ${traj}
+      <div class="ec-expand" id="ex-${e.id}">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;font-weight:600">Recent Milestones</div>
+        ${msHtml}${metHtml}
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ov-load').style.display='none';
+  document.getElementById('ov').style.display='block';
+}
+
+function toggleCard(id) {
+  document.getElementById('ec-'+id).classList.toggle('open');
+  document.getElementById('ex-'+id).classList.toggle('on');
+}
+
+// ── Signals ───────────────────────────────────────────────────────────────
+let chartC=null, chartL=null;
+
+function renderSignals() {
+  // Sunset map
+  const dc={};
+  D.milestones.forEach(m=>{
+    if(m.displacement_entities?.length)
+      m.displacement_entities.forEach(d=>dc[d]=(dc[d]||0)+1);
+  });
+  const de=Object.entries(dc).sort((a,b)=>b[1]-a[1]);
+  const mx=de[0]?.[1]||1;
+  document.getElementById('sunset').innerHTML = de.length
+    ? de.map(([n,c])=>`<div class="sun-row"><div class="sun-name">${esc(n)}</div><div class="sun-track"><div class="sun-fill" style="width:${(c/mx)*100}%"></div></div><div class="sun-ct">${c}</div></div>`).join('')
+    : '<div class="empty">No displacement signals yet</div>';
+
+  // Score-5 milestones
+  const h5 = D.milestones.filter(m=>m.forward_implication_score===5).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('hi5').innerHTML = h5.map(m=>{
+    const e=emap[m.entity_id];
+    return `<div class="hi-item"><div class="hi-ent">${esc(e?.name||'')}</div><div class="hi-evt">${esc(m.event||'')}</div><div class="hi-meta">${(m.date||'').slice(0,7)} ${claimB(m.claim_type)} ${layerB(m.stack_layer)}</div></div>`;
+  }).join('') || '<div class="empty">None found</div>';
+
+  // Claim type doughnut
+  const cc={demonstrated:0,announced:0,inferred:0};
+  D.milestones.forEach(m=>{ if(m.claim_type) cc[m.claim_type]++; });
+  if(typeof Chart === 'undefined') {
+    document.getElementById('c-claim').parentElement.innerHTML += '<div class="empty" style="font-size:12px">Charts require internet access to load.</div>';
+    document.getElementById('sg-load').style.display='none';
+    document.getElementById('sg-c').style.display='block';
+    return;
+  }
+  if(chartC) chartC.destroy();
+  chartC = new Chart(document.getElementById('c-claim'),{
+    type:'doughnut',
+    data:{
+      labels:['Demonstrated','Announced','Inferred'],
+      datasets:[{data:[cc.demonstrated,cc.announced,cc.inferred],backgroundColor:['#10b981','#3b82f6','#f59e0b'],borderWidth:2,borderColor:'#fff'}]
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom'}}}
+  });
+
+  // Stack layer bar
+  const lc={};
+  D.milestones.forEach(m=>{ if(m.stack_layer) lc[m.stack_layer]=(lc[m.stack_layer]||0)+1; });
+  const le=Object.entries(lc).sort((a,b)=>b[1]-a[1]);
+  if(chartL) chartL.destroy();
+  chartL = new Chart(document.getElementById('c-layer'),{
+    type:'bar',
+    data:{
+      labels:le.map(([k])=>k),
+      datasets:[{data:le.map(([,v])=>v),backgroundColor:['#8b5cf6','#ec4899','#10b981','#3b82f6','#f59e0b'],borderRadius:5}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  });
+
+  // Contested
+  const cont=D.milestones.filter(m=>m.is_contested).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('contested').innerHTML = cont.length
+    ? cont.map(m=>`<div class="hi-item"><div class="hi-ent">${esc(emap[m.entity_id]?.name||'')}</div><div class="hi-evt">${esc(m.event||'')}</div><div class="hi-meta">${(m.date||'').slice(0,7)} ${claimB(m.claim_type)}</div></div>`).join('')
+    : '<div class="empty">No contested milestones flagged</div>';
+
+  document.getElementById('sg-load').style.display='none';
+  document.getElementById('sg-c').style.display='block';
+}
+
+// ── Search ────────────────────────────────────────────────────────────────
+function populateFilters() {
+  const sel=document.getElementById('f-ent');
+  [...D.entities].sort((a,b)=>a.name.localeCompare(b.name)).forEach(e=>{
+    const o=document.createElement('option');
+    o.value=e.id; o.textContent=e.name; sel.appendChild(o);
+  });
+}
+
+function search() {
+  const q  = document.getElementById('q').value.toLowerCase().trim();
+  const fe = document.getElementById('f-ent').value;
+  const fc = document.getElementById('f-ct').value;
+  const fl = document.getElementById('f-sl').value;
+  const fs = parseInt(document.getElementById('f-sc').value)||0;
+  const fd = document.getElementById('f-dis').value;
+
+  let res = D.milestones;
+  if(fe) res=res.filter(m=>m.entity_id===fe);
+  if(fc) res=res.filter(m=>m.claim_type===fc);
+  if(fl) res=res.filter(m=>m.stack_layer===fl);
+  if(fs) res=res.filter(m=>(m.forward_implication_score||0)>=fs);
+  if(fd==='yes') res=res.filter(m=>m.displacement_entities?.length);
+  if(q) res=res.filter(m=>
+    (m.event||'').toLowerCase().includes(q)||
+    (m.significance||'').toLowerCase().includes(q)||
+    (m.strategic_signal||'').toLowerCase().includes(q)
+  );
+
+  res=res.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('results');
+  if(!res.length){el.innerHTML='<div class="empty">No milestones match.</div>';return;}
+
+  el.innerHTML = res.slice(0,60).map(m=>{
+    const ent=emap[m.entity_id];
+    const dispTag=m.displacement_entities?.length
+      ? `<span class="b" style="background:#fee2e2;color:#991b1b">🌅 ${esc(m.displacement_entities.join(', '))}</span>` : '';
+    return `<div class="rc">
+      <div class="rc-hdr"><div class="rc-ent">${esc(ent?.name||'')}</div><div class="rc-date">${(m.date||'').slice(0,10)}</div></div>
+      <div class="rc-evt">${hl(m.event,q)}</div>
+      ${m.significance?`<div class="rc-sig">${hl(m.significance,q)}</div>`:''}
+      ${m.strategic_signal?`<div class="rc-strat">${hl(m.strategic_signal,q)}</div>`:''}
+      <div class="mi-foot" style="margin-top:10px">${claimB(m.claim_type)}${layerB(m.stack_layer)}${m.is_contested?badge('contested','b-con'):''}${pips(m.forward_implication_score)}${dispTag}</div>
+    </div>`;
+  }).join('');
+
+  if(res.length>60)
+    el.innerHTML+=`<div class="empty">Showing 60 of ${res.length} — refine filters to narrow down.</div>`;
+}
+
+// ── Model Feature Matrix ──────────────────────────────────────────────────
+const MF = { features:[], models:[], mfMap:{}, entityMap:{}, loaded:false };
+let activeCat = 'all';
+let activeProvider = 'all';
+
+async function loadMF() {
+  const [features, models, mfRows, entities] = await Promise.all([
+    get('features',       'select=*&order=category,sort_order&limit=200'),
+    get('models',         'select=*&order=release_date&limit=100'),
+    get('model_features', 'select=*&limit=5000'),
+    get('entities',       'select=id,name&limit=50'),
+  ]);
+  MF.features = features;
+  MF.models   = models;
+  MF.entityMap = {};
+  entities.forEach(e => MF.entityMap[e.id] = e.name);
+  MF.mfMap    = {};
+  mfRows.forEach(r => {
+    if (!MF.mfMap[r.model_id]) MF.mfMap[r.model_id] = {};
+    MF.mfMap[r.model_id][r.feature_id] = r.value;
+  });
+}
+
+function buildProviderPills() {
+  const providers = [...new Set(MF.models.map(m => MF.entityMap[m.entity_id]).filter(Boolean))].sort();
+  document.getElementById('provider-pills').innerHTML =
+    ['All', ...providers].map(p =>
+      `<button class="cat-pill${p==='All'?' on':''}" style="font-weight:600" data-prov="${esc(p)}" onclick="setProv(this)">${esc(p)}</button>`
+    ).join('');
+}
+
+function setProv(el) {
+  activeProvider = el.dataset.prov === 'All' ? 'all' : el.dataset.prov;
+  document.querySelectorAll('#provider-pills .cat-pill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  // reset category filter when switching provider
+  activeCat = 'all';
+  document.querySelectorAll('#cat-pills .cat-pill').forEach(p => p.classList.toggle('on', p.dataset.cat==='All'));
+  renderMatrix();
+}
+
+function buildCatPills() {
+  const cats = [...new Set(MF.features.map(f => f.category))];
+  // Use data-cat attribute — avoids & encoding issues in onclick strings
+  document.getElementById('cat-pills').innerHTML =
+    ['All', ...cats].map(c =>
+      `<button class="cat-pill${c==='All'?' on':''}" data-cat="${esc(c)}" onclick="setCat(this)">${esc(c)}</button>`
+    ).join('');
+}
+
+function setCat(el) {
+  // dataset.cat auto-decodes &amp; → & so it matches the DB strings exactly
+  activeCat = el.dataset.cat === 'All' ? 'all' : el.dataset.cat;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  renderMatrix();
+}
+
+function renderMatrix() {
+  const showDepr = document.getElementById('show-depr')?.checked;
+  let models = showDepr ? MF.models : MF.models.filter(m => m.is_current);
+  if (activeProvider !== 'all') models = models.filter(m => MF.entityMap[m.entity_id] === activeProvider);
+  const features = activeCat === 'all' ? MF.features : MF.features.filter(f => f.category === activeCat);
+  if (!models.length || !features.length) return;
+
+  // Group features by category
+  const cats = {};
+  features.forEach(f => { (cats[f.category] = cats[f.category]||[]).push(f); });
+
+  const tierCls = t => t==='haiku'?'tp-haiku':t==='sonnet'?'tp-sonnet':t==='opus'?'tp-opus':'';
+
+  const cellVal = (f, m) => {
+    const v = (MF.mfMap[m.id]||{})[f.id];
+    if (v === undefined || v === null) return '<td class="mf-na">—</td>';
+    if (f.value_type === 'boolean') {
+      return v === 'true'
+        ? '<td class="mf-true" title="Yes">✓</td>'
+        : '<td class="mf-false" title="No">✕</td>';
+    }
+    if (f.value_type === 'integer' || f.value_type === 'float') {
+      const num = parseFloat(v);
+      let disp = v;
+      if (f.unit === 'USD/MTok')       disp = '$' + v;
+      else if (f.unit === '%')         disp = v + '%';
+      else if (f.unit === 'tokens' && num >= 1000) disp = (num>=1000000?(num/1000000).toFixed(0)+'M':(num/1000).toFixed(0)+'K');
+      else if (f.unit === 'rpm' && num >= 1000)    disp = (num/1000).toFixed(0)+'K';
+      return `<td class="mf-num">${esc(disp)}</td>`;
+    }
+    if (f.value_type === 'enum' || f.value_type === 'date' || f.value_type === 'string') {
+      return `<td><span class="mf-enum">${esc(v)}</span></td>`;
+    }
+    return `<td>${esc(v)}</td>`;
+  };
+
+  // Table header
+  let html = '<table class="mfm"><thead><tr>';
+  html += '<th style="min-width:200px">Feature</th>';
+  models.forEach(m => {
+    const shortV = m.api_version.replace(/^(claude|gpt|o\d|gemini)-?/,'').replace(/-\d{8}$/,'').substring(0,22);
+    const provider = (MF.entityMap[m.entity_id]||'').replace('Google DeepMind','Google').replace('OpenAI','OpenAI');
+    const provColor = provider==='OpenAI'?'#10a37f':provider==='Google'?'#4285f4':'#4f46e5';
+    html += `<th><div style="font-size:9px;font-weight:700;color:${provColor};margin-bottom:2px">${esc(provider)}</div>
+      <div class="mhdr-name">${esc(m.display_name)}</div>
+      <div class="mhdr-ver">${esc(shortV)}</div>
+      <div><span class="tier-pill ${tierCls(m.tier)}">${esc(m.tier||'')}</span></div>
+      ${!m.is_current?'<div style="font-size:9px;color:#94a3b8;margin-top:2px">deprecated</div>':''}
+    </th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // Rows
+  Object.entries(cats).forEach(([cat, flist]) => {
+    html += `<tr class="cat-hdr"><td colspan="${models.length+1}">${esc(cat)}</td></tr>`;
+    flist.forEach(f => {
+      html += `<tr><td title="${esc(f.description||f.display_name)}">${esc(f.display_name)}</td>`;
+      models.forEach(m => { html += cellVal(f, m); });
+      html += '</tr>';
+    });
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('matrix-wrap').innerHTML = html;
+}
+
+// ── Init / reload ─────────────────────────────────────────────────────────
+async function reload() {
+  document.getElementById('ov-load').style.display='block';
+  document.getElementById('ov').style.display='none';
+  document.getElementById('sg-load').style.display='block';
+  document.getElementById('sg-c').style.display='none';
+  await init();
+}
+
+async function init() {
+  try {
+    await loadAll();
+  } catch(err) {
+    const msg = `<div style="color:var(--red);padding:40px;text-align:center">Failed to load data: ${err.message}<br><small>Check your internet connection and that Supabase is reachable.</small></div>`;
+    document.getElementById('ov-load').innerHTML = msg;
+    document.getElementById('sg-load').innerHTML = msg;
+    return;
+  }
+  const ts = new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('hdr-meta').textContent =
+    `${D.entities.length} entities · ${D.milestones.length} milestones · ${ts}`;
+  try { renderOverview(); } catch(e) {
+    document.getElementById('ov-load').innerHTML=`<div style="color:var(--red);padding:40px">Overview error: ${e.message}</div>`;
+  }
+  try { renderSignals(); } catch(e) {
+    document.getElementById('sg-load').innerHTML=`<div style="color:var(--red);padding:40px">Signals error: ${e.message}</div>`;
+    document.getElementById('sg-load').style.display='block';
+  }
+  try { populateFilters(); search(); } catch(e) { /* search non-fatal */ }
+}
+
+init();
+</script>
+</body>
+</html>
