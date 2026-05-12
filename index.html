@@ -535,11 +535,23 @@ let activeCat = 'all';
 let activeProvider = 'all';
 
 async function loadMF() {
+  // model_features can exceed PostgREST's 1000-row cap — paginate
+  async function getAllMF() {
+    let rows = [], offset = 0, pageSize = 1000;
+    while (true) {
+      const batch = await get('model_features', `select=*&limit=${pageSize}&offset=${offset}`);
+      rows = rows.concat(batch);
+      if (batch.length < pageSize) break;
+      offset += pageSize;
+    }
+    return rows;
+  }
+
   const [features, models, mfRows, entities] = await Promise.all([
-    get('features',       'select=*&order=category,sort_order&limit=200'),
-    get('models',         'select=*&order=release_date&limit=100'),
-    get('model_features', 'select=*&limit=5000'),
-    get('entities',       'select=id,name&limit=50'),
+    get('features',  'select=*&order=category,sort_order&limit=200'),
+    get('models',    'select=*&order=release_date&limit=100'),
+    getAllMF(),
+    get('entities',  'select=id,name&limit=50'),
   ]);
   MF.features = features;
   MF.models   = models;
