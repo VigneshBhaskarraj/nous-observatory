@@ -100,6 +100,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
 .panel-t { font-size: 13px; font-weight: 600; margin-bottom: 16px; }
 
+/* ── Rel map legend ── */
+.rl-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); white-space: nowrap;
+  background: rgba(255,255,255,.8); padding: 2px 7px; border-radius: 20px; border: 1px solid var(--border); }
+.rl-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.rl-line { width: 16px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+
 .sun-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
 .sun-row:last-child { border-bottom: none; }
 .sun-name { flex: 1; font-weight: 500; }
@@ -197,6 +203,20 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
   <div class="loader" id="ov-load"><div class="spin"></div>Fetching graph…</div>
   <div id="ov" style="display:none">
     <div class="stats" id="stats"></div>
+
+    <!-- AI Landscape Map -->
+    <div id="rel-map-section" style="display:none;margin-bottom:32px">
+      <div class="sh" style="margin-bottom:4px">
+        🌐 AI Landscape Map
+        <span style="font-size:12px;color:var(--muted);font-weight:400" id="rel-map-subtitle">— entity relationships · hover to explore · click to highlight</span>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative">
+        <canvas id="rel-canvas" style="display:block;width:100%;cursor:default"></canvas>
+        <div id="rel-tooltip" style="position:absolute;display:none;background:#0f172a;color:#fff;padding:10px 14px;border-radius:8px;font-size:12px;pointer-events:none;z-index:20;max-width:240px;line-height:1.65;box-shadow:0 4px 16px rgba(0,0,0,.25)"></div>
+        <div id="rel-legend" style="position:absolute;bottom:10px;right:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"></div>
+      </div>
+    </div>
+
     <div class="sh">Entities <span style="font-size:12px;color:var(--muted);font-weight:400">— click to expand milestones & metrics</span></div>
     <div class="eg" id="eg"></div>
   </div>
@@ -348,7 +368,10 @@ async function sw(ev, id) {
   ev.target.classList.add('on');
   if (id === 'tree') {
     const fr = document.getElementById('tree-frame');
-    if (!fr.src || fr.src === window.location.href) fr.src = 'model-tree.html';
+    if (!fr.src || !fr.src.includes('model-tree.html')) fr.src = 'model-tree.html';
+  }
+  if (id === 'search') {
+    if (D.milestones.length) search();
   }
   if (id === 'intel' && !INTEL.loaded) {
     try {
@@ -437,6 +460,364 @@ function renderOverview() {
 function toggleCard(id) {
   document.getElementById('ec-'+id).classList.toggle('open');
   document.getElementById('ex-'+id).classList.toggle('on');
+}
+
+// ── AI Landscape Relationship Map ────────────────────────────────────────────
+let _relNodes = [], _relEdges = [], _hovNode = null;
+
+const GEO_COLOR = e => {
+  const hq = (e.headquarters||'').toLowerCase();
+  if (hq.includes('china')||hq.includes('beijing')||hq.includes('shanghai')||hq.includes('hangzhou')||hq.includes('shenzhen')) return '#ef4444';
+  if (hq.includes('uk')||hq.includes('london')||hq.includes('britain')) return '#059669';
+  if (hq.includes('france')||hq.includes('paris')) return '#d97706';
+  if (e.name==='Google DeepMind'||e.name==='Nvidia'||e.name==='Apple') return '#0ea5e9';
+  return '#4f46e5'; // default US/other
+};
+
+const EDGE_COLORS = {
+  competitor:'#ef4444', competes_with:'#ef4444',
+  partnership:'#059669', partner:'#059669', partnered_with:'#059669', collaboration:'#059669',
+  investment:'#7c3aed', investor:'#7c3aed', invested_in:'#7c3aed', funded_by:'#7c3aed',
+  acquisition:'#2563eb', acquired:'#2563eb', parent:'#2563eb',
+  derived_from:'#d97706', based_on:'#d97706',
+  default:'#94a3b8'
+};
+
+function renderRelMap() {
+  const canvas = document.getElementById('rel-canvas');
+  if (!canvas || !D.entities.length) return;
+
+  const W = canvas.parentElement.offsetWidth;
+  const H = Math.min(520, Math.max(380, W * 0.42));
+  canvas.width = W * (window.devicePixelRatio||1);
+  canvas.height = H * (window.devicePixelRatio||1);
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+
+  // Milestone counts
+  const mc = {};
+  D.milestones.forEach(m => mc[m.entity_id] = (mc[m.entity_id]||0)+1);
+  const maxMc = Math.max(...Object.values(mc), 1);
+  const allScores = {};
+  D.milestones.forEach(m => allScores[m.entity_id] = (allScores[m.entity_id]||0)+(m.forward_implication_score||0));
+
+  // Build nodes — start in a circle
+  _relNodes = D.entities.filter(e=>mc[e.id]).map((e, i, arr) => {
+    const angle = (i / arr.length) * Math.PI * 2 - Math.PI/2;
+    const baseR = W * 0.31;
+    const jitter = (Math.random()-0.5) * 60;
+    return {
+      id: e.id, entity: e,
+      x: W/2 + (baseR + jitter) * Math.cos(angle),
+      y: H/2 + (baseR + jitter) * 0.78 * Math.sin(angle),
+      vx: 0, vy: 0,
+      r: Math.round(7 + ((mc[e.id]||0)/maxMc) * 18),
+      color: GEO_COLOR(e),
+      count: mc[e.id]||0,
+      score: allScores[e.id]||0,
+      label: e.name.replace('Google DeepMind','Google DeepMind').replace(' AI Research','').replace(' Labs','')
+    };
+  });
+
+  // Also add entities with zero milestones (smaller nodes)
+  D.entities.filter(e=>!mc[e.id]).forEach((e, i) => {
+    const angle = (i / 5) * Math.PI * 2;
+    _relNodes.push({
+      id:e.id, entity:e,
+      x: W/2+(W*0.15)*Math.cos(angle), y:H/2+(H*0.2)*Math.sin(angle),
+      vx:0,vy:0, r:6, color:GEO_COLOR(e), count:0, score:0,
+      label:e.name.replace(' AI Research','').replace(' Labs','')
+    });
+  });
+
+  const nMap = {};
+  _relNodes.forEach(n => nMap[n.id] = n);
+
+  // Build edges from relationships data
+  _relEdges = [];
+  D.relationships.forEach(rel => {
+    // Try both schema variants
+    const srcId = rel.entity_id_1 || rel.from_entity_id || rel.source_entity_id;
+    const tgtId = rel.entity_id_2 || rel.to_entity_id   || rel.target_entity_id;
+    const src = nMap[srcId], tgt = nMap[tgtId];
+    if (src && tgt && src !== tgt) {
+      _relEdges.push({
+        source: src, target: tgt,
+        type: (rel.relationship_type||'default').toLowerCase(),
+        label: rel.description || rel.relationship_type || ''
+      });
+    }
+  });
+
+  // If no relationship edges, create "co-region" soft edges between top entities
+  if (!_relEdges.length) {
+    const top = [..._relNodes].sort((a,b)=>b.count-a.count).slice(0,8);
+    for (let i=0;i<top.length-1;i++) {
+      if (Math.random()>0.45) _relEdges.push({source:top[i],target:top[i+1],type:'default',label:''});
+    }
+  }
+
+  // Force-directed layout — run to stable state
+  for (let iter = 0; iter < 280; iter++) {
+    const k = 0.88 - iter/350; // cooling
+    // Repulsion
+    for (let i = 0; i < _relNodes.length; i++) {
+      for (let j = i+1; j < _relNodes.length; j++) {
+        const a = _relNodes[i], b = _relNodes[j];
+        const dx = b.x-a.x, dy = b.y-a.y;
+        const d2 = dx*dx+dy*dy+1;
+        const d  = Math.sqrt(d2);
+        const minD = (a.r + b.r) * 2.8;
+        const force = Math.min(3000/d2, 8) * (d < minD ? 2.5 : 1);
+        const fx = force*dx/d, fy = force*dy/d;
+        a.vx -= fx; a.vy -= fy;
+        b.vx += fx; b.vy += fy;
+      }
+    }
+    // Edge spring attraction
+    _relEdges.forEach(e => {
+      const dx = e.target.x-e.source.x, dy = e.target.y-e.source.y;
+      const d = Math.max(Math.sqrt(dx*dx+dy*dy),1);
+      const idealD = (e.source.r+e.target.r)*3 + 50;
+      const f = (d-idealD)*0.02;
+      const fx = f*dx/d, fy = f*dy/d;
+      e.source.vx += fx; e.source.vy += fy;
+      e.target.vx -= fx; e.target.vy -= fy;
+    });
+    // Center gravity
+    _relNodes.forEach(n => {
+      n.vx += (W/2 - n.x) * 0.012;
+      n.vy += (H/2 - n.y) * 0.012;
+      n.vx *= k; n.vy *= k;
+      n.x += n.vx; n.y += n.vy;
+      n.x = Math.max(n.r+20, Math.min(W-n.r-20, n.x));
+      n.y = Math.max(n.r+22, Math.min(H-n.r-28, n.y));
+    });
+  }
+
+  // Render legend
+  const relTypes = [...new Set(_relEdges.map(e=>e.type).filter(t=>t!=='default'))].slice(0,5);
+  const usRegion = _relNodes.filter(n=>GEO_COLOR(n.entity)==='#4f46e5').length;
+  const cnRegion = _relNodes.filter(n=>GEO_COLOR(n.entity)==='#ef4444').length;
+  let legendHtml = '';
+  if (usRegion) legendHtml += `<span class="rl-item"><span class="rl-dot" style="background:#4f46e5"></span>US</span>`;
+  if (cnRegion) legendHtml += `<span class="rl-item"><span class="rl-dot" style="background:#ef4444"></span>China</span>`;
+  legendHtml += `<span class="rl-item"><span class="rl-dot" style="background:#0ea5e9"></span>Other</span>`;
+  relTypes.forEach(t => {
+    const c = EDGE_COLORS[t]||EDGE_COLORS.default;
+    legendHtml += `<span class="rl-item"><span class="rl-line" style="background:${c}"></span>${t.replace(/_/g,' ')}</span>`;
+  });
+  document.getElementById('rel-legend').innerHTML = legendHtml;
+  document.getElementById('rel-map-subtitle').textContent =
+    `— ${_relNodes.filter(n=>n.count>0).length} entities · ${_relEdges.length} relationships · hover to explore · click to highlight`;
+
+  // Draw the map
+  _drawRelMap(ctx, W, H);
+  document.getElementById('rel-map-section').style.display = 'block';
+
+  // Mouse events (use CSS pixel coords, convert to canvas logical coords)
+  const dpr = window.devicePixelRatio||1;
+  canvas.onmousemove = function(ev) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (ev.clientX - rect.left);
+    const my = (ev.clientY - rect.top);
+    const prev = _hovNode;
+    _hovNode = _relNodes.find(n => {
+      const dx = n.x-mx, dy = n.y-my;
+      return Math.sqrt(dx*dx+dy*dy) < n.r+6;
+    }) || null;
+    if (_hovNode !== prev) _drawRelMap(ctx, W, H);
+    const tt = document.getElementById('rel-tooltip');
+    if (_hovNode) {
+      const e2 = _hovNode.entity;
+      const rels = _relEdges.filter(r=>r.source===_hovNode||r.target===_hovNode);
+      const relStr = rels.length ? `<br><span style="color:#94a3b8">${rels.map(r=>{
+        const other = r.source===_hovNode?r.target.entity.name:r.source.entity.name;
+        return `${r.type.replace(/_/g,' ')} → ${other}`;
+      }).slice(0,3).join('<br>')}</span>` : '';
+      tt.innerHTML = `<strong style="font-size:13px">${esc(e2.name)}</strong><br>
+        <span style="color:#94a3b8">${_hovNode.count} milestones${e2.current_valuation?' · '+esc(e2.current_valuation):''}</span>
+        ${e2.headquarters?`<br><span style="color:#64748b">📍 ${esc(e2.headquarters)}</span>`:''}
+        ${relStr}`;
+      let tx = _hovNode.x + _hovNode.r + 10;
+      let ty = _hovNode.y - 10;
+      if (tx + 240 > W) tx = _hovNode.x - _hovNode.r - 250;
+      if (ty + 80  > H) ty = H - 90;
+      tt.style.left = tx + 'px';
+      tt.style.top  = ty + 'px';
+      tt.style.display = 'block';
+      canvas.style.cursor = 'pointer';
+    } else {
+      tt.style.display = 'none';
+      canvas.style.cursor = 'default';
+    }
+  };
+  canvas.onclick = function() {
+    if (!_hovNode) return;
+    const card = document.getElementById('ec-'+_hovNode.id);
+    if (card) {
+      card.scrollIntoView({behavior:'smooth', block:'center'});
+      const orig = card.style.boxShadow;
+      card.style.boxShadow = `0 0 0 3px ${_hovNode.color}, 0 4px 20px ${_hovNode.color}44`;
+      card.style.borderColor = _hovNode.color;
+      setTimeout(()=>{card.style.boxShadow=orig; card.style.borderColor='';},2200);
+    }
+  };
+  canvas.onmouseleave = function() {
+    _hovNode = null;
+    document.getElementById('rel-tooltip').style.display = 'none';
+    _drawRelMap(ctx, W, H);
+    canvas.style.cursor = 'default';
+  };
+}
+
+function _drawRelMap(ctx, W, H) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#f8fafc');
+  bg.addColorStop(1, '#f1f5f9');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle dot grid
+  ctx.fillStyle = '#dde4f0';
+  for (let gx = 30; gx < W; gx += 50) {
+    for (let gy = 20; gy < H; gy += 50) {
+      ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── Edges ──
+  _relEdges.forEach(edge => {
+    if (!edge.source || !edge.target) return;
+    const isHov = _hovNode && (edge.source===_hovNode || edge.target===_hovNode);
+    const isDim = _hovNode && !isHov;
+    const color = EDGE_COLORS[edge.type] || EDGE_COLORS.default;
+
+    ctx.save();
+    ctx.globalAlpha = isDim ? 0.08 : isHov ? 0.85 : 0.28;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isHov ? 2.5 : 1.5;
+    if (!isHov) ctx.setLineDash([4, 4]);
+
+    // Slightly curved edge
+    const mx2 = (edge.source.x + edge.target.x) / 2;
+    const my2 = (edge.source.y + edge.target.y) / 2;
+    const perp = { x: -(edge.target.y - edge.source.y) * 0.15, y: (edge.target.x - edge.source.x) * 0.15 };
+    const cpx = mx2 + perp.x, cpy = my2 + perp.y;
+
+    ctx.beginPath();
+    ctx.moveTo(edge.source.x, edge.source.y);
+    ctx.quadraticCurveTo(cpx, cpy, edge.target.x, edge.target.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Arrow head at target
+    if (isHov) {
+      const angle = Math.atan2(edge.target.y - cpy, edge.target.x - cpx);
+      const ar = edge.target.r + 4;
+      const ax = edge.target.x - Math.cos(angle)*ar;
+      const ay = edge.target.y - Math.sin(angle)*ar;
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(ax - Math.cos(angle-0.4)*9, ay - Math.sin(angle-0.4)*9);
+      ctx.lineTo(ax - Math.cos(angle+0.4)*9, ay - Math.sin(angle+0.4)*9);
+      ctx.closePath(); ctx.fill();
+
+      // Relationship label at midpoint
+      ctx.font = 'bold 10px -apple-system,sans-serif';
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.9;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const bgW = ctx.measureText(edge.label||edge.type).width + 10;
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.strokeStyle = color; ctx.lineWidth = 1;
+      const lx = cpx, ly = cpy - 10;
+      ctx.beginPath(); ctx.roundRect(lx-bgW/2, ly-8, bgW, 16, 4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.fillText((edge.label||edge.type).replace(/_/g,' '), lx, ly);
+    }
+    ctx.restore();
+  });
+
+  // ── Nodes ──
+  _relNodes.forEach(node => {
+    const isHov = node === _hovNode;
+    const isConn = _hovNode && _relEdges.some(e=>(e.source===_hovNode&&e.target===node)||(e.target===_hovNode&&e.source===node));
+    const isDim  = _hovNode && !isHov && !isConn;
+
+    ctx.save();
+    if (isDim) ctx.globalAlpha = 0.22;
+
+    // Outer glow ring (for hovered or connected)
+    if (isHov || isConn) {
+      const glowR = node.r * 2.4;
+      const grd = ctx.createRadialGradient(node.x, node.y, node.r*0.8, node.x, node.y, glowR);
+      grd.addColorStop(0, node.color + (isHov?'35':'22'));
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(node.x, node.y, glowR, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Drop shadow
+    ctx.shadowColor = node.color + (isHov ? '55' : '28');
+    ctx.shadowBlur = isHov ? 18 : 8;
+
+    // Node circle — white fill with color stroke
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = node.color;
+    ctx.lineWidth = isHov ? 3.5 : isConn ? 2.5 : 2;
+    ctx.beginPath(); ctx.arc(node.x, node.y, node.r, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Tinted inner fill
+    ctx.fillStyle = node.color + '18';
+    ctx.beginPath(); ctx.arc(node.x, node.y, node.r-1, 0, Math.PI*2); ctx.fill();
+
+    // Center dot — sized by score/count
+    const dotR = Math.min(node.r*0.4, 5);
+    ctx.fillStyle = node.color;
+    ctx.globalAlpha = ctx.globalAlpha * 0.9;
+    ctx.beginPath(); ctx.arc(node.x, node.y, dotR, 0, Math.PI*2); ctx.fill();
+
+    ctx.restore();
+
+    // Label
+    ctx.save();
+    if (isDim) ctx.globalAlpha = 0.2;
+    const fontSize = Math.min(11.5, 9 + node.r * 0.15);
+    ctx.font = `${isHov?700:600} ${fontSize}px -apple-system, BlinkMacSystemFont, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+
+    // Measure & potentially truncate
+    let lbl = node.label;
+    const maxLW = node.r * 4.5 + 20;
+    while (ctx.measureText(lbl).width > maxLW && lbl.length > 5) lbl = lbl.slice(0,-1);
+    if (lbl !== node.label) lbl += '…';
+
+    const ly = node.y + node.r + 4;
+    const lw = ctx.measureText(lbl).width;
+
+    // Background pill for legibility
+    ctx.fillStyle = 'rgba(255,255,255,0.82)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(node.x-lw/2-3, ly-1, lw+6, fontSize+4, 3);
+    else ctx.rect(node.x-lw/2-3, ly-1, lw+6, fontSize+4);
+    ctx.fill();
+
+    ctx.fillStyle = isHov ? node.color : '#374151';
+    ctx.fillText(lbl, node.x, ly);
+    ctx.restore();
+  });
 }
 
 // ── Signals ───────────────────────────────────────────────────────────────
@@ -865,6 +1246,7 @@ async function init() {
   try { renderOverview(); } catch(e) {
     document.getElementById('ov-load').innerHTML=`<div style="color:var(--red);padding:40px">Overview error: ${e.message}</div>`;
   }
+  try { requestAnimationFrame(() => renderRelMap()); } catch(e) { /* map non-fatal */ }
   try { renderSignals(); } catch(e) {
     document.getElementById('sg-load').innerHTML=`<div style="color:var(--red);padding:40px">Signals error: ${e.message}</div>`;
     document.getElementById('sg-load').style.display='block';
@@ -873,6 +1255,15 @@ async function init() {
 }
 
 init();
+
+// Re-render map on window resize
+let _resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => {
+    if (D.entities.length) renderRelMap();
+  }, 200);
+});
 </script>
 </body>
 </html>
