@@ -172,7 +172,7 @@ body {
     </div>
   </div>
   <div class="hdr-links">
-    <a href="index.html" class="hdr-link">← Observatory</a>
+    <a href="model-advisor.html" class="hdr-link">🤖 Model Advisor</a>
   </div>
 </div>
 
@@ -766,23 +766,24 @@ function drawTree(provKey, animate=true){
     const cp2x=p.x+dx*0.82, cp2y=p.y+dy*0.58;
     const d=`M${p.x} ${p.y} C${cp1x} ${cp1y},${cp2x} ${cp2y},${n.x} ${n.y}`;
 
-    // PCB/circuit trace style — right-angle elbow paths
-    const midY = p.y + (n.y - p.y) * 0.52;
-    const pcb = `M${p.x} ${p.y} L${p.x} ${midY} L${n.x} ${midY} L${n.x} ${n.y}`;
+    // Organic bezier — natural growth feel
+    const dx=n.x-p.x, dy=n.y-p.y;
+    const cp1x=p.x+dx*0.15, cp1y=p.y+dy*0.42;
+    const cp2x=p.x+dx*0.82, cp2y=p.y+dy*0.58;
+    const d=`M${p.x} ${p.y} C${cp1x} ${cp1y},${cp2x} ${cp2y},${n.x} ${n.y}`;
 
-    // Outer glow trace
-    el('path',{d:pcb,fill:'none',stroke:tree.color,'stroke-width':sw+3,
-      'stroke-linecap':'butt','stroke-linejoin':'miter',
-      opacity:'0.12',filter:'url(#bf)'},gBranches);
-    // Main PCB trace
-    const bEl=el('path',{d:pcb,fill:'none',stroke:'url(#bgrad)',
-      'stroke-width':sw,'stroke-linecap':'butt','stroke-linejoin':'miter',
-      opacity: n.isLatest?'1':'0.75',
+    // Outer glow
+    el('path',{d,fill:'none',stroke:tree.color,'stroke-width':sw+4,
+      'stroke-linecap':'round',opacity:'0.10',filter:'url(#bf)'},gBranches);
+    // Main branch
+    const bEl=el('path',{d,fill:'none',stroke:'url(#bgrad)',
+      'stroke-width':sw,'stroke-linecap':'round',
+      opacity: n.isLatest?'1':'0.78',
       'data-branch':n.id},gBranches);
-    // Bright hairline on top for edge-lit PCB feel
-    el('path',{d:pcb,fill:'none',stroke:tree.light,'stroke-width':'0.6',
-      'stroke-linecap':'butt','stroke-linejoin':'miter',
-      opacity: n.isLatest?'0.5':'0.2'},gBranches);
+    // Bright highlight hairline
+    el('path',{d,fill:'none',stroke:tree.light,'stroke-width':'0.7',
+      'stroke-linecap':'round',
+      opacity: n.isLatest?'0.45':'0.18'},gBranches);
 
     // Animate growth
     if(animate){
@@ -795,11 +796,6 @@ function drawTree(provKey, animate=true){
         requestAnimationFrame(()=>{ bEl.style.strokeDashoffset='0'; });
       } catch(e){}
     }
-    // PCB elbow joint dot (solder point at the corner)
-    const midY2 = p.y + (n.y - p.y) * 0.52;
-    el('circle',{cx:n.x,cy:midY2,r:'2',
-      fill:tree.color,opacity:'0.5'},gBranches);
-
     branchEls.push({el:bEl,nodeId:n.id});
   });
 

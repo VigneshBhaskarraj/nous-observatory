@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Advisor — Nous Observatory</title>
+<style>
+:root {
+  --bg:#070d1a; --card:rgba(10,18,40,0.85); --border:rgba(40,80,180,0.22);
+  --text:#c8deff; --muted:#4878a8; --accent:#5090d0; --glow:rgba(60,120,240,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+body{background-image:radial-gradient(ellipse at 20% 0%,rgba(20,40,140,.18) 0%,transparent 60%),
+  radial-gradient(ellipse at 80% 80%,rgba(60,20,120,.12) 0%,transparent 50%);}
+
+/* ── HEADER ── */
+.hdr{background:rgba(5,10,24,.96);border-bottom:1px solid var(--border);
+  padding:10px 28px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;backdrop-filter:blur(14px);
+  box-shadow:0 1px 18px rgba(0,40,160,.18);}
+.hdr-brand{display:flex;align-items:center;gap:14px;}
+.hdr-title{font-size:15px;font-weight:800;color:#a8d0ff;letter-spacing:-.2px;}
+.hdr-sub{font-size:11px;color:var(--muted);}
+.hdr-links{display:flex;gap:16px;}
+.hdr-link{font-size:11px;color:var(--muted);text-decoration:none;opacity:.7;transition:opacity .2s;}
+.hdr-link:hover{opacity:1;color:#a8d0ff;}
+
+/* ── HERO ── */
+.hero{max-width:800px;margin:0 auto;padding:48px 28px 0;}
+.hero-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.hero-title{font-size:30px;font-weight:800;color:#d8eaff;line-height:1.2;margin-bottom:10px;}
+.hero-title span{color:#60a8f0;}
+.hero-desc{font-size:14px;color:var(--muted);max-width:560px;line-height:1.7;}
+
+/* ── INPUT CARD ── */
+.input-card{max-width:800px;margin:28px auto 0;background:var(--card);
+  border:1px solid var(--border);border-radius:16px;padding:24px;
+  backdrop-filter:blur(12px);box-shadow:0 4px 32px rgba(0,40,180,.12);}
+.input-label{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;}
+textarea{width:100%;background:rgba(5,10,28,.7);border:1px solid rgba(40,80,180,.3);
+  border-radius:10px;padding:14px 16px;color:#c8deff;font-size:13.5px;line-height:1.7;
+  resize:vertical;min-height:100px;font-family:inherit;outline:none;transition:border-color .2s;}
+textarea:focus{border-color:#4878a8;box-shadow:0 0 0 3px rgba(60,100,200,.12);}
+textarea::placeholder{color:#2a4870;}
+
+.examples{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.ex-pill{font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid rgba(40,80,180,.3);
+  color:#4878a8;cursor:pointer;transition:all .15s;background:rgba(10,20,50,.4);}
+.ex-pill:hover{border-color:#5090d0;color:#90c0f0;background:rgba(20,50,120,.3);}
+
+/* ── CONSTRAINTS ── */
+.constraints{margin-top:18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+@media(max-width:600px){.constraints{grid-template-columns:1fr;}}
+.constraint{background:rgba(5,10,28,.5);border:1px solid rgba(40,80,180,.2);border-radius:10px;padding:12px 14px;}
+.c-label{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:8px;}
+.c-options{display:flex;gap:5px;flex-wrap:wrap;}
+.c-opt{font-size:11px;padding:3px 10px;border-radius:16px;border:1px solid rgba(40,80,180,.25);
+  color:var(--muted);cursor:pointer;transition:all .15s;}
+.c-opt.on{background:rgba(60,100,220,.25);border-color:#5090d0;color:#a8d0ff;}
+.c-opt:hover:not(.on){border-color:#4878a8;color:#80b0e0;}
+
+.analyze-btn{width:100%;margin-top:18px;padding:13px;background:linear-gradient(135deg,#2050a0,#4070c0);
+  border:none;border-radius:10px;color:#d0e8ff;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .2s;letter-spacing:.2px;box-shadow:0 4px 20px rgba(40,80,200,.25);}
+.analyze-btn:hover{background:linear-gradient(135deg,#2860b0,#5080d0);
+  box-shadow:0 4px 28px rgba(40,80,200,.45);transform:translateY(-1px);}
+.analyze-btn:active{transform:translateY(0);}
+
+/* ── RESULTS ── */
+.results{max-width:800px;margin:28px auto 60px;display:none;}
+.results.show{display:block;}
+
+.section-hdr{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);
+  margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* ── MODEL CARDS ── */
+.model-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.model-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:18px 20px;backdrop-filter:blur(10px);transition:border-color .2s;position:relative;overflow:hidden;}
+.model-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:.6;}
+.model-card:hover{border-color:rgba(80,144,208,.4);}
+.mc-rank{position:absolute;top:14px;right:16px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:10px;background:rgba(20,40,90,.6);color:var(--muted);}
+.mc-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;
+  margin-bottom:8px;border:1px solid;}
+.mc-name{font-size:17px;font-weight:800;color:#d0e8ff;margin-bottom:2px;}
+.mc-provider{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.mc-why{font-size:12.5px;color:#8ab0d8;line-height:1.6;margin-bottom:10px;
+  border-left:2px solid rgba(60,120,220,.3);padding-left:10px;}
+.mc-caps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.mc-cap{font-size:10px;padding:2px 7px 2px 5px;border-radius:8px;display:inline-flex;
+  align-items:center;gap:2px;white-space:nowrap;}
+.mc-pricing{display:flex;gap:12px;font-size:11px;color:var(--muted);}
+.mc-price-item{display:flex;gap:4px;align-items:center;}
+.mc-price-val{color:#a8c8f0;font-weight:600;}
+
+/* ── TASK ARCHITECTURE ── */
+.arch-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;margin-bottom:28px;backdrop-filter:blur(10px);}
+.arch-title{font-size:13px;font-weight:700;color:#a0c4f0;margin-bottom:16px;}
+.arch-flow{display:flex;flex-direction:column;gap:8px;}
+.arch-task{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;
+  background:rgba(10,20,48,.5);border:1px solid rgba(40,80,180,.2);border-radius:10px;}
+.arch-arrow{text-align:center;color:var(--muted);font-size:11px;padding:0 14px;}
+.at-num{width:22px;height:22px;border-radius:50%;background:rgba(40,80,200,.3);
+  border:1px solid rgba(60,100,220,.4);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#80b0f0;flex-shrink:0;margin-top:1px;}
+.at-body{flex:1;}
+.at-name{font-size:12px;font-weight:700;color:#c0d8f8;margin-bottom:2px;}
+.at-model{font-size:11px;padding:1px 8px;border-radius:8px;display:inline-block;
+  background:rgba(20,50,120,.5);color:#80b0f0;border:1px solid rgba(40,80,180,.3);margin-bottom:4px;}
+.at-why{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* ── COST ESTIMATOR ── */
+.cost-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:20px;backdrop-filter:blur(10px);}
+.cost-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+@media(max-width:560px){.cost-grid{grid-template-columns:1fr;}}
+.cost-row{background:rgba(10,20,48,.5);border:1px solid rgba(40,80,180,.18);
+  border-radius:10px;padding:12px 14px;}
+.cost-row-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;}
+input[type=range]{width:100%;accent-color:#5090d0;margin:4px 0;}
+.cost-row-val{font-size:12px;color:#a0c0e8;font-weight:600;margin-top:4px;}
+.cost-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+.cost-box{background:rgba(10,20,48,.6);border:1px solid rgba(40,80,180,.22);
+  border-radius:10px;padding:12px;text-align:center;}
+.cost-box-val{font-size:20px;font-weight:800;color:#60b0f0;margin-bottom:3px;}
+.cost-box-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.cost-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;}
+.cost-stack-row{display:flex;align-items:center;justify-content:space-between;
+  padding:6px 0;border-bottom:1px solid rgba(40,80,180,.12);font-size:12px;}
+.cost-stack-row:last-child{border-bottom:none;}
+.cost-stack-name{color:#80b0e0;}
+.cost-stack-share{color:var(--muted);font-size:11px;}
+.cost-stack-val{color:#6ee7b7;font-weight:700;}
+
+/* ── TWEAK ── */
+.tweak-bar{background:rgba(10,20,50,.6);border:1px solid rgba(40,80,180,.2);
+  border-radius:10px;padding:12px 16px;margin-top:18px;margin-bottom:28px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.tweak-label{font-size:11px;color:var(--muted);white-space:nowrap;}
+.tweak-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tweak-tag{font-size:11px;padding:3px 10px;border-radius:16px;border:1px solid rgba(40,80,180,.3);
+  color:var(--muted);cursor:pointer;transition:all .15s;}
+.tweak-tag.on{background:rgba(60,100,220,.22);border-color:#5090d0;color:#a8d0ff;}
+.tweak-tag:hover:not(.on){border-color:#5090d0;color:#80b0e0;}
+
+/* ── Empty state ── */
+.empty-hint{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-hint-icon{font-size:40px;margin-bottom:14px;opacity:.4;}
+.empty-hint-text{font-size:13px;line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">
+    <div>
+      <div class="hdr-title">🤖 Model Advisor</div>
+      <div class="hdr-sub">Find your optimal AI stack · Nous Observatory</div>
+    </div>
+  </div>
+  <div class="hdr-links">
+    <a href="index.html" class="hdr-link">← Observatory</a>
+    <a href="model-tree.html" class="hdr-link">⬡ Model Tree</a>
+    <a href="power-map.html" class="hdr-link">🔥 Power Map</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-label">AI Model Advisor</div>
+  <div class="hero-title">Find your <span>perfect AI stack</span></div>
+  <div class="hero-desc">Describe what you're building. Get instant model recommendations, a task architecture showing which model handles what, and a monthly cost breakdown.</div>
+</div>
+
+<div class="input-card">
+  <div class="input-label">Describe your use case</div>
+  <textarea id="uc-input" placeholder="e.g. I want to build a customer support bot that can handle complex queries, read uploaded PDFs, and escalate to a human when needed...
+
+Or: I need to analyze large codebases, auto-generate documentation, and run nightly code review on pull requests...
+
+Or: Building a research assistant that searches the web, reads long reports, and generates structured summaries in Chinese and English..."></textarea>
+
+  <div class="examples" id="examples">
+    <span class="ex-pill" onclick="fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')">Customer support</span>
+    <span class="ex-pill" onclick="fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code to junior developers')">Code assistant</span>
+    <span class="ex-pill" onclick="fillExample('research tool that reads long PDF reports and academic papers, extracts key findings, and writes structured summaries')">Research & docs</span>
+    <span class="ex-pill" onclick="fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')">Voice / real-time</span>
+    <span class="ex-pill" onclick="fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')">Agentic automation</span>
+    <span class="ex-pill" onclick="fillExample('budget-conscious classification pipeline that processes 100,000 short texts per day with minimal cost')">High-volume / cheap</span>
+  </div>
+
+  <div class="constraints">
+    <div class="constraint">
+      <div class="c-label">Priority</div>
+      <div class="c-options" id="c-priority">
+        <span class="c-opt on" data-val="balanced">Balanced</span>
+        <span class="c-opt" data-val="quality">Max quality</span>
+        <span class="c-opt" data-val="cost">Minimize cost</span>
+        <span class="c-opt" data-val="speed">Low latency</span>
+      </div>
+    </div>
+    <div class="constraint">
+      <div class="c-label">Deployment</div>
+      <div class="c-options" id="c-deploy">
+        <span class="c-opt on" data-val="any">Any API</span>
+        <span class="c-opt" data-val="oss">Open source only</span>
+        <span class="c-opt" data-val="us">US providers only</span>
+      </div>
+    </div>
+    <div class="constraint">
+      <div class="c-label">Context needs</div>
+      <div class="c-options" id="c-ctx">
+        <span class="c-opt on" data-val="normal">Normal (&lt;128K)</span>
+        <span class="c-opt" data-val="long">Long (200K+)</span>
+        <span class="c-opt" data-val="ultra">Ultra (1M+)</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="analyze-btn" onclick="analyze()">⬡ Analyze My Use Case →</button>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="results">
+
+  <div style="max-width:800px;margin:0 auto;padding:0 28px;">
+
+    <!-- Tweak bar -->
+    <div class="tweak-bar">
+      <span class="tweak-label">Refine:</span>
+      <div class="tweak-tags" id="tweak-tags"></div>
+    </div>
+
+    <!-- Recommended stack -->
+    <div class="section-hdr">⭐ Recommended Stack</div>
+    <div class="model-cards" id="model-cards"></div>
+
+    <!-- Task architecture -->
+    <div class="section-hdr">🏗 Task Architecture</div>
+    <div class="arch-card">
+      <div class="arch-title" id="arch-title"></div>
+      <div class="arch-flow" id="arch-flow"></div>
+    </div>
+
+    <!-- Cost estimator -->
+    <div class="section-hdr">💰 Cost Estimator</div>
+    <div class="cost-card">
+      <div class="cost-grid">
+        <div class="cost-row">
+          <div class="cost-row-label">Daily messages / requests</div>
+          <input type="range" id="vol-slider" min="0" max="6" value="2" oninput="updateCost()">
+          <div class="cost-row-val" id="vol-label">1,000 / day</div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-row-label">Avg tokens per exchange</div>
+          <input type="range" id="tok-slider" min="0" max="4" value="1" oninput="updateCost()">
+          <div class="cost-row-val" id="tok-label">~500 in / 300 out</div>
+        </div>
+      </div>
+      <div class="cost-breakdown">
+        <div class="cost-box">
+          <div class="cost-box-val" id="cost-daily">—</div>
+          <div class="cost-box-lbl">Est. / day</div>
+        </div>
+        <div class="cost-box">
+          <div class="cost-box-val" id="cost-monthly">—</div>
+          <div class="cost-box-lbl">Est. / month</div>
+        </div>
+        <div class="cost-box">
+          <div class="cost-box-val" id="cost-per1k">—</div>
+          <div class="cost-box-lbl">Cost / 1K msgs</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px;">Cost by model role</div>
+        <div id="cost-stack-breakdown"></div>
+      </div>
+      <div class="cost-note" id="cost-note"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Empty hint -->
+<div class="empty-hint" id="empty-hint">
+  <div class="empty-hint-icon">🤖</div>
+  <div class="empty-hint-text">Describe your use case above — or pick an example —<br>and get instant model recommendations.</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  MODEL DATA
+// ═══════════════════════════════════════════════════════════
+const MODELS = [
+  // Anthropic
+  { id:'claude-haiku-4-5',    name:'Haiku 4.5',       provider:'Anthropic', provColor:'#c0622f',
+    priceIn:0.80, priceOut:4,    ctx:200,  speed:1, oss:false, usOnly:true,
+    caps:['vision','tools','agent'],
+    strengths:['fast','cheap','volume','simple','chat','classification','triage','routing'],
+    badge:'⚡ Fastest Claude', tier:'fast',
+    pitch:'Ultra-low latency for high-volume simple tasks. Route simple queries here to save budget.' },
+  { id:'claude-sonnet-4-6',   name:'Sonnet 4.6',      provider:'Anthropic', provColor:'#c0622f',
+    priceIn:3,    priceOut:15,   ctx:200,  speed:2, oss:false, usOnly:true,
+    caps:['vision','tools','think','code','agent'],
+    strengths:['coding','reasoning','analysis','vision','writing','balanced','tools','complex','agentic','review'],
+    badge:'⭐ Best Balance',  tier:'balanced',
+    pitch:'The default workhorse — strong reasoning, vision, coding, and tool use at a price that scales.' },
+  { id:'claude-opus-4-6',     name:'Opus 4.6',        provider:'Anthropic', provColor:'#c0622f',
+    priceIn:15,   priceOut:75,   ctx:200,  speed:3, oss:false, usOnly:true,
+    caps:['vision','tools','think'],
+    strengths:['research','complex','judgment','nuanced','legal','medical','critical','flagship','best'],
+    badge:'🏆 Highest Quality', tier:'flagship',
+    pitch:'When quality is everything. Complex judgment, nuanced analysis, critical decision-making.' },
+  // OpenAI
+  { id:'gpt-4o-mini',         name:'GPT-4o mini',     provider:'OpenAI',    provColor:'#1d8a52',
+    priceIn:0.15, priceOut:0.60, ctx:128,  speed:1, oss:false, usOnly:true,
+    caps:['vision','tools'],
+    strengths:['cheap','fast','volume','simple','classification','extraction','embeddings'],
+    badge:'💰 Cheapest Vision', tier:'fast',
+    pitch:'Cheapest model with vision. Ideal for classification, extraction, and simple structured tasks at massive scale.' },
+  { id:'gpt-4o',              name:'GPT-4o',          provider:'OpenAI',    provColor:'#1d8a52',
+    priceIn:2.50, priceOut:10,   ctx:128,  speed:2, oss:false, usOnly:true,
+    caps:['vision','audio','tools','code'],
+    strengths:['multimodal','voice','audio','vision','coding','balanced','realtime','speech'],
+    badge:'🎙 Best Multimodal', tier:'balanced',
+    pitch:'Native audio + vision in one model. Best for voice apps, live transcription, or mixed media input.' },
+  { id:'o4-mini',             name:'o4-mini',         provider:'OpenAI',    provColor:'#1d8a52',
+    priceIn:1.10, priceOut:4.40, ctx:200,  speed:2, oss:false, usOnly:true,
+    caps:['vision','think','code'],
+    strengths:['reasoning','coding','math','logic','analysis','affordable','affordable-reasoning'],
+    badge:'⚡ Fast Reasoning', tier:'reasoning',
+    pitch:'80% of o3 quality at 1/10th the price. Best value for reasoning and coding tasks.' },
+  { id:'o3',                  name:'o3',              provider:'OpenAI',    provColor:'#1d8a52',
+    priceIn:10,   priceOut:40,   ctx:200,  speed:3, oss:false, usOnly:true,
+    caps:['vision','think','code','agent'],
+    strengths:['research','hard','frontier','science','math','engineering','phd'],
+    badge:'🔬 Frontier Reasoning', tier:'flagship',
+    pitch:'OpenAI\'s current frontier. Problems that stumped every other model. GPQA 87.7%.' },
+  // Google
+  { id:'gemini-2.5-flash',    name:'Gemini 2.5 Flash',provider:'Google',    provColor:'#3a85c8',
+    priceIn:0.15, priceOut:0.60, ctx:1000, speed:2, oss:false, usOnly:false,
+    caps:['vision','think','tools','code'],
+    strengths:['long-context','documents','cheap','coding','search','grounding','large-context','1m'],
+    badge:'📄 Best Value',      tier:'balanced',
+    pitch:'1M context window + thinking mode at $0.15/M. Best value for long-document tasks.' },
+  { id:'gemini-2.5-pro',      name:'Gemini 2.5 Pro',  provider:'Google',    provColor:'#3a85c8',
+    priceIn:1.25, priceOut:10,   ctx:1000, speed:3, oss:false, usOnly:false,
+    caps:['vision','audio','think','tools','code'],
+    strengths:['long-context','video','research','frontier','google','deep-research','grounding'],
+    badge:'📚 Best Long Context',tier:'flagship',
+    pitch:'Google\'s flagship. 1M context + thinking + video. Best for document-heavy research workflows.' },
+  // DeepSeek
+  { id:'deepseek-chat',       name:'DeepSeek-V3',     provider:'DeepSeek',  provColor:'#1e7a8a',
+    priceIn:0.27, priceOut:1.10, ctx:128,  speed:2, oss:true, usOnly:false,
+    caps:['oss','tools','code'],
+    strengths:['coding','cheap','open','efficient','instruction','budget'],
+    badge:'🔓 Best Open Source',tier:'balanced',
+    pitch:'GPT-4o class quality at $0.27/M — open weights, highly efficient, excellent at code.' },
+  { id:'deepseek-reasoner',   name:'DeepSeek-R1',     provider:'DeepSeek',  provColor:'#1e7a8a',
+    priceIn:0.55, priceOut:2.19, ctx:128,  speed:3, oss:true, usOnly:false,
+    caps:['oss','think','code'],
+    strengths:['reasoning','math','coding','open','cheap-reasoning','distillable','mit'],
+    badge:'🧠 Open Reasoning',  tier:'reasoning',
+    pitch:'MIT-licensed reasoning model matching o1 on STEM. Distillable weights for self-hosting.' },
+  // Qwen
+  { id:'qwen3-235b-a22b',     name:'Qwen3-235B',      provider:'Alibaba',   provColor:'#e07830',
+    priceIn:0.22, priceOut:0.88, ctx:128,  speed:2, oss:true, usOnly:false,
+    caps:['oss','think','tools','code','multi'],
+    strengths:['multilingual','chinese','japanese','cheap','reasoning','open','moe','translate','bilingual'],
+    badge:'🌏 Best Multilingual',tier:'flagship',
+    pitch:'235B MoE (22B active). Cheapest frontier-class model + best-in-class Chinese/multilingual.' },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  KEYWORD → NEEDS MAP
+// ═══════════════════════════════════════════════════════════
+const KW = {
+  vision:  ['image','photo','screenshot','visual','picture','diagram','chart','pdf','document','scan','ocr','see','look','view','video','screenshot','attachment'],
+  audio:   ['voice','audio','speech','listen','podcast','transcript','speak','talk','conversation','microphone','call','phone'],
+  think:   ['complex','hard','difficult','reasoning','logic','math','science','engineering','prove','analyze','research','phd','deep','nuanced','tricky','intricate','sophisticated'],
+  code:    ['code','program','script','function','bug','debug','build','develop','software','api','backend','frontend','github','repository','codebase','pull request','unit test','deployment'],
+  agent:   ['agent','automate','automation','workflow','pipeline','autonomous','browser','computer','task','schedule','multi-step','orchestrate','plan'],
+  fast:    ['fast','quick','real-time','realtime','instant','latency','immediate','live','stream','responsive','millisecond'],
+  cheap:   ['cheap','budget','affordable','cost','money','economical','free','save','minimize','high volume','millions','thousands','scale'],
+  context: ['long document','long report','entire','whole','book','100 pages','full codebase','repository','large context','1m','million token','huge','massive file'],
+  multi:   ['chinese','japanese','multilingual','translate','language','spanish','french','arabic','korean','bilingual','international','global'],
+  oss:     ['open source','open-source','local','self-host','on-premise','private','air-gap','fine-tune','custom model','deploy locally'],
+  research:['research','academic','paper','study','analysis','synthesize','literature','report','findings'],
+  writing: ['write','draft','blog','article','email','copywriting','content','essay','summarize','summary'],
+  customer:['customer','support','ticket','helpdesk','service','complaint','FAQ','chatbot'],
+};
+
+// ═══════════════════════════════════════════════════════════
+//  TASK ARCHITECTURES
+// ═══════════════════════════════════════════════════════════
+const ARCHS = {
+  customer: {
+    label:'Customer Support Architecture',
+    desc:'Route by complexity: fast model triages, balanced model responds, flagship handles escalations.',
+    tasks:[
+      {name:'Intent Classification & Routing', tier:'fast',      why:'Instantly categorize query type — billing, technical, returns — at near-zero cost.'},
+      {name:'Response Generation',             tier:'balanced',  why:'Draft accurate, helpful replies with tool access to your knowledge base.'},
+      {name:'Complex / Escalation Handling',   tier:'flagship',  why:'Edge cases, upset customers, and legal/policy questions need peak judgment.'},
+    ]
+  },
+  code: {
+    label:'Coding Assistant Architecture',
+    desc:'Parallel model strategy: reasoning for hard problems, fast model for boilerplate.',
+    tasks:[
+      {name:'Requirements Analysis & Planning', tier:'reasoning', why:'Understand complex specs and design the approach before writing a line.'},
+      {name:'Code Generation',                  tier:'balanced',  why:'Strong coding with tool use for file reads, shell commands, and iteration.'},
+      {name:'Code Review & Bug Detection',      tier:'reasoning', why:'Deep analysis of logic errors, security issues, and edge cases.'},
+      {name:'Tests & Documentation',            tier:'fast',      why:'High-volume, lower-stakes generation — save budget here.'},
+    ]
+  },
+  research: {
+    label:'Research & Analysis Architecture',
+    desc:'Long-context model for ingestion, flagship for synthesis, fast for delivery.',
+    tasks:[
+      {name:'Document Ingestion & Extraction', tier:'longctx',  why:'Process 100-page reports, entire codebases, or multi-document sets in one pass.'},
+      {name:'Analysis & Synthesis',            tier:'flagship', why:'Connect disparate findings, identify implications, challenge assumptions.'},
+      {name:'Summary & Report Generation',     tier:'balanced', why:'Structure and write final output with consistent quality.'},
+    ]
+  },
+  agent: {
+    label:'Agentic Workflow Architecture',
+    desc:'Reasoning model plans and decides; fast model executes repetitive sub-steps.',
+    tasks:[
+      {name:'Goal Decomposition & Planning',   tier:'reasoning', why:'Break ambiguous objectives into concrete executable steps.'},
+      {name:'Tool Execution & Web Actions',    tier:'balanced',  why:'Browser use, API calls, file operations — balanced model handles most loops.'},
+      {name:'Verification & Error Recovery',   tier:'reasoning', why:'Catch failures, retry intelligently, escalate when stuck.'},
+    ]
+  },
+  multimodal: {
+    label:'Multimodal Processing Architecture',
+    desc:'Vision model for media; fast model for text routing; long-context for doc analysis.',
+    tasks:[
+      {name:'Image / Audio / PDF Processing',  tier:'vision',   why:'Native multimodal understanding of images, voice, scanned documents.'},
+      {name:'Content Analysis & Structuring',  tier:'balanced', why:'Extract structured data and meaning from processed media.'},
+      {name:'Output Generation',               tier:'fast',     why:'Generate summaries, captions, or structured reports at volume.'},
+    ]
+  },
+  content: {
+    label:'Content Creation Pipeline',
+    tasks:[
+      {name:'Research & Outline',      tier:'balanced', why:'Structure the piece, gather references, plan sections.'},
+      {name:'Draft Generation',        tier:'balanced', why:'Write full drafts with consistent voice and style.'},
+      {name:'Edit & Polish',           tier:'flagship', why:'Final quality check — improve clarity, flow, and accuracy.'},
+    ]
+  },
+  generic: {
+    label:'Recommended Stack',
+    tasks:[
+      {name:'Primary Tasks',           tier:'balanced', why:'Your core workload — balanced quality and cost.'},
+      {name:'High-Stakes Decisions',   tier:'flagship', why:'Where quality matters most — complex judgment, critical output.'},
+      {name:'High-Volume / Simple',    tier:'fast',     why:'Routing, classification, extraction — minimize cost here.'},
+    ]
+  }
+};
+
+const CAP_DEF = {
+  vision: {icon:'👁', label:'Vision',      bg:'rgba(59,130,246,.22)',  color:'#93c5fd', border:'rgba(59,130,246,.4)'},
+  audio:  {icon:'🎙', label:'Audio',       bg:'rgba(168,85,247,.22)', color:'#d8b4fe', border:'rgba(168,85,247,.4)'},
+  think:  {icon:'🧠', label:'Thinking',    bg:'rgba(124,58,237,.22)', color:'#a78bfa', border:'rgba(124,58,237,.4)'},
+  tools:  {icon:'🔧', label:'Tool Use',    bg:'rgba(20,184,166,.22)', color:'#5eead4', border:'rgba(20,184,166,.4)'},
+  code:   {icon:'💻', label:'Coding',      bg:'rgba(16,185,129,.22)', color:'#6ee7b7', border:'rgba(16,185,129,.4)'},
+  agent:  {icon:'🤖', label:'Agentic',     bg:'rgba(239,68,68,.2)',   color:'#fca5a5', border:'rgba(239,68,68,.35)'},
+  oss:    {icon:'🔓', label:'Open OSS',    bg:'rgba(245,158,11,.2)',  color:'#fcd34d', border:'rgba(245,158,11,.35)'},
+  multi:  {icon:'🌐', label:'Multilingual',bg:'rgba(14,165,233,.2)',  color:'#7dd3fc', border:'rgba(14,165,233,.35)'},
+};
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let _results = [];
+let _constraints = { priority:'balanced', deploy:'any', ctx:'normal' };
+let _activeTweaks = new Set();
+
+// ═══════════════════════════════════════════════════════════
+//  CONSTRAINT TOGGLES
+// ═══════════════════════════════════════════════════════════
+['c-priority','c-deploy','c-ctx'].forEach(groupId=>{
+  document.getElementById(groupId).addEventListener('click', e=>{
+    const opt = e.target.closest('.c-opt');
+    if(!opt) return;
+    document.querySelectorAll(`#${groupId} .c-opt`).forEach(o=>o.classList.remove('on'));
+    opt.classList.add('on');
+    const key = groupId.replace('c-','');
+    _constraints[key] = opt.dataset.val;
+  });
+});
+
+// ═══════════════════════════════════════════════════════════
+//  EXAMPLE FILLER
+// ═══════════════════════════════════════════════════════════
+function fillExample(text){
+  document.getElementById('uc-input').value = text;
+  analyze();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  KEYWORD DETECTION
+// ═══════════════════════════════════════════════════════════
+function detectNeeds(text){
+  const lower = text.toLowerCase();
+  const detected = new Set();
+  for(const [need, words] of Object.entries(KW)){
+    if(words.some(w=>lower.includes(w))) detected.add(need);
+  }
+  return detected;
+}
+
+function archType(needs){
+  if(needs.has('customer')) return 'customer';
+  if(needs.has('code'))     return 'code';
+  if(needs.has('agent'))    return 'agent';
+  if(needs.has('vision') && !needs.has('code')) return 'multimodal';
+  if(needs.has('research')) return 'research';
+  if(needs.has('writing'))  return 'content';
+  return 'generic';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SCORING
+// ═══════════════════════════════════════════════════════════
+function scoreModels(needs, tweaks, constraints){
+  const allNeeds = new Set([...needs, ...tweaks]);
+
+  return MODELS
+    .filter(m=>{
+      if(constraints.deploy==='oss' && !m.oss) return false;
+      if(constraints.deploy==='us' && !m.usOnly) return false;
+      if(constraints.ctx==='ultra' && m.ctx < 500) return false;
+      if(constraints.ctx==='long' && m.ctx < 100) return false;
+      return true;
+    })
+    .map(m=>{
+      let score = 0;
+      for(const need of allNeeds){
+        if(m.caps.includes(need)) score += 3;
+        if(m.strengths.includes(need)) score += 2;
+      }
+      // Priority modifiers
+      if(constraints.priority==='cost')    score += (1/(m.priceIn+m.priceOut))*0.5;
+      if(constraints.priority==='speed')   score += (3-m.speed)*2;
+      if(constraints.priority==='quality') score += m.tier==='flagship'?4:m.tier==='reasoning'?3:0;
+      // Penalize if OSS not wanted and it's OSS
+      if(!allNeeds.has('oss') && m.oss && constraints.deploy!=='oss') score -= 0.5;
+      return {...m, score};
+    })
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,4);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER MODEL CARDS
+// ═══════════════════════════════════════════════════════════
+function renderCards(models, needs){
+  const rankLabels = ['Primary','Fallback','Alternative','Budget pick'];
+  const rankColors = ['rgba(80,144,208,.6)','rgba(60,180,120,.4)','rgba(160,100,220,.4)','rgba(200,160,40,.4)'];
+
+  return models.map((m,i)=>{
+    const capsBadges = m.caps.map(c=>{
+      const d=CAP_DEF[c];
+      return d?`<span class="mc-cap" style="background:${d.bg};color:${d.color};border:1px solid ${d.border}">${d.icon} ${d.label}</span>`:'';
+    }).join('');
+
+    const matchedNeeds = [...needs].filter(n=>m.caps.includes(n)||m.strengths.includes(n));
+    const matchStr = matchedNeeds.length
+      ? `Matches your needs: <strong style="color:#80d0b0">${matchedNeeds.slice(0,4).join(', ')}</strong>`
+      : m.pitch;
+
+    return `
+      <div class="model-card" style="border-color:${m.provColor}28">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,${m.provColor},transparent);border-radius:14px 14px 0 0;opacity:.6;"></div>
+        <div class="mc-rank" style="color:${rankColors[i]};border-color:${rankColors[i]}">${rankLabels[i]||'Option'}</div>
+        <span class="mc-badge" style="background:${m.provColor}22;color:${m.provColor}ee;border-color:${m.provColor}44">${m.badge}</span>
+        <div class="mc-name">${m.name}</div>
+        <div class="mc-provider" style="color:${m.provColor}aa">${m.provider}</div>
+        <div class="mc-why">${matchStr}</div>
+        <div class="mc-caps">${capsBadges}</div>
+        <div class="mc-pricing">
+          <span class="mc-price-item">⬆ <span class="mc-price-val">$${m.priceIn}/M</span> input</span>
+          <span class="mc-price-item">⬇ <span class="mc-price-val">$${m.priceOut}/M</span> output</span>
+          <span class="mc-price-item">📏 <span class="mc-price-val">${m.ctx}K</span> ctx</span>
+          <span class="mc-price-item">⚡ <span class="mc-price-val">${['Fast','Medium','Slow'][m.speed-1]}</span></span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER ARCHITECTURE
+// ═══════════════════════════════════════════════════════════
+function tierToModel(tier, models){
+  const m = {
+    fast:      models.find(m=>m.speed===1) || models[models.length-1],
+    balanced:  models.find(m=>m.tier==='balanced') || models[0],
+    flagship:  models.find(m=>m.tier==='flagship'||m.tier==='reasoning') || models[0],
+    reasoning: models.find(m=>m.tier==='reasoning') || models[0],
+    longctx:   models.find(m=>m.ctx>=500) || models.find(m=>m.ctx>=200) || models[0],
+    vision:    models.find(m=>m.caps.includes('vision')) || models[0],
+    code:      models.find(m=>m.caps.includes('code')) || models[0],
+  };
+  return m[tier] || models[0];
+}
+
+function renderArch(archKey, models){
+  const arch = ARCHS[archKey];
+  document.getElementById('arch-title').textContent = arch.label + (arch.desc ? ' — '+arch.desc : '');
+  const flow = document.getElementById('arch-flow');
+  flow.innerHTML = arch.tasks.map((t,i)=>{
+    const m = tierToModel(t.tier, models);
+    return `
+      ${i>0?'<div class="arch-arrow">↓</div>':''}
+      <div class="arch-task">
+        <div class="at-num">${i+1}</div>
+        <div class="at-body">
+          <div class="at-name">${t.name}</div>
+          <span class="at-model" style="color:${m.provColor};border-color:${m.provColor}44;background:${m.provColor}15">${m.name}</span>
+          <div class="at-why">${t.why}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COST ESTIMATOR
+// ═══════════════════════════════════════════════════════════
+const VOL_STEPS  = [100,500,1000,5000,10000,50000,100000];
+const TOK_PRESETS= [
+  {in:200,  out:100,  label:'~200 in / 100 out'},
+  {in:500,  out:300,  label:'~500 in / 300 out'},
+  {in:1000, out:600,  label:'~1K in / 600 out'},
+  {in:2000, out:1000, label:'~2K in / 1K out'},
+  {in:5000, out:2000, label:'~5K in / 2K out'},
+];
+
+function updateCost(){
+  if(!_results.length) return;
+  const vol = VOL_STEPS[+document.getElementById('vol-slider').value];
+  const tok = TOK_PRESETS[+document.getElementById('tok-slider').value];
+  document.getElementById('vol-label').textContent = vol.toLocaleString() + ' / day';
+  document.getElementById('tok-label').textContent = tok.label;
+
+  // Weight distribution: 60% primary, 30% fallback, 10% flagship
+  const weights = [0.55, 0.30, 0.10, 0.05];
+  let totalDaily = 0;
+  const breakdown = _results.map((m,i)=>{
+    const w = weights[i]||0.05;
+    const msgs = vol * w;
+    const cost = msgs * (m.priceIn * tok.in/1e6 + m.priceOut * tok.out/1e6);
+    totalDaily += cost;
+    return {name:m.name, share:Math.round(w*100), cost, provColor:m.provColor};
+  });
+
+  const daily = totalDaily;
+  const monthly = daily * 30;
+  const per1k = (daily / vol) * 1000;
+
+  document.getElementById('cost-daily').textContent   = daily<0.01 ? '<$0.01' : '$'+daily.toFixed(2);
+  document.getElementById('cost-monthly').textContent = monthly<1  ? '<$1'    : '$'+monthly.toFixed(monthly<100?1:0);
+  document.getElementById('cost-per1k').textContent   = per1k<0.01 ? '<$0.01' : '$'+per1k.toFixed(3);
+
+  document.getElementById('cost-stack-breakdown').innerHTML = breakdown.map(b=>`
+    <div class="cost-stack-row">
+      <span class="cost-stack-name" style="color:${b.provColor}cc">${b.name}</span>
+      <span class="cost-stack-share">${b.share}% of volume</span>
+      <span class="cost-stack-val">$${b.cost.toFixed(b.cost<0.01?4:2)}/day</span>
+    </div>`).join('');
+
+  document.getElementById('cost-note').textContent =
+    `Estimate based on ${vol.toLocaleString()} msgs/day × ${tok.label} tokens. `+
+    `Mix assumes primary model handles ~${weights[0]*100}% of volume, fallback ~${(weights[1]*100).toFixed(0)}%, rest spread across alternatives. `+
+    `Real costs vary with actual token usage.`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TWEAK TAGS
+// ═══════════════════════════════════════════════════════════
+const TWEAK_OPTIONS = [
+  {key:'vision',   label:'👁 Add Vision'},
+  {key:'audio',    label:'🎙 Add Audio'},
+  {key:'think',    label:'🧠 Better Reasoning'},
+  {key:'fast',     label:'⚡ Prioritize Speed'},
+  {key:'cheap',    label:'💰 Reduce Cost'},
+  {key:'oss',      label:'🔓 Open Source Only'},
+  {key:'multi',    label:'🌐 Multilingual'},
+  {key:'context',  label:'📄 Long Context'},
+  {key:'code',     label:'💻 More Coding'},
+  {key:'agent',    label:'🤖 Agentic'},
+];
+
+function renderTweaks(){
+  document.getElementById('tweak-tags').innerHTML = TWEAK_OPTIONS.map(t=>`
+    <span class="tweak-tag ${_activeTweaks.has(t.key)?'on':''}" data-key="${t.key}">${t.label}</span>
+  `).join('');
+  document.querySelectorAll('.tweak-tag').forEach(tag=>{
+    tag.addEventListener('click',()=>{
+      const k=tag.dataset.key;
+      if(_activeTweaks.has(k)) _activeTweaks.delete(k); else _activeTweaks.add(k);
+      const text=document.getElementById('uc-input').value;
+      runAnalysis(text);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN ANALYZE FUNCTION
+// ═══════════════════════════════════════════════════════════
+function analyze(){
+  const text = document.getElementById('uc-input').value.trim();
+  if(!text){ alert('Please describe your use case first.'); return; }
+  _activeTweaks.clear();
+  runAnalysis(text);
+}
+
+function runAnalysis(text){
+  const needs = detectNeeds(text);
+  const arch  = archType(needs);
+  _results    = scoreModels(needs, _activeTweaks, _constraints);
+
+  if(!_results.length){
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('empty-hint').style.display='block';
+    return;
+  }
+
+  document.getElementById('empty-hint').style.display='none';
+  document.getElementById('model-cards').innerHTML = renderCards(_results, needs);
+  renderArch(arch, _results);
+  renderTweaks();
+  updateCost();
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

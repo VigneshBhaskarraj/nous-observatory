@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Map — AI Displacement Intelligence</title>
+<style>
+:root{--bg:#070d1a;--card:rgba(10,18,40,0.9);--border:rgba(40,80,180,0.2);--text:#c8deff;--muted:#4878a8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg);color:var(--text);font-size:13px;line-height:1.5;overflow-x:hidden;}
+body{background-image:radial-gradient(ellipse at 70% 10%,rgba(40,20,100,.2) 0%,transparent 50%),
+  radial-gradient(ellipse at 20% 80%,rgba(20,60,140,.15) 0%,transparent 50%);}
+
+/* HEADER */
+.hdr{background:rgba(5,10,24,.97);border-bottom:1px solid var(--border);padding:9px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;backdrop-filter:blur(14px);
+  box-shadow:0 1px 18px rgba(0,40,160,.18);}
+.hdr-left{display:flex;align-items:center;gap:14px;}
+.hdr-title{font-size:15px;font-weight:800;color:#a8d0ff;}
+.hdr-sub{font-size:11px;color:var(--muted);}
+.hdr-links{display:flex;gap:14px;}
+.hdr-link{font-size:11px;color:var(--muted);text-decoration:none;opacity:.7;transition:opacity .2s;}
+.hdr-link:hover{opacity:1;color:#a8d0ff;}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 47px);}
+.sidebar{width:300px;flex-shrink:0;border-right:1px solid var(--border);
+  overflow-y:auto;display:flex;flex-direction:column;background:rgba(5,10,24,.6);}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(40,80,180,.3);border-radius:3px;}
+.main{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+
+/* SIDEBAR SECTIONS */
+.sb-section{padding:16px 16px 8px;border-bottom:1px solid var(--border);}
+.sb-title{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);
+  font-weight:700;margin-bottom:10px;}
+.sb-loading{font-size:11px;color:var(--muted);padding:12px 0;}
+
+/* ENTITY STATS */
+.ent-row{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;
+  border-radius:6px;padding:5px 8px;margin:0 -8px;transition:background .15s;}
+.ent-row:hover{background:rgba(40,80,180,.15);}
+.ent-row.active{background:rgba(40,80,180,.22);border:1px solid rgba(60,120,220,.3);}
+.ent-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.ent-name{flex:1;font-size:12px;font-weight:500;color:#c0d8f8;}
+.ent-score{font-size:10px;color:var(--muted);text-align:right;}
+.ent-bar-wrap{width:60px;height:4px;background:rgba(40,80,180,.2);border-radius:2px;flex-shrink:0;}
+.ent-bar{height:4px;border-radius:2px;transition:width .3s;}
+
+/* LEGEND */
+.legend-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px;color:var(--muted);}
+.legend-circle{border-radius:50%;flex-shrink:0;}
+
+/* DETAIL PANEL */
+.detail{padding:14px 16px;border-top:1px solid var(--border);background:rgba(5,10,26,.8);
+  flex-shrink:0;max-height:45%;overflow-y:auto;}
+.detail.hidden{display:none;}
+.detail::-webkit-scrollbar{width:3px;}
+.detail::-webkit-scrollbar-thumb{background:rgba(40,80,180,.3);border-radius:3px;}
+.d-title{font-size:13px;font-weight:700;color:#c8e0ff;margin-bottom:4px;}
+.d-sub{font-size:10px;color:var(--muted);margin-bottom:10px;}
+.d-events{display:flex;flex-direction:column;gap:5px;}
+.d-evt{background:rgba(10,20,48,.6);border:1px solid rgba(40,80,180,.2);border-radius:7px;
+  padding:7px 10px;border-left:2px solid;}
+.d-evt-date{font-size:9px;color:var(--muted);margin-bottom:2px;}
+.d-evt-text{font-size:11px;color:#a8c8f0;line-height:1.5;}
+.d-evt-score{font-size:9px;color:#6ee7b7;margin-top:3px;}
+
+/* MAIN CANVAS AREA */
+#map-canvas{width:100%;height:100%;display:block;}
+.canvas-overlay{position:absolute;inset:0;pointer-events:none;}
+
+/* TOP BAR */
+.top-bar{padding:10px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0;
+  border-bottom:1px solid var(--border);background:rgba(5,10,24,.5);}
+.top-bar-title{font-size:13px;font-weight:700;color:#a0c4f0;}
+.top-bar-desc{font-size:11px;color:var(--muted);}
+.view-btns{display:flex;gap:6px;margin-left:auto;}
+.vbtn{font-size:11px;padding:4px 12px;border-radius:16px;border:1px solid rgba(40,80,180,.3);
+  background:rgba(10,20,50,.4);color:var(--muted);cursor:pointer;transition:all .15s;}
+.vbtn.on{background:rgba(60,100,220,.25);border-color:#5090d0;color:#a8d0ff;}
+.vbtn:hover:not(.on){border-color:#4878a8;color:#80b0e0;}
+
+/* TOOLTIP */
+.tt{position:fixed;background:rgba(5,10,28,.97);border:1px solid rgba(40,80,200,.4);
+  border-radius:8px;padding:8px 12px;font-size:11px;pointer-events:none;
+  z-index:300;opacity:0;transition:opacity .15s;backdrop-filter:blur(12px);
+  max-width:240px;box-shadow:0 4px 20px rgba(0,40,180,.3);color:#c8deff;}
+.tt.show{opacity:1;}
+.tt-title{font-weight:700;margin-bottom:3px;color:#a8d0ff;}
+.tt-body{color:#6898c8;line-height:1.5;}
+
+/* HEAT VIEW */
+.heat-wrap{padding:20px;overflow:auto;flex:1;}
+.heat-table{border-collapse:collapse;font-size:10px;}
+.heat-th{padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;}
+.heat-th.row{text-align:left;position:sticky;left:0;background:var(--bg);z-index:5;}
+.heat-td{width:56px;height:44px;text-align:center;border:1px solid rgba(40,80,180,.1);
+  position:relative;cursor:pointer;transition:border-color .15s;}
+.heat-td:hover{border-color:rgba(80,140,240,.5);}
+.heat-td-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;}
+.heat-count{font-size:11px;font-weight:700;}
+.heat-score{font-size:8px;opacity:.7;}
+.heat-row-hdr{padding:6px 8px;font-size:10px;color:#a0c4e8;font-weight:600;
+  text-align:left;white-space:nowrap;position:sticky;left:0;
+  background:rgba(5,10,24,.95);border-right:1px solid var(--border);}
+
+/* STATS CHIPS */
+.stats-row{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);}
+.stat-chip{background:rgba(10,20,50,.6);border:1px solid rgba(40,80,180,.2);border-radius:8px;
+  padding:6px 12px;text-align:center;}
+.stat-chip-val{font-size:16px;font-weight:800;color:#60b0f0;}
+.stat-chip-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div>
+      <div class="hdr-title">🔥 Power Map — AI Displacement Intelligence</div>
+      <div class="hdr-sub">Who is threatening whom · Based on our semantic milestone analysis · Unique to Nous Observatory</div>
+    </div>
+  </div>
+  <div class="hdr-links">
+    <a href="index.html" class="hdr-link">← Observatory</a>
+    <a href="model-advisor.html" class="hdr-link">🤖 Advisor</a>
+    <a href="model-tree.html" class="hdr-link">⬡ Tree</a>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-title">⚔ Most Aggressive</div>
+      <div id="sb-aggressor"><div class="sb-loading">Loading…</div></div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-title">🎯 Most Threatened</div>
+      <div id="sb-threatened"><div class="sb-loading">Loading…</div></div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-title">Legend</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.8;">
+        <div class="legend-row"><div class="legend-circle" style="width:14px;height:14px;background:#ef4444;opacity:.8;"></div>High displacement (score 4-5)</div>
+        <div class="legend-row"><div class="legend-circle" style="width:14px;height:14px;background:#f59e0b;opacity:.8;"></div>Medium (score 2-3)</div>
+        <div class="legend-row"><div class="legend-circle" style="width:14px;height:14px;background:#3b82f6;opacity:.8;"></div>Low (score 1)</div>
+        <div style="margin-top:6px;">Each cell: <strong style="color:#80b0e0">aggressor → target</strong>.<br>Number = displacement events. Click any cell for details.</div>
+      </div>
+    </div>
+    <!-- Detail panel in sidebar -->
+    <div class="detail hidden" id="detail-panel">
+      <div class="d-title" id="d-title">—</div>
+      <div class="d-sub"  id="d-sub">—</div>
+      <div class="d-events" id="d-events"></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-area">
+
+    <div class="top-bar">
+      <div>
+        <div class="top-bar-title">Displacement Heatmap</div>
+        <div class="top-bar-desc">Row = aggressor (whose milestone displaced others) · Column = target (who got displaced)</div>
+      </div>
+      <div class="view-btns">
+        <button class="vbtn on" onclick="setView('heat')">⬛ Heatmap</button>
+        <button class="vbtn" onclick="setView('network')">🕸 Network</button>
+      </div>
+    </div>
+
+    <div class="stats-row" id="stats-row"></div>
+
+    <!-- HEAT VIEW -->
+    <div id="heat-view" class="heat-wrap">
+      <div style="color:var(--muted);font-size:12px;padding:40px;text-align:center;" id="heat-loading">
+        <div style="font-size:24px;margin-bottom:12px;opacity:.5;">🔥</div>
+        Loading displacement intelligence from Supabase…
+      </div>
+    </div>
+
+    <!-- NETWORK VIEW -->
+    <div id="network-view" style="display:none;flex:1;position:relative;">
+      <canvas id="net-canvas"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<div class="tt" id="tooltip"><div class="tt-title" id="tt-title"></div><div class="tt-body" id="tt-body"></div></div>
+
+<script>
+const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
+const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
+const SBH = { apikey:KEY, Authorization:'Bearer '+KEY };
+
+async function sbGet(table, qs){
+  const r = await fetch(`${SB}/rest/v1/${table}?${qs}`,{headers:SBH});
+  if(!r.ok) return [];
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ENTITY COLORS
+// ═══════════════════════════════════════════════════════════
+const ENT_COLORS = {
+  'Anthropic':      '#c0622f',
+  'OpenAI':         '#1d8a52',
+  'Google DeepMind':'#3a85c8',
+  'Alibaba AI':     '#e07830',
+  'Moonshot AI':    '#7c3aed',
+  'DeepSeek':       '#1e7a8a',
+  'Meta AI':        '#0064e0',
+  'Microsoft':      '#00adef',
+  'Amazon':         '#ff9900',
+  'Apple':          '#555555',
+  'NVIDIA':         '#76b900',
+  'Qualcomm':       '#3253dc',
+  'Mistral AI':     '#ff6b35',
+  'xAI':            '#e50914',
+  'Cohere':         '#39c5bb',
+  'Stability AI':   '#7e22ce',
+  'Hugging Face':   '#ffd21e',
+  'Scale AI':       '#6366f1',
+};
+function entColor(name){ return ENT_COLORS[name]||'#5090d0'; }
+
+// ═══════════════════════════════════════════════════════════
+//  DATA LOADING
+// ═══════════════════════════════════════════════════════════
+let _entities = [];
+let _matrix   = {};  // matrix[source][target] = {count, score, events[]}
+let _curView  = 'heat';
+
+async function load(){
+  try {
+    // 1. Fetch entities
+    const ents = await sbGet('entities','select=id,name,type&order=name');
+    _entities = ents.filter(e=>e.type==='company');
+    const entMap = {};
+    _entities.forEach(e=>entMap[e.id]=e.name);
+
+    // 2. Fetch milestones with displacement_entities (non-null/non-empty)
+    const miles = await sbGet('milestones',
+      'select=entity_id,date,event,forward_implication_score,displacement_entities'+
+      '&displacement_entities=not.is.null&order=date.desc&limit=1000');
+
+    // 3. Build matrix
+    _matrix={};
+    let totalDisplacement = 0;
+    for(const m of miles){
+      const srcName = entMap[m.entity_id];
+      if(!srcName) continue;
+      const displaced = m.displacement_entities;
+      if(!Array.isArray(displaced) || !displaced.length) continue;
+      for(const tgt of displaced){
+        if(!_matrix[srcName]) _matrix[srcName]={};
+        if(!_matrix[srcName][tgt]) _matrix[srcName][tgt]={count:0,score:0,events:[]};
+        _matrix[srcName][tgt].count++;
+        _matrix[srcName][tgt].score += m.forward_implication_score||1;
+        _matrix[srcName][tgt].events.push({
+          date: m.date?.slice(0,7)||'',
+          event: m.event||'',
+          score: m.forward_implication_score
+        });
+        totalDisplacement++;
+      }
+    }
+
+    // 4. Render stats
+    renderStats(totalDisplacement, miles.length);
+
+    // 5. Build rankings
+    const aggressorMap = {}; // source → total count
+    const threatenedMap= {}; // target → total count
+    for(const [src, targets] of Object.entries(_matrix)){
+      aggressorMap[src] = Object.values(targets).reduce((s,v)=>s+v.count,0);
+      for(const [tgt, v] of Object.entries(targets)){
+        threatenedMap[tgt] = (threatenedMap[tgt]||0) + v.count;
+      }
+    }
+
+    renderSidebar('sb-aggressor', aggressorMap, '⚔', true);
+    renderSidebar('sb-threatened', threatenedMap, '🎯', false);
+
+    // 6. Render heatmap
+    document.getElementById('heat-loading').style.display='none';
+    renderHeat();
+
+    // 7. Init network
+    initNetwork();
+
+  } catch(e){
+    document.getElementById('heat-loading').innerHTML=
+      `<div style="color:#ef4444">Error loading data: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STATS BAR
+// ═══════════════════════════════════════════════════════════
+function renderStats(totalDisp, totalMiles){
+  const totalEntities = Object.keys(_matrix).length;
+  const maxDisplace = Math.max(...Object.values(
+    Object.fromEntries(Object.entries(_matrix).map(([src,tgts])=>[src,Object.values(tgts).reduce((s,v)=>s+v.count,0)]))
+  )||[0]);
+  const mostAggressive = Object.entries(
+    Object.fromEntries(Object.entries(_matrix).map(([src,tgts])=>[src,Object.values(tgts).reduce((s,v)=>s+v.count,0)]))
+  ).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+
+  document.getElementById('stats-row').innerHTML = [
+    {val:totalDisp, lbl:'Displacement Events'},
+    {val:totalMiles, lbl:'Milestones Analyzed'},
+    {val:totalEntities, lbl:'Active Aggressors'},
+    {val:mostAggressive, lbl:'Most Aggressive Lab'},
+  ].map(s=>`<div class="stat-chip">
+    <div class="stat-chip-val">${s.val}</div>
+    <div class="stat-chip-lbl">${s.lbl}</div>
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SIDEBAR RANKINGS
+// ═══════════════════════════════════════════════════════════
+function renderSidebar(elId, dataMap, icon, isAggressor){
+  const sorted = Object.entries(dataMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxVal = sorted[0]?.[1]||1;
+  document.getElementById(elId).innerHTML = sorted.map(([name,count])=>`
+    <div class="ent-row" onclick="focusEntity('${name.replace(/'/g,"\\'")}',${isAggressor})">
+      <div class="ent-dot" style="background:${entColor(name)}"></div>
+      <div class="ent-name">${name}</div>
+      <div class="ent-bar-wrap">
+        <div class="ent-bar" style="width:${Math.round(count/maxVal*100)}%;background:${entColor(name)}88"></div>
+      </div>
+      <div class="ent-score">${count}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HEATMAP
+// ═══════════════════════════════════════════════════════════
+function renderHeat(){
+  // Collect all sources and all targets that appear
+  const sources = Object.keys(_matrix).sort();
+  const targetsSet = new Set();
+  for(const tgts of Object.values(_matrix)) Object.keys(tgts).forEach(t=>targetsSet.add(t));
+  const targets = [...targetsSet].sort();
+
+  // Max count for color scaling
+  let maxCount = 0;
+  for(const src of sources) for(const tgt of targets){
+    const v = _matrix[src]?.[tgt];
+    if(v) maxCount = Math.max(maxCount, v.count);
+  }
+
+  let html = `<table class="heat-table"><thead><tr>
+    <th class="heat-th row">Aggressor → Target</th>
+    ${targets.map(t=>`<th class="heat-th" style="color:${entColor(t)}88;font-size:9px;writing-mode:vertical-rl;padding:8px 4px;min-width:44px">${t}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  for(const src of sources){
+    const rowTotal = Object.values(_matrix[src]||{}).reduce((s,v)=>s+v.count,0);
+    html += `<tr>
+      <td class="heat-row-hdr" style="border-left:2px solid ${entColor(src)}">
+        <span style="color:${entColor(src)}">${src}</span>
+        <span style="color:var(--muted);font-size:9px;margin-left:4px">${rowTotal} total</span>
+      </td>`;
+    for(const tgt of targets){
+      if(src===tgt){ html+=`<td class="heat-td" style="background:rgba(5,10,26,.8)"><div style="width:100%;height:100%;background:repeating-linear-gradient(45deg,rgba(40,80,180,.05),rgba(40,80,180,.05) 2px,transparent 2px,transparent 6px)"></div></td>`; continue; }
+      const v = _matrix[src]?.[tgt];
+      if(!v){ html+=`<td class="heat-td"><div class="heat-td-inner"><span style="color:rgba(40,80,180,.15)">·</span></div></td>`; continue; }
+
+      const intensity = Math.min(v.count/Math.max(maxCount,1),1);
+      const alpha = 0.12 + intensity*0.65;
+      const avgScore = v.score/v.count;
+      const baseColor = avgScore>=4?'239,68,68': avgScore>=2?'245,158,11':'59,130,246';
+      const bg = `rgba(${baseColor},${alpha})`;
+
+      html+=`<td class="heat-td" style="background:${bg}"
+        onclick="showDetail('${src.replace(/'/g,"\\'")}','${tgt.replace(/'/g,"\\'")}')">
+        <div class="heat-td-inner">
+          <div class="heat-count" style="color:rgba(${baseColor},1)">${v.count}</div>
+          <div class="heat-score">∅${avgScore.toFixed(1)}</div>
+        </div>
+      </td>`;
+    }
+    html+='</tr>';
+  }
+  html+='</tbody></table>';
+  document.getElementById('heat-view').innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CELL DETAIL
+// ═══════════════════════════════════════════════════════════
+function showDetail(src, tgt){
+  const v = _matrix[src]?.[tgt];
+  if(!v) return;
+  const panel = document.getElementById('detail-panel');
+  const avgScore = (v.score/v.count).toFixed(1);
+  document.getElementById('d-title').innerHTML =
+    `<span style="color:${entColor(src)}">${src}</span> → <span style="color:${entColor(tgt)}">${tgt}</span>`;
+  document.getElementById('d-sub').textContent =
+    `${v.count} displacement event${v.count>1?'s':''} · Avg impact score ${avgScore}/5`;
+  document.getElementById('d-events').innerHTML = v.events
+    .sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,6)
+    .map(e=>`<div class="d-evt" style="border-left-color:${e.score>=4?'#ef4444':e.score>=2?'#f59e0b':'#3b82f6'}">
+      <div class="d-evt-date">${e.date}</div>
+      <div class="d-evt-text">${e.event}</div>
+      ${e.score?`<div class="d-evt-score">Impact ${e.score}/5 ${'◆'.repeat(e.score||0)}${'◇'.repeat(5-(e.score||0))}</div>`:''}
+    </div>`).join('');
+  panel.classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ENTITY FOCUS
+// ═══════════════════════════════════════════════════════════
+function focusEntity(name, isAggressor){
+  if(isAggressor){
+    // Show all targets this entity displaced
+    const targets = _matrix[name];
+    if(!targets) return;
+    const top = Object.entries(targets).sort((a,b)=>b[1].count-a[1].count)[0];
+    if(top) showDetail(name, top[0]);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  NETWORK VIEW (force-directed canvas)
+// ═══════════════════════════════════════════════════════════
+let _netNodes = [], _netEdges = [], _animId = null;
+
+function initNetwork(){
+  const canvas = document.getElementById('net-canvas');
+  const container = document.getElementById('network-view');
+
+  function resize(){
+    canvas.width  = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Build nodes
+  const allNames = new Set([
+    ...Object.keys(_matrix),
+    ...Object.values(_matrix).flatMap(tgts=>Object.keys(tgts))
+  ]);
+
+  const aggressorTotals = {};
+  const threatenedTotals = {};
+  for(const [src,tgts] of Object.entries(_matrix)){
+    aggressorTotals[src] = Object.values(tgts).reduce((s,v)=>s+v.count,0);
+    for(const [tgt,v] of Object.entries(tgts)){
+      threatenedTotals[tgt]=(threatenedTotals[tgt]||0)+v.count;
+    }
+  }
+
+  const maxAgg = Math.max(...Object.values(aggressorTotals),1);
+  const maxThr = Math.max(...Object.values(threatenedTotals),1);
+
+  _netNodes = [...allNames].map((name,i)=>{
+    const angle = (i/allNames.size)*Math.PI*2;
+    const r = Math.min(canvas.width,canvas.height)*0.3;
+    return {
+      name, id:i,
+      x: canvas.width/2 + Math.cos(angle)*r,
+      y: canvas.height/2 + Math.sin(angle)*r,
+      vx:0, vy:0,
+      radius: 12 + (aggressorTotals[name]||0)/maxAgg*18,
+      agg: aggressorTotals[name]||0,
+      thr: threatenedTotals[name]||0,
+      color: entColor(name),
+    };
+  });
+
+  // Build edges (aggregate per pair)
+  const edgeMap = {};
+  for(const [src,tgts] of Object.entries(_matrix)){
+    for(const [tgt,v] of Object.entries(tgts)){
+      const key=`${src}→${tgt}`;
+      edgeMap[key]={src,tgt,count:v.count,score:v.score,events:v.events};
+    }
+  }
+  _netEdges = Object.values(edgeMap);
+
+  const nodeMap = {};
+  _netNodes.forEach(n=>nodeMap[n.name]=n);
+
+  // Force simulation
+  function tick(){
+    const W=canvas.width, H=canvas.height;
+    const K=0.02, REPEL=1800, DAMP=0.88;
+
+    // Attraction toward center
+    _netNodes.forEach(n=>{
+      n.vx += (W/2-n.x)*0.003;
+      n.vy += (H/2-n.y)*0.003;
+    });
+
+    // Node repulsion
+    for(let i=0;i<_netNodes.length;i++){
+      for(let j=i+1;j<_netNodes.length;j++){
+        const a=_netNodes[i],b=_netNodes[j];
+        const dx=b.x-a.x, dy=b.y-a.y;
+        const dist=Math.max(Math.sqrt(dx*dx+dy*dy),1);
+        const force=REPEL/(dist*dist);
+        const fx=dx/dist*force, fy=dy/dist*force;
+        a.vx-=fx; a.vy-=fy;
+        b.vx+=fx; b.vy+=fy;
+      }
+    }
+
+    // Edge attraction
+    _netEdges.forEach(e=>{
+      const a=nodeMap[e.src], b=nodeMap[e.tgt];
+      if(!a||!b) return;
+      const dx=b.x-a.x, dy=b.y-a.y;
+      const dist=Math.max(Math.sqrt(dx*dx+dy*dy),1);
+      const targetDist=120+e.count*8;
+      const force=(dist-targetDist)*K;
+      const fx=dx/dist*force, fy=dy/dist*force;
+      a.vx+=fx; a.vy+=fy;
+      b.vx-=fx; b.vy-=fy;
+    });
+
+    _netNodes.forEach(n=>{
+      n.vx*=DAMP; n.vy*=DAMP;
+      n.x+=n.vx; n.y+=n.vy;
+      n.x=Math.max(n.radius+20,Math.min(W-n.radius-20,n.x));
+      n.y=Math.max(n.radius+20,Math.min(H-n.radius-20,n.y));
+    });
+  }
+
+  function draw(){
+    const ctx=canvas.getContext('2d');
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    // Background
+    ctx.fillStyle='rgba(7,13,26,.95)';
+    ctx.fillRect(0,0,W,H);
+
+    // Edges
+    const maxEdge=Math.max(..._netEdges.map(e=>e.count),1);
+    _netEdges.forEach(e=>{
+      const a=nodeMap[e.src], b=nodeMap[e.tgt];
+      if(!a||!b) return;
+      const alpha=0.08+e.count/maxEdge*0.35;
+      const avgScore=e.score/e.count;
+      const color=avgScore>=4?`rgba(239,68,68,${alpha})`:avgScore>=2?`rgba(245,158,11,${alpha})`:`rgba(59,130,246,${alpha})`;
+
+      ctx.save();
+      ctx.strokeStyle=color;
+      ctx.lineWidth=0.5+e.count/maxEdge*2.5;
+
+      // Curved edge
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      const dx=b.y-a.y, dy=-(b.x-a.x); // perpendicular
+      const len=Math.sqrt(dx*dx+dy*dy)||1;
+      const cpx=mx+dx/len*30, cpy=my+dy/len*30;
+
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y);
+      ctx.quadraticCurveTo(cpx,cpy,b.x,b.y);
+      ctx.stroke();
+
+      // Arrowhead
+      const t=0.85;
+      const ex=cpx+(b.x-cpx)*t*2-cpx+(cpx-a.x)*(1-t)*0.5;
+      // Simple end marker
+      const angle=Math.atan2(b.y-cpy,b.x-cpx);
+      ctx.fillStyle=color;
+      ctx.beginPath();
+      ctx.moveTo(b.x-Math.cos(angle)*14,b.y-Math.sin(angle)*14);
+      ctx.lineTo(b.x-Math.cos(angle-0.4)*10,b.y-Math.sin(angle-0.4)*10);
+      ctx.lineTo(b.x-Math.cos(angle+0.4)*10,b.y-Math.sin(angle+0.4)*10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Nodes
+    _netNodes.forEach(n=>{
+      const c=n.color;
+
+      // Glow
+      const grad=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.radius*2.5);
+      grad.addColorStop(0,c+'55');
+      grad.addColorStop(1,'transparent');
+      ctx.fillStyle=grad;
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.radius*2.5,0,Math.PI*2); ctx.fill();
+
+      // Body
+      ctx.fillStyle='rgba(5,10,26,.9)';
+      ctx.strokeStyle=c+'bb';
+      ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.radius,0,Math.PI*2);
+      ctx.fill(); ctx.stroke();
+
+      // Inner ring
+      ctx.strokeStyle=c+'44';
+      ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(n.x,n.y,n.radius-4,0,Math.PI*2); ctx.stroke();
+
+      // Center dot
+      ctx.fillStyle=c+'cc';
+      ctx.beginPath(); ctx.arc(n.x,n.y,2.5,0,Math.PI*2); ctx.fill();
+
+      // Label
+      ctx.fillStyle='rgba(200,224,255,.85)';
+      ctx.font=`bold ${Math.max(8,9)}px -apple-system,sans-serif`;
+      ctx.textAlign='center';
+      ctx.fillText(n.name.split(' ')[0], n.x, n.y+n.radius+13);
+
+      // Aggression indicator (red top arc)
+      if(n.agg>0){
+        const pct=n.agg/Math.max(..._netNodes.map(x=>x.agg),1);
+        ctx.strokeStyle=`rgba(239,68,68,${0.4+pct*0.5})`;
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(n.x,n.y,n.radius+3,-Math.PI/2-Math.PI*pct,-Math.PI/2+Math.PI*pct);
+        ctx.stroke();
+      }
+    });
+  }
+
+  function loop(){
+    tick(); draw();
+    _animId=requestAnimationFrame(loop);
+  }
+  if(_animId) cancelAnimationFrame(_animId);
+  loop();
+
+  // Hover tooltip
+  canvas.addEventListener('mousemove', e=>{
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    const tt=document.getElementById('tooltip');
+    let hit=null;
+    for(const n of _netNodes){
+      const dx=mx-n.x, dy=my-n.y;
+      if(Math.sqrt(dx*dx+dy*dy)<=n.radius+4){ hit=n; break; }
+    }
+    if(hit){
+      document.getElementById('tt-title').textContent=hit.name;
+      document.getElementById('tt-body').innerHTML=
+        `<strong style="color:#ef9999">Displaced others:</strong> ${hit.agg} events<br>`+
+        `<strong style="color:#99c4ef">Was displaced:</strong> ${hit.thr} times`;
+      tt.style.left=(e.clientX+15)+'px';
+      tt.style.top=(e.clientY-8)+'px';
+      tt.classList.add('show');
+    } else {
+      tt.classList.remove('show');
+    }
+  });
+  canvas.addEventListener('mouseleave',()=>document.getElementById('tooltip').classList.remove('show'));
+  canvas.addEventListener('click', e=>{
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    for(const n of _netNodes){
+      const dx=mx-n.x, dy=my-n.y;
+      if(Math.sqrt(dx*dx+dy*dy)<=n.radius+4){
+        focusEntity(n.name, true); break;
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  VIEW TOGGLE
+// ═══════════════════════════════════════════════════════════
+function setView(v){
+  _curView=v;
+  document.querySelectorAll('.vbtn').forEach(b=>b.classList.remove('on'));
+  event.target.classList.add('on');
+  document.getElementById('heat-view').style.display    = v==='heat'    ? 'block' : 'none';
+  document.getElementById('network-view').style.display = v==='network' ? 'flex'  : 'none';
+  if(v==='network'){
+    const c=document.getElementById('net-canvas');
+    const wrap=document.getElementById('network-view');
+    c.width=wrap.offsetWidth; c.height=wrap.offsetHeight;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+load();
+</script>
+</body>
+</html>
