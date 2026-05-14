@@ -55,6 +55,12 @@ body {
 .ptab.oai.on { background:rgba(29,138,82,.1); box-shadow:0 2px 14px rgba(29,138,82,.22); }
 .ptab.goo { border-color:#3a85c8; color:#3a85c8; }
 .ptab.goo.on { background:rgba(58,133,200,.1); box-shadow:0 2px 14px rgba(58,133,200,.22); }
+.ptab.ali { border-color:#e07830; color:#e07830; }
+.ptab.ali.on { background:rgba(224,120,48,.1); box-shadow:0 2px 14px rgba(224,120,48,.22); }
+.ptab.moo { border-color:#7c3aed; color:#7c3aed; }
+.ptab.moo.on { background:rgba(124,58,237,.1); box-shadow:0 2px 14px rgba(124,58,237,.22); }
+.ptab.dsk { border-color:#1e7a8a; color:#1e7a8a; }
+.ptab.dsk.on { background:rgba(30,122,138,.1); box-shadow:0 2px 14px rgba(30,122,138,.22); }
 
 /* ── MAIN STAGE ── */
 .stage { flex:1; position:relative; overflow:hidden; display:flex; flex-direction:column; }
@@ -175,6 +181,9 @@ body {
   <button class="ptab ant on" onclick="setProvider('anthropic',this)">Anthropic</button>
   <button class="ptab oai"    onclick="setProvider('openai',this)">OpenAI</button>
   <button class="ptab goo"    onclick="setProvider('google',this)">Google DeepMind</button>
+  <button class="ptab ali"    onclick="setProvider('alibaba',this)">Alibaba / Qwen</button>
+  <button class="ptab moo"    onclick="setProvider('moonshot',this)">Moonshot / Kimi</button>
+  <button class="ptab dsk"    onclick="setProvider('deepseek',this)">DeepSeek</button>
 </div>
 
 <!-- STAGE -->
@@ -202,7 +211,7 @@ body {
 const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
 const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
 const SBH = { apikey:KEY, Authorization:'Bearer '+KEY };
-const _provNameMap = { anthropic:'Anthropic', openai:'OpenAI', google:'Google DeepMind' };
+const _provNameMap = { anthropic:'Anthropic', openai:'OpenAI', google:'Google DeepMind', alibaba:'Alibaba AI', moonshot:'Moonshot AI', deepseek:'DeepSeek' };
 let _entCache = {};   // name → entity object
 let _mileCache = {};  // entityId → milestones[]
 
@@ -260,6 +269,23 @@ const USECASES = {
   o1:   { chips:[['Chain of thought','uc-reason'],['Science','uc-analysis'],['Math','uc-reason']], when:'First "reasoning model" — deliberately thinks before responding. Use for STEM problems, code debugging, or multi-step logic where GPT-4o makes errors.', skip:'Quick factual queries or creative writing. o1 is slower and more expensive than GPT-4o.' },
   o3:   { chips:[['Best reasoning','uc-reason'],['Research','uc-analysis'],['SWE-bench 71%','uc-code']], when:'OpenAI\'s current reasoning frontier. Complex software engineering, advanced research, and problems that stumped o1. GPQA 87.7%.', skip:'Cost-sensitive tasks. o3 is expensive — use o4-mini for most coding/reasoning needs.' },
   o4mini:{ chips:[['Fast reasoning','uc-reason'],['Coding','uc-code'],['Affordable','uc-speed']], when:'Best price-performance for reasoning tasks. 80%+ of o3 quality at 1/10th the cost. Most enterprise reasoning use cases.', skip:'Creative writing, simple Q&A. The reasoning overhead isn\'t needed.' },
+  // Alibaba / Qwen
+  qwen7b:   { chips:[['Open weights','uc-code'],['Baseline','uc-analysis']], when:'Lightweight self-hosted inference. Qwen-7B fits on consumer GPU; good for private document processing or edge deployments.', skip:'Production-grade tasks — Qwen2.5 or Qwen3 delivers dramatically better quality.' },
+  qwen14b:  { chips:[['Mid-size OSS','uc-code'],['Multilingual','uc-analysis']], when:'Chinese + English bilingual tasks at mid-size scale. Better reasoning than 7B, still fits on one A100.', skip:'Cost-sensitive API tasks — hosted Qwen APIs are often cheaper than self-hosting 14B.' },
+  qwen2_72b:{ chips:[['Strong OSS','uc-reason'],['Multilingual','uc-analysis'],['Function calling','uc-code']], when:'Best open-weights Chinese model at launch. Function calling + long context made it competitive with GPT-4o for structured tasks.', skip:'Qwen2.5 supersedes for most use cases. Only choose if you need proven stability.' },
+  qwen25_72b:{ chips:[['Coding','uc-code'],['Math','uc-reason'],['128K context','uc-analysis']], when:'Major capability jump over Qwen2. Top open-weights model for coding + math. 128K context for long documents.', skip:'If you need MoE efficiency — QwQ-32B or Qwen3-235B are better choices at similar open access.' },
+  qwq32b:   { chips:[['Reasoning','uc-reason'],['Math','uc-reason'],['Chain-of-thought','uc-analysis']], when:'Alibaba\'s o1-equivalent. Strong at competition math, scientific reasoning, and multi-step logic. Surprises at 32B scale.', skip:'Creative writing or fast responses — the extended reasoning overhead is wasteful for simple tasks.' },
+  qwen3_235b:{ chips:[['Flagship','uc-reason'],['Thinking mode','uc-reason'],['MoE','uc-code']], when:'Alibaba\'s frontier: 235B MoE (22B active). Global SOTA on several benchmarks. Thinking mode for hard problems; non-thinking for fast responses.', skip:'If you need a fully open model for fine-tuning — the full MoE weights are large. Use Qwen3-32B instead.' },
+  // Moonshot / Kimi
+  kimiv1:   { chips:[['Long context','uc-analysis'],['Chinese LLM','uc-analysis']], when:'First major long-context Chinese model. Good for reading lengthy PDFs, legal docs, or books in Chinese or English.', skip:'Superseded by Kimi 1.5 and Kimi k1.5. Only choose for backward compatibility.' },
+  kimi1m:   { chips:[['1M context','uc-analysis'],['Long doc','uc-analysis']], when:'When you need to ingest entire repositories, book-length reports, or multi-hour transcripts in one pass. Few models match this context window.', skip:'Short-context tasks — the 1M window adds latency and cost overhead for standard queries.' },
+  kimik15:  { chips:[['Reasoning','uc-reason'],['Multimodal','uc-vision'],['Long thinking','uc-reason']], when:'Moonshot\'s o1-equivalent. Strong math + code reasoning with chain-of-thought. Competitive with o1 on some STEM benchmarks.', skip:'Latency-sensitive tasks — extended reasoning adds significant response time.' },
+  kimi25:   { chips:[['Latest Kimi','uc-reason'],['Vision','uc-vision'],['Agentic','uc-agent']], when:'Moonshot\'s current flagship. Improved reasoning + multimodal understanding. Best Kimi for agentic workflows and coding tasks.', skip:'Simple Q&A or translation — lighter models are more cost-efficient for those.' },
+  // DeepSeek
+  ds1:      { chips:[['Open weights','uc-code'],['MoE','uc-code']], when:'First notable DeepSeek open model. Showed that high-quality LLMs could be trained at fraction of typical cost.', skip:'R1 and V3 are dramatically better. Historical reference point only.' },
+  ds2:      { chips:[['MoE pioneer','uc-code'],['Efficient','uc-speed'],['236B MoE','uc-analysis']], when:'Groundbreaking MoE efficiency at 236B (21B active). Changed the conversation on training cost vs. quality trade-offs.', skip:'V3 surpasses in quality. Use V3 or R1 for production tasks.' },
+  dsv3:     { chips:[['Coding','uc-code'],['Open weights','uc-code'],['Efficient','uc-speed']], when:'Highly capable open-weights model at GPT-4o class performance. Excellent for code generation and instruction following at low cost.', skip:'Deep reasoning tasks — R1 with chain-of-thought outperforms V3 on complex multi-step problems.' },
+  dsr1:     { chips:[['Best open reasoning','uc-reason'],['Math','uc-reason'],['MIT License','uc-code']], when:'Open-weights reasoning model that matched o1 on key STEM benchmarks — a landmark moment for open-source AI. MIT licensed, fully distillable.', skip:'Conversational or creative tasks. R1 thinks in chains; overkill for simple queries.' },
   // Google
   g15pro:{ chips:[['2M context','uc-analysis'],['Video','uc-vision'],['Grounding','uc-code']], when:'Very long documents or video understanding at scale. 2M token context handles entire codebases, hour-long recordings, or huge PDF collections.', skip:'Cost-sensitive tasks or shorter context — Gemini 2.5 Flash offers better price/performance.' },
   g20flash:{ chips:[['Fast','uc-speed'],['Real-time audio','uc-vision'],['Live API','uc-agent']], when:'Real-time streaming applications: voice assistants, live video analysis, interactive agents via the Live API.', skip:'Tasks needing the deepest reasoning — use Gemini 2.5 Pro instead.' },
@@ -349,6 +375,61 @@ const TREES = {
       g25:     ['1M context','Deep Think mode','Reasoning advances'],
       g25pro:  ['1M context','SWE-bench 63.8%','Best Gemini ever','Think mode'],
       g25flash:['1M context','Think mode','Best price/perf','Fast + smart'],
+    }
+  },
+  alibaba:{
+    color:'#e07830', dim:'#8a4010', light:'#f4b87a', glow:'rgba(224,120,48,0.35)',
+    name:'Alibaba AI',
+    nodes:[
+      {id:'root',       x:410,y:510, label:'Alibaba AI',        sub:'Tongyi Lab',     parent:null,     r:13, tier:'root'},
+      {id:'qwen7b',     x:410,y:448, label:'Qwen-7B',           sub:'Aug 2023',       parent:'root',   r:10, tier:'early', api:'qwen-7b'},
+      {id:'qwen14b',    x:410,y:385, label:'Qwen-14B',          sub:'Sep 2023',       parent:'qwen7b', r:10, tier:'early', api:'qwen-14b'},
+      {id:'qwen2_72b',  x:310,y:316, label:'Qwen2-72B',         sub:'Jun 2024',       parent:'qwen14b',r:11, tier:'standard', api:'qwen2-72b-instruct', gpqa:'42.0',heval:'86.0',price:'0.90'},
+      {id:'qwen25_72b', x:340,y:248, label:'Qwen2.5-72B',       sub:'Sep 2024',       parent:'qwen2_72b',r:11,tier:'standard', api:'qwen2.5-72b-instruct', gpqa:'49.5',heval:'86.5',price:'1.20', isLatest:false},
+      {id:'qwq32b',     x:200,y:192, label:'QwQ-32B',           sub:'Mar 2025',       parent:'qwen25_72b',r:12,tier:'reasoning', api:'qwq-32b', gpqa:'65.2',heval:'92.0',price:'0.90', isLatest:true},
+      {id:'qwen3_235b', x:480,y:170, label:'Qwen3-235B',        sub:'Apr 2025 ✦',     parent:'qwen25_72b',r:13,tier:'flagship', api:'qwen3-235b-a22b', gpqa:'70.3',heval:'92.7',price:'0.22', isLatest:true},
+    ],
+    feats:{
+      qwen7b:    ['Open weights','Instruction tuned','Chinese bilingual','Efficient'],
+      qwen14b:   ['Open weights','128K context','Tool use','Bilingual'],
+      qwen2_72b: ['128K context','Function calling','Code','Top open OSS 2024'],
+      qwen25_72b:['128K context','Math specialist','Code agent','Structured output'],
+      qwq32b:    ['131K context','Chain-of-thought','Competition math','o1-class reasoning'],
+      qwen3_235b:['128K context','MoE 22B active','Thinking mode','Global SOTA benchmarks'],
+    }
+  },
+  moonshot:{
+    color:'#7c3aed', dim:'#4a1590', light:'#c4b5fd', glow:'rgba(124,58,237,0.35)',
+    name:'Moonshot AI',
+    nodes:[
+      {id:'root',    x:410,y:510, label:'Moonshot AI',     sub:'Founded 2023',   parent:null,    r:13, tier:'root'},
+      {id:'kimiv1',  x:410,y:442, label:'Kimi v1',         sub:'Oct 2023',       parent:'root',  r:10, tier:'early', api:'kimi-chat'},
+      {id:'kimi1m',  x:280,y:368, label:'Kimi 1M',         sub:'Mar 2024',       parent:'kimiv1',r:11, tier:'standard', api:'kimi-1m-context', gpqa:'—',heval:'—',price:'—'},
+      {id:'kimik15', x:200,y:280, label:'Kimi k1.5',       sub:'Jan 2025',       parent:'kimi1m',r:12, tier:'reasoning', api:'kimi-k1-5', gpqa:'70.0',heval:'94.0',price:'—', isLatest:false},
+      {id:'kimi25',  x:560,y:310, label:'Kimi 2.5',        sub:'May 2025 ✦',     parent:'kimiv1',r:12, tier:'flagship', api:'kimi-k2-5', gpqa:'—',heval:'—',price:'—', isLatest:true},
+    ],
+    feats:{
+      kimiv1:  ['200K context','Chinese/English','Long document','Base model'],
+      kimi1m:  ['1M token context','Full codebase ingestion','Book-length docs','Multi-doc QA'],
+      kimik15: ['128K context','Extended thinking','Math + code','o1-competitive'],
+      kimi25:  ['Vision','Agentic','Best Kimi yet','Reasoning + fast modes'],
+    }
+  },
+  deepseek:{
+    color:'#1e7a8a', dim:'#0a404a', light:'#80d4e0', glow:'rgba(30,122,138,0.35)',
+    name:'DeepSeek',
+    nodes:[
+      {id:'root',   x:410,y:510, label:'DeepSeek',       sub:'Founded 2023',   parent:null,   r:13, tier:'root'},
+      {id:'ds1',    x:410,y:445, label:'DeepSeek v1',    sub:'Nov 2023',       parent:'root', r:10, tier:'early', api:'deepseek-llm-7b'},
+      {id:'ds2',    x:410,y:380, label:'DeepSeek-V2',    sub:'May 2024',       parent:'ds1',  r:11, tier:'standard', api:'deepseek-v2', gpqa:'44.2',heval:'90.2',price:'0.14'},
+      {id:'dsv3',   x:310,y:296, label:'DeepSeek-V3',    sub:'Dec 2024',       parent:'ds2',  r:12, tier:'standard', api:'deepseek-chat', gpqa:'59.1',heval:'91.6',price:'0.27', isLatest:true},
+      {id:'dsr1',   x:550,y:296, label:'DeepSeek-R1',    sub:'Jan 2025 ✦',     parent:'ds2',  r:13, tier:'reasoning', api:'deepseek-reasoner', gpqa:'71.5',heval:'96.3',price:'2.19', isLatest:true},
+    ],
+    feats:{
+      ds1:   ['Open weights','7B / 67B sizes','MoE architecture','Chinese AI disruptor'],
+      ds2:   ['236B MoE 21B active','128K context','Ultra-cheap training','Efficient inference'],
+      dsv3:  ['128K context','GPT-4o class quality','Mixture of Experts','MIT License'],
+      dsr1:  ['128K context','o1-class reasoning','Fully open MIT','Distillable weights'],
     }
   }
 };

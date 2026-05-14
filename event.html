@@ -6,27 +6,27 @@
 <title>Google I/O 2026 — Nous Observatory Intelligence Brief</title>
 <style>
 :root {
-  --bg: #0a0f1e;
-  --card: #111827;
-  --border: #1e2d45;
-  --text: #e2e8f0;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
   --muted: #64748b;
   --accent: #4285f4;
   --accent2: #34a853;
-  --warn: #fbbc04;
-  --red: #ea4335;
+  --warn: #d97706;
+  --red: #dc2626;
   --indigo: #4f46e5;
   --google-blue: #4285f4;
   --google-green: #34a853;
-  --google-yellow: #fbbc04;
-  --google-red: #ea4335;
+  --google-yellow: #d97706;
+  --google-red: #dc2626;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
 
 /* ── HERO ── */
 .hero {
-  background: linear-gradient(135deg, #0a1628 0%, #0d2244 50%, #0a1628 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 50%, #f0f9ff 100%);
   border-bottom: 1px solid var(--border);
   padding: 48px 28px 36px;
   position: relative;
@@ -35,25 +35,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 70% 50%, rgba(66,133,244,.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 70% 50%, rgba(66,133,244,.06) 0%, transparent 60%);
   pointer-events: none;
 }
 .hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--google-blue); margin-bottom: 12px; }
-.hero-title { font-size: 36px; font-weight: 800; line-height: 1.1; max-width: 700px; }
+.hero-title { font-size: 36px; font-weight: 800; line-height: 1.1; max-width: 700px; color: #0f172a; }
 .hero-title span { color: var(--google-blue); }
 .hero-sub { color: var(--muted); font-size: 15px; margin-top: 10px; max-width: 600px; }
 .hero-meta { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
 .hero-stat { }
 .hero-stat-n { font-size: 22px; font-weight: 700; }
 .hero-stat-l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-.status-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(52,168,83,.12); border: 1px solid rgba(52,168,83,.3); color: #34a853; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 20px; }
-.status-badge.live { background: rgba(234,67,53,.12); border-color: rgba(234,67,53,.3); color: #ea4335; }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; border: 1px solid #86efac; color: #166534; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 20px; }
+.status-badge.live { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .status-dot.pulse { animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
 /* ── NAV ── */
-.subnav { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+.subnav { background: #ffffff; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 .snav { padding: 12px 16px; border: none; background: none; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s; }
 .snav:hover { color: var(--text); }
 .snav.on { color: var(--google-blue); border-bottom-color: var(--google-blue); }
@@ -74,44 +74,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
 .card-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-.card-body { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+.card-body { font-size: 13px; color: #475569; line-height: 1.6; }
 
 /* ── MILESTONE FEED ── */
 .milestone { border-left: 3px solid var(--border); padding: 14px 0 14px 18px; margin-bottom: 12px; position: relative; }
 .milestone.demonstrated { border-left-color: #34a853; }
 .milestone.announced    { border-left-color: #4285f4; }
 .milestone.inferred     { border-left-color: #9b59b6; }
-.milestone.new          { border-left-color: #fbbc04; background: rgba(251,188,4,.03); border-radius: 0 8px 8px 0; }
+.milestone.new          { border-left-color: #d97706; background: rgba(217,119,6,.03); border-radius: 0 8px 8px 0; }
 .ms-date  { font-size: 11px; color: var(--muted); font-weight: 600; }
 .ms-event { font-size: 14px; font-weight: 600; margin: 3px 0; color: var(--text); }
-.ms-sig   { font-size: 12px; color: #94a3b8; }
+.ms-sig   { font-size: 12px; color: #475569; }
 .ms-tags  { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
-.tag-d  { background: rgba(52,168,83,.15);  color: #34a853; }
-.tag-a  { background: rgba(66,133,244,.15); color: #4285f4; }
-.tag-i  { background: rgba(155,89,182,.15); color: #9b59b6; }
-.tag-new { background: rgba(251,188,4,.15); color: #fbbc04; }
-.tag-dis { background: rgba(234,67,53,.12); color: #ea4335; }
+.tag-d  { background: #dcfce7; color: #166534; }
+.tag-a  { background: #dbeafe; color: #1d4ed8; }
+.tag-i  { background: #f3e8ff; color: #6b21a8; }
+.tag-new { background: #fef3c7; color: #92400e; }
+.tag-dis { background: #fee2e2; color: #991b1b; }
 
 /* ── BENCHMARK TABLE ── */
 .bench-wrap { overflow-x: auto; }
 .bench { width: 100%; border-collapse: collapse; }
-.bench th { background: #0d1b2e; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.bench td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; vertical-align: middle; }
-.bench tr:hover td { background: rgba(255,255,255,.02); }
+.bench th { background: #f8fafc; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.bench td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.bench tr:hover td { background: #f8fafc; }
 .bench .provider-google  { color: #4285f4; font-weight: 700; }
 .bench .provider-openai  { color: #10a37f; font-weight: 700; }
 .bench .provider-anthropic { color: #cf6679; font-weight: 700; }
 .score-bar-wrap { display: flex; align-items: center; gap: 8px; }
 .score-bar { height: 6px; border-radius: 3px; min-width: 4px; }
 .score-val { font-size: 12px; font-weight: 600; white-space: nowrap; }
-.winner { background: rgba(251,188,4,.08); }
+.winner { background: #fefce8; }
 
 /* ── WATCH CARDS ── */
 .watch-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-.watch-area { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-.watch-context { font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.5; }
-.watch-signal { font-size: 11px; background: rgba(66,133,244,.08); border: 1px solid rgba(66,133,244,.2); color: #93c5fd; padding: 6px 10px; border-radius: 6px; margin-top: 8px; }
+.watch-area { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.watch-context { font-size: 12px; color: #475569; margin-bottom: 12px; line-height: 1.5; }
+.watch-signal { font-size: 11px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; padding: 6px 10px; border-radius: 6px; margin-top: 8px; }
 .conf-bar { height: 4px; border-radius: 2px; background: var(--border); margin-bottom: 8px; }
 .conf-fill { height: 4px; border-radius: 2px; }
 .conf-label { font-size: 10px; color: var(--muted); }
@@ -129,18 +129,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .chip-l { font-size: 11px; color: var(--muted); }
 
 /* ── DISPLACEMENT ── */
-.displacement-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
-.dis-source { font-weight: 700; font-size: 13px; min-width: 220px; }
+.displacement-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.dis-source { font-weight: 700; font-size: 13px; min-width: 220px; color: var(--text); }
 .dis-arrow { color: var(--red); font-size: 16px; }
 .dis-targets { display: flex; gap: 6px; flex-wrap: wrap; }
-.dis-chip { font-size: 11px; background: rgba(234,67,53,.1); border: 1px solid rgba(234,67,53,.25); color: #f87171; padding: 2px 9px; border-radius: 4px; }
+.dis-chip { font-size: 11px; background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 2px 9px; border-radius: 4px; }
 
 /* ── FOOTER ── */
-.footer { border-top: 1px solid var(--border); padding: 24px 28px; text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; }
+.footer { border-top: 1px solid var(--border); padding: 24px 28px; text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; background: #fff; }
 .footer a { color: #4285f4; text-decoration: none; }
 
 /* ── LOADING ── */
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-msg { color: var(--muted); font-size: 13px; padding: 20px 0; }
 </style>
@@ -345,7 +345,7 @@ async function init(){
       <div class="chip"><div class="chip-n" style="color:#4285f4">${gMilestones.length}</div><div class="chip-l">Total milestones</div></div>
       <div class="chip"><div class="chip-n" style="color:#34a853">${demoCount}</div><div class="chip-l">Demonstrated</div></div>
       <div class="chip"><div class="chip-n" style="color:#4285f4">${annCount}</div><div class="chip-l">Announced</div></div>
-      <div class="chip"><div class="chip-n" style="color:#fbbc04">${score5}</div><div class="chip-l">Score-5 signals</div></div>
+      <div class="chip"><div class="chip-n" style="color:#d97706">${score5}</div><div class="chip-l">Score-5 signals</div></div>
     `;
 
     // ── Recent milestones (last 8) ──
@@ -357,8 +357,8 @@ async function init(){
         <div class="ms-sig">${esc(m.significance||'')}</div>
         <div class="ms-tags">
           ${claimTag(m.claim_type)}
-          ${m.forward_implication_score>=4?`<span class="tag" style="background:rgba(251,188,4,.12);color:#fbbc04">Signal ${m.forward_implication_score}/5</span>`:''}
-          ${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:#94a3b8">${esc(m.stack_layer)}</span>`:''}
+          ${m.forward_implication_score>=4?`<span class="tag" style="background:#fef3c7;color:#92400e">Signal ${m.forward_implication_score}/5</span>`:''}
+          ${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}
         </div>
       </div>
     `).join('');
@@ -367,8 +367,8 @@ async function init(){
     const metrics = await get('key_metrics',`entity_id=eq.${gid}&select=metric_name,metric_value,as_of_date&order=as_of_date.desc&limit=20`);
     if(metrics.length){
       document.getElementById('google-metrics').innerHTML = metrics.map(m=>`
-        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-          <span style="color:#94a3b8;font-size:12px">${esc(m.metric_name)}</span>
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+          <span style="color:var(--muted);font-size:12px">${esc(m.metric_name)}</span>
           <span style="font-weight:700;font-size:13px">${esc(m.metric_value)}</span>
         </div>
       `).join('');
@@ -378,7 +378,7 @@ async function init(){
     const allModels = await get('models','select=*&order=release_date&limit=100');
     const gemModels = allModels.filter(m=>m.entity_id===gid);
     document.getElementById('gemini-models').innerHTML = gemModels.map(m=>`
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
         <div>
           <span style="font-weight:700;font-size:13px">${esc(m.display_name)}</span>
           <span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span>
@@ -430,7 +430,7 @@ async function init(){
     document.getElementById('watch-cards').innerHTML = watchItems.map(w=>`
       <div class="watch-card">
         <div class="watch-area">${w.area}</div>
-        <div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?'#4285f4':w.conf>70?'#fbbc04':'#64748b'}"></div></div>
+        <div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?'#4285f4':w.conf>70?'#d97706':'#94a3b8'}"></div></div>
         <div class="conf-label" style="margin-bottom:10px">Confidence: ${w.conf}%</div>
         <div class="watch-context">${esc(w.context)}</div>
         <div class="watch-signal">💡 ${esc(w.signal)}</div>
@@ -465,7 +465,7 @@ async function init(){
     };
 
     const fkeys = ['gpqa_score','math_benchmark_score','humaneval_score','swe_bench_score','context_window','output_price_per_million_tokens'];
-    const colors = { gpqa_score:'#4285f4', math_benchmark_score:'#34a853', humaneval_score:'#fbbc04', swe_bench_score:'#ea4335', context_window:'#9b59b6', output_price_per_million_tokens:'#94a3b8' };
+    const colors = { gpqa_score:'#4285f4', math_benchmark_score:'#34a853', humaneval_score:'#d97706', swe_bench_score:'#dc2626', context_window:'#7c3aed', output_price_per_million_tokens:'#64748b' };
     const maxes  = { gpqa_score:100, math_benchmark_score:100, humaneval_score:100, swe_bench_score:100 };
 
     // Find winner per column
@@ -483,9 +483,9 @@ async function init(){
         ${fkeys.slice(0,4).map(fk=>{
           const v=mfMap[m.id]?.[fByKey[fk]]||'—';
           const isW=winners[fk]===m.id;
-          return `<td>${scoreBar(v, maxes[fk]||100, isW?'#fbbc04':colors[fk])}</td>`;
+          return `<td>${scoreBar(v, maxes[fk]||100, isW?'#d97706':colors[fk])}</td>`;
         }).join('')}
-        <td style="font-size:12px;color:#94a3b8">${mfMap[m.id]?.[fByKey['context_window']]?Number(mfMap[m.id][fByKey['context_window']]).toLocaleString()+' tok':'—'}</td>
+        <td style="font-size:12px;color:var(--muted)">${mfMap[m.id]?.[fByKey['context_window']]?Number(mfMap[m.id][fByKey['context_window']]).toLocaleString()+' tok':'—'}</td>
         <td style="font-size:12px">${mfMap[m.id]?.[fByKey['output_price_per_million_tokens']]?'$'+mfMap[m.id][fByKey['output_price_per_million_tokens']]:'—'}</td>
       </tr>
     `).join('');
@@ -531,9 +531,9 @@ async function init(){
       html+=`<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Others Threatening Google</div>`;
       threateningGoogle.slice(0,8).forEach(m=>{
         html+=`<div class="displacement-row">
-          <div class="dis-source"><div style="font-size:11px;color:#94a3b8">${eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div>
+          <div class="dis-source"><div style="font-size:11px;color:var(--muted)">${eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div>
           <div class="dis-arrow" style="color:#4285f4">←</div>
-          <div class="dis-targets"><div class="dis-chip" style="background:rgba(66,133,244,.1);border-color:rgba(66,133,244,.25);color:#60a5fa">Google DeepMind</div></div>
+          <div class="dis-targets"><div class="dis-chip" style="background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8">Google DeepMind</div></div>
         </div>`;
       });
     }

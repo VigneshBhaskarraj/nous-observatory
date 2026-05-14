@@ -188,6 +188,7 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
   <button class="ntab" onclick="sw(event,'signals')">Signals</button>
   <button class="ntab" onclick="sw(event,'search')">Search</button>
   <button class="ntab" onclick="sw(event,'models')">⚗️ Models</button>
+  <button class="ntab" onclick="sw(event,'intel')">📡 Live Intel</button>
   <button class="ntab" onclick="sw(event,'tree')">🌳 Model Tree</button>
 </nav>
 
@@ -256,6 +257,34 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
     </div>
   </div>
   <div class="res-list" id="results"><div class="empty">Type to search across 299 milestones</div></div>
+</div>
+
+<!-- ── LIVE INTEL ── -->
+<div class="tab" id="t-intel">
+  <div class="loader" id="intel-load"><div class="spin"></div>Loading intelligence feed…</div>
+  <div id="intel-c" style="display:none">
+    <!-- Event selector -->
+    <div style="margin-bottom:24px">
+      <div class="sh" style="margin-bottom:8px">📡 Live Event Intelligence</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Real-time milestones tagged by conference event — select an event to explore what happened, what was announced, and what it means.</div>
+      <div class="cat-pills" id="event-pills"></div>
+    </div>
+
+    <!-- Event overview cards -->
+    <div id="intel-overview" style="margin-bottom:28px"></div>
+
+    <!-- Milestone feed -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="panel-t" style="font-size:14px;font-weight:600;margin-bottom:14px">🗓 Event Milestones</div>
+        <div id="intel-feed"></div>
+      </div>
+      <div>
+        <div class="panel-t" style="font-size:14px;font-weight:600;margin-bottom:14px">💥 Displacement Signals</div>
+        <div id="intel-displace"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ── TREE ── -->
@@ -349,6 +378,22 @@ async function sw(ev, id) {
   if (id === 'tree') {
     const fr = document.getElementById('tree-frame');
     if (!fr.src || fr.src === window.location.href) fr.src = 'model-tree.html';
+  }
+  if (id === 'intel' && !INTEL.loaded) {
+    try {
+      await loadIntel();
+      INTEL.loaded = true;
+      buildEventPills();
+      renderIntel();
+      document.getElementById('intel-load').style.display = 'none';
+      document.getElementById('intel-c').style.display = 'block';
+    } catch(e) {
+      document.getElementById('intel-load').innerHTML =
+        `<div style="color:var(--red);padding:40px;text-align:center">Failed to load intel: ${e.message}</div>`;
+    }
+  } else if (id === 'intel' && INTEL.loaded) {
+    document.getElementById('intel-load').style.display = 'none';
+    document.getElementById('intel-c').style.display = 'block';
   }
   if (id === 'models' && !MF.loaded) {
     try {
@@ -673,6 +718,156 @@ function renderMatrix() {
 
   html += '</tbody></table>';
   document.getElementById('matrix-wrap').innerHTML = html;
+}
+
+// ── Live Intel ────────────────────────────────────────────────────────────
+const EVENTS = [
+  { key:'google-io',   label:'Google I/O',       pattern:'I/O',         color:'#4285f4', icon:'🔵', lastDate:'2026-05' },
+  { key:'nvidia-gtc',  label:'NVIDIA GTC',        pattern:'GTC',         color:'#76b900', icon:'🟢', lastDate:'2025-03' },
+  { key:'openai-dev',  label:'OpenAI Dev Day',    pattern:'Dev Day',     color:'#10a37f', icon:'🤖', lastDate:'2024-11' },
+  { key:'apple-wwdc',  label:'Apple WWDC',        pattern:'WWDC',        color:'#555555', icon:'🍎', lastDate:'2025-06' },
+  { key:'ms-build',    label:'Microsoft Build',   pattern:'Build',       color:'#00adef', icon:'🪟', lastDate:'2025-05' },
+  { key:'meta-connect',label:'Meta Connect',      pattern:'Connect',     color:'#0064e0', icon:'📘', lastDate:'2024-09' },
+];
+let INTEL = { loaded: false, activeEvent: null, milestones: [] };
+
+async function loadIntel() {
+  // Fetch milestones that have a source_event set
+  const r = await fetch(
+    `${SB}/rest/v1/milestones?select=*&source_event=not.is.null&order=date.desc&limit=500`,
+    { headers: HDR }
+  );
+  if (!r.ok) throw new Error('Intel fetch failed: ' + r.status);
+  INTEL.milestones = await r.json();
+}
+
+function buildEventPills() {
+  // Auto-select most recent by lastDate
+  const sorted = [...EVENTS].sort((a,b) => b.lastDate.localeCompare(a.lastDate));
+  INTEL.activeEvent = sorted[0].key;
+
+  document.getElementById('event-pills').innerHTML = EVENTS.map(ev => `
+    <button class="cat-pill${ev.key === INTEL.activeEvent ? ' on' : ''}"
+      onclick="setIntelEvent('${ev.key}')"
+      style="${ev.key === INTEL.activeEvent ? `background:${ev.color};border-color:${ev.color};color:#fff` : ''}">
+      ${ev.icon} ${ev.label}
+    </button>`).join('');
+}
+
+function setIntelEvent(key) {
+  INTEL.activeEvent = key;
+  document.querySelectorAll('#event-pills .cat-pill').forEach(b => {
+    b.classList.remove('on');
+    b.style.background = ''; b.style.borderColor = ''; b.style.color = '';
+  });
+  const ev = EVENTS.find(e => e.key === key);
+  const btn = [...document.querySelectorAll('#event-pills .cat-pill')]
+    .find(b => b.textContent.trim().includes(ev.label));
+  if (btn) {
+    btn.classList.add('on');
+    btn.style.background = ev.color;
+    btn.style.borderColor = ev.color;
+    btn.style.color = '#fff';
+  }
+  renderIntel();
+}
+
+function renderIntel() {
+  const ev = EVENTS.find(e => e.key === INTEL.activeEvent);
+  if (!ev) return;
+
+  // Filter milestones matching this event pattern
+  const ms = INTEL.milestones.filter(m =>
+    m.source_event && m.source_event.toLowerCase().includes(ev.pattern.toLowerCase())
+  );
+
+  // Overview cards
+  const announced = ms.filter(m => m.claim_type === 'announced').length;
+  const demonstrated = ms.filter(m => m.claim_type === 'demonstrated').length;
+  const highSignal = ms.filter(m => (m.forward_implication_score||0) >= 4).length;
+  const displaced = ms.filter(m => m.displacement_entities && m.displacement_entities.length > 0);
+
+  document.getElementById('intel-overview').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px">
+      <div class="stat" style="padding:14px 18px">
+        <div class="stat-n" style="font-size:24px;color:${ev.color}">${ms.length}</div>
+        <div class="stat-l">Total Milestones</div>
+      </div>
+      <div class="stat" style="padding:14px 18px">
+        <div class="stat-n" style="font-size:24px;color:#059669">${demonstrated}</div>
+        <div class="stat-l">Demonstrated</div>
+      </div>
+      <div class="stat" style="padding:14px 18px">
+        <div class="stat-n" style="font-size:24px;color:#3b82f6">${announced}</div>
+        <div class="stat-l">Announced</div>
+      </div>
+      <div class="stat" style="padding:14px 18px">
+        <div class="stat-n" style="font-size:24px;color:#ef4444">${highSignal}</div>
+        <div class="stat-l">High-Signal (4-5)</div>
+      </div>
+    </div>`;
+
+  if (!ms.length) {
+    document.getElementById('intel-feed').innerHTML =
+      `<div class="empty">No milestones tagged with <strong>${ev.label}</strong> yet.<br>
+       <small style="color:var(--muted)">Insert milestones with source_event = '${ev.label}' to populate this view.</small></div>`;
+    document.getElementById('intel-displace').innerHTML = '';
+    return;
+  }
+
+  // Feed
+  const feedHtml = ms.slice(0,20).map(m => {
+    const ent = emap[m.entity_id];
+    const clsMap = { demonstrated:'b-dem', announced:'b-ann', inferred:'b-inf' };
+    const scoreBar = m.forward_implication_score
+      ? `<div style="display:flex;align-items:center;gap:4px;margin-top:4px">
+           ${Array.from({length:5},(_,i)=>`<div style="width:7px;height:7px;border-radius:50%;background:${i<m.forward_implication_score?ev.color:'#e2e8f0'}"></div>`).join('')}
+           <span style="font-size:10px;color:var(--muted)">impact</span>
+         </div>` : '';
+    return `<div class="rc" style="margin-bottom:10px;padding:14px 16px;border-left:3px solid ${ev.color}">
+      <div class="rc-hdr">
+        <span class="rc-ent">${esc(ent?.name||'')}</span>
+        <span class="rc-date">${(m.date||'').slice(0,10)}</span>
+      </div>
+      <div class="rc-evt">${esc(m.event||'')}</div>
+      ${m.significance ? `<div class="rc-sig">${esc(m.significance.slice(0,200))}${m.significance.length>200?'…':''}</div>` : ''}
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center">
+        ${m.claim_type ? `<span class="b ${clsMap[m.claim_type]||'b-inf'}">${esc(m.claim_type)}</span>` : ''}
+        ${m.stack_layer ? `<span class="b b-inf-l">${esc(m.stack_layer)}</span>` : ''}
+      </div>
+      ${scoreBar}
+    </div>`;
+  }).join('');
+  document.getElementById('intel-feed').innerHTML = feedHtml ||
+    `<div class="empty" style="padding:24px">No milestones in this feed.</div>`;
+
+  // Displacement panel
+  if (!displaced.length) {
+    document.getElementById('intel-displace').innerHTML =
+      `<div class="empty" style="padding:24px">No displacement signals tagged for this event.</div>`;
+    return;
+  }
+  const dispMap = {};
+  displaced.forEach(m => {
+    (m.displacement_entities||[]).forEach(target => {
+      if (!dispMap[target]) dispMap[target] = [];
+      dispMap[target].push(m);
+    });
+  });
+  const dispHtml = Object.entries(dispMap)
+    .sort((a,b) => b[1].length - a[1].length)
+    .slice(0,8)
+    .map(([target, msList]) => `
+      <div class="sun-row">
+        <span class="sun-name">⚠ ${esc(target)}</span>
+        <div class="sun-track"><div class="sun-fill" style="width:${Math.min(100, msList.length * 25)}%;background:${ev.color}"></div></div>
+        <span class="sun-ct">${msList.length}</span>
+      </div>`).join('');
+  document.getElementById('intel-displace').innerHTML = `
+    <div class="panel" style="padding:16px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Entities mentioned in displacement_entities across ${ev.label} milestones</div>
+      ${dispHtml}
+    </div>`;
 }
 
 // ── Init / reload ─────────────────────────────────────────────────────────
