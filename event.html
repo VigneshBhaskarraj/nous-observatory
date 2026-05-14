@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google I/O 2026 — Nous Observatory Intelligence Brief</title>
+<style>
+:root {
+  --bg: #0a0f1e;
+  --card: #111827;
+  --border: #1e2d45;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --accent: #4285f4;
+  --accent2: #34a853;
+  --warn: #fbbc04;
+  --red: #ea4335;
+  --indigo: #4f46e5;
+  --google-blue: #4285f4;
+  --google-green: #34a853;
+  --google-yellow: #fbbc04;
+  --google-red: #ea4335;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0a1628 0%, #0d2244 50%, #0a1628 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 28px 36px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 70% 50%, rgba(66,133,244,.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--google-blue); margin-bottom: 12px; }
+.hero-title { font-size: 36px; font-weight: 800; line-height: 1.1; max-width: 700px; }
+.hero-title span { color: var(--google-blue); }
+.hero-sub { color: var(--muted); font-size: 15px; margin-top: 10px; max-width: 600px; }
+.hero-meta { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+.hero-stat { }
+.hero-stat-n { font-size: 22px; font-weight: 700; }
+.hero-stat-l { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(52,168,83,.12); border: 1px solid rgba(52,168,83,.3); color: #34a853; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 20px; }
+.status-badge.live { background: rgba(234,67,53,.12); border-color: rgba(234,67,53,.3); color: #ea4335; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.status-dot.pulse { animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── NAV ── */
+.subnav { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 0; z-index: 100; }
+.snav { padding: 12px 16px; border: none; background: none; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s; }
+.snav:hover { color: var(--text); }
+.snav.on { color: var(--google-blue); border-bottom-color: var(--google-blue); }
+
+/* ── CONTENT ── */
+.content { max-width: 1200px; margin: 0 auto; padding: 32px 28px; }
+.section { margin-bottom: 48px; display: none; }
+.section.on { display: block; }
+
+.sh { font-size: 18px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.sh-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+/* ── CARDS ── */
+.grid2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+@media(max-width:900px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.card-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+.card-body { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+/* ── MILESTONE FEED ── */
+.milestone { border-left: 3px solid var(--border); padding: 14px 0 14px 18px; margin-bottom: 12px; position: relative; }
+.milestone.demonstrated { border-left-color: #34a853; }
+.milestone.announced    { border-left-color: #4285f4; }
+.milestone.inferred     { border-left-color: #9b59b6; }
+.milestone.new          { border-left-color: #fbbc04; background: rgba(251,188,4,.03); border-radius: 0 8px 8px 0; }
+.ms-date  { font-size: 11px; color: var(--muted); font-weight: 600; }
+.ms-event { font-size: 14px; font-weight: 600; margin: 3px 0; color: var(--text); }
+.ms-sig   { font-size: 12px; color: #94a3b8; }
+.ms-tags  { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.tag-d  { background: rgba(52,168,83,.15);  color: #34a853; }
+.tag-a  { background: rgba(66,133,244,.15); color: #4285f4; }
+.tag-i  { background: rgba(155,89,182,.15); color: #9b59b6; }
+.tag-new { background: rgba(251,188,4,.15); color: #fbbc04; }
+.tag-dis { background: rgba(234,67,53,.12); color: #ea4335; }
+
+/* ── BENCHMARK TABLE ── */
+.bench-wrap { overflow-x: auto; }
+.bench { width: 100%; border-collapse: collapse; }
+.bench th { background: #0d1b2e; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.bench td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; vertical-align: middle; }
+.bench tr:hover td { background: rgba(255,255,255,.02); }
+.bench .provider-google  { color: #4285f4; font-weight: 700; }
+.bench .provider-openai  { color: #10a37f; font-weight: 700; }
+.bench .provider-anthropic { color: #cf6679; font-weight: 700; }
+.score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.score-bar { height: 6px; border-radius: 3px; min-width: 4px; }
+.score-val { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.winner { background: rgba(251,188,4,.08); }
+
+/* ── WATCH CARDS ── */
+.watch-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.watch-area { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.watch-context { font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.5; }
+.watch-signal { font-size: 11px; background: rgba(66,133,244,.08); border: 1px solid rgba(66,133,244,.2); color: #93c5fd; padding: 6px 10px; border-radius: 6px; margin-top: 8px; }
+.conf-bar { height: 4px; border-radius: 2px; background: var(--border); margin-bottom: 8px; }
+.conf-fill { height: 4px; border-radius: 2px; }
+.conf-label { font-size: 10px; color: var(--muted); }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 48px 24px; color: var(--muted); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.empty-body { font-size: 13px; max-width: 400px; margin: 0 auto; }
+
+/* ── STAT CHIPS ── */
+.chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.chip { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; }
+.chip-n { font-size: 22px; font-weight: 700; }
+.chip-l { font-size: 11px; color: var(--muted); }
+
+/* ── DISPLACEMENT ── */
+.displacement-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.dis-source { font-weight: 700; font-size: 13px; min-width: 220px; }
+.dis-arrow { color: var(--red); font-size: 16px; }
+.dis-targets { display: flex; gap: 6px; flex-wrap: wrap; }
+.dis-chip { font-size: 11px; background: rgba(234,67,53,.1); border: 1px solid rgba(234,67,53,.25); color: #f87171; padding: 2px 9px; border-radius: 4px; }
+
+/* ── FOOTER ── */
+.footer { border-top: 1px solid var(--border); padding: 24px 28px; text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; }
+.footer a { color: #4285f4; text-decoration: none; }
+
+/* ── LOADING ── */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-msg { color: var(--muted); font-size: 13px; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Nous Observatory · Event Intelligence Brief</div>
+  <div class="hero-title"><span>Google I/O 2026</span> — AI Landscape Intel</div>
+  <div class="hero-sub">Longitudinal context meets live updates. What Google has been building toward, where competitors stand today, and what to watch as announcements drop.</div>
+  <div class="hero-meta">
+    <div class="hero-stat"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Google milestones tracked</div></div>
+    <div class="hero-stat"><div class="hero-stat-n" id="stat-models">4</div><div class="hero-stat-l">Gemini models in matrix</div></div>
+    <div class="hero-stat"><div class="hero-stat-n" id="stat-features">138</div><div class="hero-stat-l">Features tracked per model</div></div>
+    <div class="hero-stat"><div class="hero-stat-n" id="stat-new">—</div><div class="hero-stat-l">New I/O updates live</div></div>
+  </div>
+  <div class="status-badge" id="status-badge">
+    <div class="status-dot"></div>
+    <span id="status-text">Pre-event · Loading context…</span>
+  </div>
+</div>
+
+<!-- SUBNAV -->
+<div class="subnav">
+  <button class="snav on" onclick="showSection('going-in', this)">📊 Going In</button>
+  <button class="snav" onclick="showSection('watch', this)">🔭 What To Watch</button>
+  <button class="snav" onclick="showSection('benchmarks', this)">⚡ Benchmark Snapshot</button>
+  <button class="snav" onclick="showSection('live', this)">🔴 Live Updates <span id="live-count" style="display:none;background:#ea4335;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px"></span></button>
+  <button class="snav" onclick="showSection('impact', this)">🌊 Impact Map</button>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- 1. GOING IN -->
+  <div class="section on" id="going-in">
+    <div class="sh">📊 Going In — Google DeepMind's Trajectory</div>
+    <div class="sh-sub">What the longitudinal record shows about Google's AI arc heading into I/O 2026.</div>
+
+    <div class="chips" id="google-chips">
+      <div class="loading-msg"><span class="spinner"></span>Loading trajectory data…</div>
+    </div>
+
+    <div class="grid2" style="margin-bottom:24px">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Recent Milestones</div>
+        <div id="recent-milestones"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Key Metrics</div>
+        <div id="google-metrics"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px">Gemini Model Line</div>
+        <div id="gemini-models"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. WHAT TO WATCH -->
+  <div class="section" id="watch">
+    <div class="sh">🔭 What To Watch</div>
+    <div class="sh-sub">Predicted focus areas for I/O 2026 — based on Google's trajectory, competitor moves, and market gaps in the longitudinal record.</div>
+    <div class="grid2" id="watch-cards">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- 3. BENCHMARKS -->
+  <div class="section" id="benchmarks">
+    <div class="sh">⚡ Competitive Benchmark Snapshot</div>
+    <div class="sh-sub">Where Gemini models stand today vs. Claude and GPT — live from the feature matrix. This is the baseline Google has to beat or defend at I/O.</div>
+    <div class="bench-wrap">
+      <table class="bench" id="bench-table">
+        <thead>
+          <tr>
+            <th>Model</th><th>Provider</th>
+            <th>GPQA Diamond</th><th>MATH</th><th>HumanEval</th>
+            <th>SWE-bench</th><th>Context Window</th><th>$/M tokens (out)</th>
+          </tr>
+        </thead>
+        <tbody id="bench-body">
+          <tr><td colspan="8" class="loading-msg"><span class="spinner"></span>Loading benchmark data…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. LIVE UPDATES -->
+  <div class="section" id="live">
+    <div class="sh">🔴 Live I/O Updates</div>
+    <div class="sh-sub">New milestones tagged <code>google-io-2026</code> appear here automatically as they're inserted into the observatory. Refresh after the event.</div>
+    <div id="live-updates">
+      <div class="empty">
+        <div class="empty-icon">📡</div>
+        <div class="empty-title">Waiting for I/O to begin</div>
+        <div class="empty-body">When milestones with <code>source_event = 'Google I/O 2026'</code> are inserted into the database, they'll appear here in real time. Check back during and after the keynote.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. IMPACT MAP -->
+  <div class="section" id="impact">
+    <div class="sh">🌊 Impact Map — Who Google Is Threatening</div>
+    <div class="sh-sub">Milestones where Google DeepMind appears in <code>displacement_entities</code> across all tracked companies — the Sunset Map focused on Google's reach.</div>
+    <div id="impact-map"><div class="loading-msg"><span class="spinner"></span>Loading displacement data…</div></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Part of <a href="index.html">Nous Observatory</a> — AI Intelligence Knowledge Graph ·
+  <a href="index.html#models">Full Model Matrix</a> ·
+  Data last updated: <span id="last-updated">loading…</span>
+</div>
+
+<script>
+const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
+const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
+const HDR = { apikey: KEY, Authorization: 'Bearer ' + KEY };
+const GOOGLE_IO_TAG = 'Google I/O 2026';
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+async function get(table, qs=''){
+  const r = await fetch(`${SB}/rest/v1/${table}?${qs}`, { headers: HDR });
+  if(!r.ok) throw new Error(`${table} ${r.status}`);
+  return r.json();
+}
+async function getAllMF(){
+  let rows=[], off=0;
+  while(true){
+    const b=await get('model_features',`select=*&limit=1000&offset=${off}`);
+    rows=rows.concat(b); if(b.length<1000) break; off+=1000;
+  }
+  return rows;
+}
+
+function showSection(id, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.snav').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+function claimTag(ct){
+  if(ct==='demonstrated') return `<span class="tag tag-d">demonstrated</span>`;
+  if(ct==='announced')    return `<span class="tag tag-a">announced</span>`;
+  if(ct==='inferred')     return `<span class="tag tag-i">inferred</span>`;
+  return '';
+}
+function scoreBar(val, max, color){
+  if(!val||val==='N/A') return '<span style="color:#475569">—</span>';
+  const n=parseFloat(val);
+  if(isNaN(n)) return `<span style="font-size:12px">${esc(val)}</span>`;
+  const pct = Math.min(100, (n/max)*100);
+  return `<div class="score-bar-wrap">
+    <div class="score-bar" style="width:${pct}px;max-width:80px;background:${color}"></div>
+    <span class="score-val" style="color:${color}">${n}%</span>
+  </div>`;
+}
+
+async function init(){
+  try {
+    // Get all entities
+    const entities = await get('entities','select=id,name,type,current_valuation,total_funding,trajectory_summary&limit=50');
+    const eMap={};entities.forEach(e=>eMap[e.id]=e);
+    const googleEntity = entities.find(e=>e.name==='Google DeepMind');
+    if(!googleEntity) return;
+    const gid = googleEntity.id;
+
+    // Get all Google milestones
+    let gMilestones=[], off=0;
+    while(true){
+      const b=await get('milestones',`entity_id=eq.${gid}&select=*&order=date.desc&limit=200&offset=${off}`);
+      gMilestones=gMilestones.concat(b); if(b.length<200) break; off+=200;
+    }
+
+    // Check for live I/O updates
+    const liveUpdates = gMilestones.filter(m=>m.source_event&&m.source_event.toLowerCase().includes('i/o'));
+    const allEntities = entities;
+
+    // ── Stat chips ──
+    document.getElementById('stat-milestones').textContent = gMilestones.length;
+    document.getElementById('stat-new').textContent = liveUpdates.length || '0';
+
+    // ── Status badge ──
+    const badge = document.getElementById('status-badge');
+    const statusText = document.getElementById('status-text');
+    if(liveUpdates.length > 0){
+      badge.classList.add('live');
+      statusText.textContent = `${liveUpdates.length} live update${liveUpdates.length>1?'s':''} from I/O`;
+      document.getElementById('live-count').textContent = liveUpdates.length;
+      document.getElementById('live-count').style.display='inline';
+    } else {
+      statusText.textContent = 'Pre-event · Context loaded · Ready for live updates';
+    }
+
+    // ── Going-in chips ──
+    const demoCount = gMilestones.filter(m=>m.claim_type==='demonstrated').length;
+    const annCount  = gMilestones.filter(m=>m.claim_type==='announced').length;
+    const score5    = gMilestones.filter(m=>m.forward_implication_score===5).length;
+    document.getElementById('google-chips').innerHTML = `
+      <div class="chip"><div class="chip-n" style="color:#4285f4">${gMilestones.length}</div><div class="chip-l">Total milestones</div></div>
+      <div class="chip"><div class="chip-n" style="color:#34a853">${demoCount}</div><div class="chip-l">Demonstrated</div></div>
+      <div class="chip"><div class="chip-n" style="color:#4285f4">${annCount}</div><div class="chip-l">Announced</div></div>
+      <div class="chip"><div class="chip-n" style="color:#fbbc04">${score5}</div><div class="chip-l">Score-5 signals</div></div>
+    `;
+
+    // ── Recent milestones (last 8) ──
+    const recent = gMilestones.slice(0, 8);
+    document.getElementById('recent-milestones').innerHTML = recent.map(m=>`
+      <div class="milestone ${m.claim_type||''}">
+        <div class="ms-date">${m.date}</div>
+        <div class="ms-event">${esc(m.event)}</div>
+        <div class="ms-sig">${esc(m.significance||'')}</div>
+        <div class="ms-tags">
+          ${claimTag(m.claim_type)}
+          ${m.forward_implication_score>=4?`<span class="tag" style="background:rgba(251,188,4,.12);color:#fbbc04">Signal ${m.forward_implication_score}/5</span>`:''}
+          ${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:#94a3b8">${esc(m.stack_layer)}</span>`:''}
+        </div>
+      </div>
+    `).join('');
+
+    // ── Key metrics ──
+    const metrics = await get('key_metrics',`entity_id=eq.${gid}&select=metric_name,metric_value,as_of_date&order=as_of_date.desc&limit=20`);
+    if(metrics.length){
+      document.getElementById('google-metrics').innerHTML = metrics.map(m=>`
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+          <span style="color:#94a3b8;font-size:12px">${esc(m.metric_name)}</span>
+          <span style="font-weight:700;font-size:13px">${esc(m.metric_value)}</span>
+        </div>
+      `).join('');
+    }
+
+    // ── Gemini model line ──
+    const allModels = await get('models','select=*&order=release_date&limit=100');
+    const gemModels = allModels.filter(m=>m.entity_id===gid);
+    document.getElementById('gemini-models').innerHTML = gemModels.map(m=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+        <div>
+          <span style="font-weight:700;font-size:13px">${esc(m.display_name)}</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span>
+        </div>
+        <span style="font-size:11px;background:rgba(66,133,244,.12);color:#4285f4;padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span>
+      </div>
+    `).join('');
+
+    // ── What To Watch ──
+    const watchItems = [
+      {
+        area: '🧠 Gemini 2.5 Ultra — Flagship push',
+        conf: 90,
+        context: 'Gemini 2.5 Pro (May) scored 84% GPQA and 97.1% MATH. Google has consistently announced a higher-tier "Ultra" variant at I/O. Claude Opus 4.6 leads at 87.7% GPQA. The gap is closeable — this is where Google has historically made its headline play.',
+        signal: 'Longitudinal: Ultra announced at every major I/O since 2023. Gemini 2.0 Ultra was previewed but never widely released — expect a fully shipped version.'
+      },
+      {
+        area: '🔧 Agentic / Project Mariner expansion',
+        conf: 85,
+        context: 'Google launched Project Mariner (browser agent) and Jules (coding agent) in late 2024. The AI agent arms race with OpenAI Operator and Anthropic Computer Use is intensifying. Expect Mariner GA and deeper workspace integration.',
+        signal: 'Our displacement map: Anthropic and OpenAI both appear in Google\'s recent displacement targets around agentic milestones.'
+      },
+      {
+        area: '⚡ Gemini 2.5 Flash pricing pressure',
+        conf: 80,
+        context: 'Gemini 2.5 Flash (78% GPQA) competes directly with Claude Haiku 4.5 and GPT-4o mini on price/performance. Google typically drops prices at I/O. Our feature matrix shows Flash pricing at $0.15/M input vs. Haiku 4.5 at $0.80/M — further compression expected.',
+        signal: 'Google\'s track record: Flash pricing dropped ~70% between 1.5 and 2.5 generations.'
+      },
+      {
+        area: '🌐 Context & long-document leadership',
+        conf: 75,
+        context: 'Gemini 1.5 Pro established the 2M token context record in 2024. No other model has matched it publicly. With Gemini 2.5, expect an announcement around practical long-context applications — not just capability but deployment at scale.',
+        signal: 'No displacement milestone for context window — meaning Google still leads uncontested. Expect them to press the advantage.'
+      },
+      {
+        area: '🎨 Multimodal: native video + audio I/O',
+        conf: 70,
+        context: 'GPT-4o leads on native multimodality in public perception. Google has the underlying capability (Gemini was native multimodal from v1) but hasn\'t won the narrative. Expect a consumer-facing multimodal demo designed to reclaim that story.',
+        signal: 'Gemini Live and Imagen 3 shipped post-I/O 2024. The I/O 2025 cycle likely surfaces deeper integration.'
+      },
+      {
+        area: '🔬 Research drops: AlphaFold successors / Veo 2+',
+        conf: 65,
+        context: 'DeepMind research announcements are a consistent I/O feature — distinct from Gemini product. AlphaFold 3 and Veo 2 were major 2024 drops. Expect at least one research-to-product bridge announcement.',
+        signal: 'Google\'s research pipeline has the highest forward_implication_score average across all entities in our DB (based on scoring of prior milestones).'
+      }
+    ];
+
+    document.getElementById('watch-cards').innerHTML = watchItems.map(w=>`
+      <div class="watch-card">
+        <div class="watch-area">${w.area}</div>
+        <div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?'#4285f4':w.conf>70?'#fbbc04':'#64748b'}"></div></div>
+        <div class="conf-label" style="margin-bottom:10px">Confidence: ${w.conf}%</div>
+        <div class="watch-context">${esc(w.context)}</div>
+        <div class="watch-signal">💡 ${esc(w.signal)}</div>
+      </div>
+    `).join('');
+
+    // ── Benchmark table ──
+    const allMF = await getAllMF();
+    const features = await get('features','select=id,feature_key,display_name&limit=500');
+    const fByKey={};features.forEach(f=>fByKey[f.feature_key]=f.id);
+    const mfMap={};
+    allMF.forEach(r=>{ if(!mfMap[r.model_id]) mfMap[r.model_id]={}; mfMap[r.model_id][r.feature_id]=r.value; });
+
+    const modelOrder = ['Gemini 2.5 Pro','Gemini 2.5 Flash','Gemini 2.0 Flash','Gemini 1.5 Pro',
+      'Claude Opus 4.6','Claude Sonnet 4.6','Claude Haiku 4.5','o3','o4-mini','GPT-4o (May)'];
+    const orderedModels = [];
+    modelOrder.forEach(n=>{ const m=allModels.find(x=>x.display_name===n); if(m) orderedModels.push(m); });
+
+    const providerColor = (eid) => {
+      const n=eMap[eid]?.name||'';
+      if(n.includes('Google')) return 'provider-google';
+      if(n.includes('OpenAI')) return 'provider-openai';
+      if(n.includes('Anthropic')) return 'provider-anthropic';
+      return '';
+    };
+    const providerShort = (eid) => {
+      const n=eMap[eid]?.name||'';
+      if(n.includes('Google')) return 'Google';
+      if(n.includes('OpenAI')) return 'OpenAI';
+      if(n.includes('Anthropic')) return 'Anthropic';
+      return n;
+    };
+
+    const fkeys = ['gpqa_score','math_benchmark_score','humaneval_score','swe_bench_score','context_window','output_price_per_million_tokens'];
+    const colors = { gpqa_score:'#4285f4', math_benchmark_score:'#34a853', humaneval_score:'#fbbc04', swe_bench_score:'#ea4335', context_window:'#9b59b6', output_price_per_million_tokens:'#94a3b8' };
+    const maxes  = { gpqa_score:100, math_benchmark_score:100, humaneval_score:100, swe_bench_score:100 };
+
+    // Find winner per column
+    const winners={};
+    fkeys.slice(0,4).forEach(fk=>{
+      let best=-Infinity, bestMid='';
+      orderedModels.forEach(m=>{ const v=parseFloat(mfMap[m.id]?.[fByKey[fk]]||''); if(!isNaN(v)&&v>best){best=v;bestMid=m.id;} });
+      winners[fk]=bestMid;
+    });
+
+    document.getElementById('bench-body').innerHTML = orderedModels.map(m=>`
+      <tr class="${Object.values(winners).includes(m.id)?'winner':''}">
+        <td style="font-weight:700">${esc(m.display_name)}</td>
+        <td class="${providerColor(m.entity_id)}">${providerShort(m.entity_id)}</td>
+        ${fkeys.slice(0,4).map(fk=>{
+          const v=mfMap[m.id]?.[fByKey[fk]]||'—';
+          const isW=winners[fk]===m.id;
+          return `<td>${scoreBar(v, maxes[fk]||100, isW?'#fbbc04':colors[fk])}</td>`;
+        }).join('')}
+        <td style="font-size:12px;color:#94a3b8">${mfMap[m.id]?.[fByKey['context_window']]?Number(mfMap[m.id][fByKey['context_window']]).toLocaleString()+' tok':'—'}</td>
+        <td style="font-size:12px">${mfMap[m.id]?.[fByKey['output_price_per_million_tokens']]?'$'+mfMap[m.id][fByKey['output_price_per_million_tokens']]:'—'}</td>
+      </tr>
+    `).join('');
+
+    // ── Live Updates ──
+    const liveSection = document.getElementById('live-updates');
+    if(liveUpdates.length > 0){
+      liveSection.innerHTML = liveUpdates.map(m=>`
+        <div class="milestone new">
+          <div class="ms-date">${m.date} <span class="tag tag-new">NEW · I/O 2026</span></div>
+          <div class="ms-event">${esc(m.event)}</div>
+          <div class="ms-sig">${esc(m.significance||'')}</div>
+          <div class="ms-tags">
+            ${claimTag(m.claim_type)}
+            ${(m.displacement_entities||[]).length>0?m.displacement_entities.map(d=>`<span class="tag tag-dis">threatens ${esc(d)}</span>`).join(''):''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Impact Map ──
+    let allMs=[], msOff=0;
+    while(true){
+      const b=await get('milestones','select=id,entity_id,date,event,displacement_entities&limit=1000&offset='+msOff+'&displacement_entities=not.is.null');
+      allMs=allMs.concat(b); if(b.length<1000) break; msOff+=1000;
+    }
+    const googleDisplacing = allMs.filter(m=>m.entity_id===gid&&(m.displacement_entities||[]).length>0);
+    const threateningGoogle = allMs.filter(m=>m.entity_id!==gid&&(m.displacement_entities||[]).includes('Google DeepMind'));
+
+    const impMap = document.getElementById('impact-map');
+    let html = '';
+    if(googleDisplacing.length){
+      html += `<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Google Threatening Others</div>`;
+      googleDisplacing.slice(0,8).forEach(m=>{
+        html+=`<div class="displacement-row">
+          <div class="dis-source"><div style="font-size:11px;color:var(--muted)">${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div>
+          <div class="dis-arrow">→</div>
+          <div class="dis-targets">${m.displacement_entities.map(d=>`<div class="dis-chip">${esc(d)}</div>`).join('')}</div>
+        </div>`;
+      });
+    }
+    if(threateningGoogle.length){
+      html+=`<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Others Threatening Google</div>`;
+      threateningGoogle.slice(0,8).forEach(m=>{
+        html+=`<div class="displacement-row">
+          <div class="dis-source"><div style="font-size:11px;color:#94a3b8">${eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div>
+          <div class="dis-arrow" style="color:#4285f4">←</div>
+          <div class="dis-targets"><div class="dis-chip" style="background:rgba(66,133,244,.1);border-color:rgba(66,133,244,.25);color:#60a5fa">Google DeepMind</div></div>
+        </div>`;
+      });
+    }
+    if(!html) html=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No displacement data yet</div><div class="empty-body">Displacement entities will be seeded as I/O announcements are processed.</div></div>`;
+    impMap.innerHTML = html;
+
+    // Footer
+    document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  } catch(e){
+    console.error(e);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
