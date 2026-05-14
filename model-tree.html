@@ -293,6 +293,65 @@ const USECASES = {
   g25flash:{ chips:[['Best value','uc-speed'],['Think mode','uc-reason'],['Fast','uc-speed']], when:'Best price-performance in the Google lineup. Think mode + 1M context at $0.15/M input. Excellent default for most tasks.', skip:'If you genuinely need frontier reasoning ceiling — 2.5 Pro has higher cap.' },
 };
 
+// ═══════════════════════════════════════════════════════════
+//  CAPABILITY BADGES — shown in decision guide
+// ═══════════════════════════════════════════════════════════
+const CAP_DEF = {
+  vision: {icon:'👁', label:'Vision',    bg:'rgba(59,130,246,.22)',  color:'#93c5fd', border:'rgba(59,130,246,.4)'},
+  audio:  {icon:'🎙', label:'Audio',     bg:'rgba(168,85,247,.22)', color:'#d8b4fe', border:'rgba(168,85,247,.4)'},
+  think:  {icon:'🧠', label:'Thinking',  bg:'rgba(124,58,237,.22)', color:'#a78bfa', border:'rgba(124,58,237,.4)'},
+  tools:  {icon:'🔧', label:'Tool Use',  bg:'rgba(20,184,166,.22)', color:'#5eead4', border:'rgba(20,184,166,.4)'},
+  code:   {icon:'💻', label:'Coding',    bg:'rgba(16,185,129,.22)', color:'#6ee7b7', border:'rgba(16,185,129,.4)'},
+  agent:  {icon:'🤖', label:'Agentic',   bg:'rgba(239,68,68,.2)',   color:'#fca5a5', border:'rgba(239,68,68,.35)'},
+  oss:    {icon:'🔓', label:'Open OSS',  bg:'rgba(245,158,11,.2)',  color:'#fcd34d', border:'rgba(245,158,11,.35)'},
+  multi:  {icon:'🌐', label:'Multilingual',bg:'rgba(14,165,233,.2)',color:'#7dd3fc', border:'rgba(14,165,233,.35)'},
+};
+const CAPS = {
+  // Anthropic
+  c3h:   {ctx:'200K',speed:'Fast', caps:['vision','tools']},
+  c3s:   {ctx:'200K',speed:'Med',  caps:['vision','tools']},
+  c3o:   {ctx:'200K',speed:'Slow', caps:['vision','tools']},
+  c35sj: {ctx:'200K',speed:'Med',  caps:['vision','tools','code']},
+  c35so: {ctx:'200K',speed:'Med',  caps:['vision','tools','code','agent']},
+  c35h:  {ctx:'200K',speed:'Fast', caps:['vision','tools']},
+  ch45:  {ctx:'200K',speed:'Fast', caps:['vision','tools','agent']},
+  cs45:  {ctx:'200K',speed:'Med',  caps:['vision','tools','think','code']},
+  cs46:  {ctx:'200K',speed:'Med',  caps:['vision','tools','think','code']},
+  co45:  {ctx:'200K',speed:'Slow', caps:['vision','tools','think']},
+  co46:  {ctx:'200K',speed:'Slow', caps:['vision','tools','think']},
+  // OpenAI
+  gpt4:     {ctx:'8K',   speed:'Med',  caps:['vision','tools','code']},
+  gpt4om:   {ctx:'128K', speed:'Fast', caps:['vision','audio','tools']},
+  gpt4oa:   {ctx:'128K', speed:'Med',  caps:['vision','tools','code']},
+  gpt4mini: {ctx:'128K', speed:'Fast', caps:['vision','tools']},
+  o1:       {ctx:'128K', speed:'Slow', caps:['think','code']},
+  o3:       {ctx:'200K', speed:'Slow', caps:['vision','think','code','agent']},
+  o4mini:   {ctx:'200K', speed:'Med',  caps:['vision','think','code']},
+  // Google
+  g15pro:   {ctx:'2M',  speed:'Med',  caps:['vision','audio','tools','code']},
+  g15flash: {ctx:'1M',  speed:'Fast', caps:['vision','tools']},
+  g20flash: {ctx:'1M',  speed:'Fast', caps:['vision','audio','tools','agent']},
+  g25pro:   {ctx:'1M',  speed:'Slow', caps:['vision','audio','think','tools','code']},
+  g25flash: {ctx:'1M',  speed:'Med',  caps:['vision','think','tools','code']},
+  // Alibaba / Qwen
+  qwen7b:    {ctx:'8K',   speed:'Fast', caps:['oss','multi']},
+  qwen14b:   {ctx:'128K', speed:'Fast', caps:['oss','multi','tools']},
+  qwen2_72b: {ctx:'128K', speed:'Med',  caps:['oss','multi','tools','code']},
+  qwen25_72b:{ctx:'128K', speed:'Med',  caps:['oss','multi','tools','code']},
+  qwq32b:    {ctx:'131K', speed:'Slow', caps:['oss','think','multi']},
+  qwen3_235b:{ctx:'128K', speed:'Med',  caps:['oss','think','tools','code','multi']},
+  // Moonshot / Kimi
+  kimiv1:  {ctx:'200K', speed:'Med',  caps:['multi']},
+  kimi1m:  {ctx:'1M',   speed:'Slow', caps:['multi']},
+  kimik15: {ctx:'128K', speed:'Slow', caps:['vision','think','multi']},
+  kimi25:  {ctx:'128K', speed:'Med',  caps:['vision','think','tools','agent','multi']},
+  // DeepSeek
+  ds1:  {ctx:'32K',  speed:'Fast', caps:['oss']},
+  ds2:  {ctx:'128K', speed:'Med',  caps:['oss','code']},
+  dsv3: {ctx:'128K', speed:'Med',  caps:['oss','tools','code']},
+  dsr1: {ctx:'128K', speed:'Slow', caps:['oss','think','code']},
+};
+
 const TREES = {
   anthropic: {
     color:'#c0622f', dim:'#7a3418', light:'#f4d0a8', glow:'rgba(192,98,47,0.35)',
@@ -614,11 +673,17 @@ function drawTree(provKey, animate=true){
   el('stop',{offset:'0%','stop-color':tree.color,'stop-opacity':'0.12'},rg);
   el('stop',{offset:'100%','stop-color':tree.color,'stop-opacity':'0'},rg);
 
-  // Branch gradient (dark root → provider glow at tips)
+  // Branch gradient — dim at root, bright at tips (PCB trace feel)
   const bg=el('linearGradient',{id:'bgrad',x1:'0',y1:'1',x2:'0',y2:'0'},defs);
-  el('stop',{offset:'0%','stop-color':'#0a1428'},bg);
-  el('stop',{offset:'30%','stop-color':tree.dim},bg);
-  el('stop',{offset:'100%','stop-color':tree.color},bg);
+  el('stop',{offset:'0%','stop-color':tree.dim,'stop-opacity':'0.5'},bg);
+  el('stop',{offset:'50%','stop-color':tree.color,'stop-opacity':'0.8'},bg);
+  el('stop',{offset:'100%','stop-color':tree.light,'stop-opacity':'1'},bg);
+
+  // Glow filter for branches
+  const bf=el('filter',{id:'bf',x:'-100%',y:'-100%',width:'300%',height:'300%'},defs);
+  el('feGaussianBlur',{stdDeviation:'3',result:'gb',in:'SourceGraphic'},bf);
+  const bfm=el('feMerge',{},bf);
+  el('feMergeNode',{in:'gb'},bfm); el('feMergeNode',{in:'SourceGraphic'},bfm);
 
   // ── Background: dark neural network space ────────────────────
   // Base fill
@@ -701,14 +766,23 @@ function drawTree(provKey, animate=true){
     const cp2x=p.x+dx*0.82, cp2y=p.y+dy*0.58;
     const d=`M${p.x} ${p.y} C${cp1x} ${cp1y},${cp2x} ${cp2y},${n.x} ${n.y}`;
 
-    // Subtle dark glow beneath branch
-    el('path',{d,fill:'none',stroke:tree.color,'stroke-width':sw+4,
-      'stroke-linecap':'round',opacity:'0.08'},gBranches);
-    // Main
-    const bEl=el('path',{d,fill:'none',stroke:'url(#bgrad)',
-      'stroke-width':sw,'stroke-linecap':'round',
-      opacity: n.isLatest?'0.95':'0.72',
+    // PCB/circuit trace style — right-angle elbow paths
+    const midY = p.y + (n.y - p.y) * 0.52;
+    const pcb = `M${p.x} ${p.y} L${p.x} ${midY} L${n.x} ${midY} L${n.x} ${n.y}`;
+
+    // Outer glow trace
+    el('path',{d:pcb,fill:'none',stroke:tree.color,'stroke-width':sw+3,
+      'stroke-linecap':'butt','stroke-linejoin':'miter',
+      opacity:'0.12',filter:'url(#bf)'},gBranches);
+    // Main PCB trace
+    const bEl=el('path',{d:pcb,fill:'none',stroke:'url(#bgrad)',
+      'stroke-width':sw,'stroke-linecap':'butt','stroke-linejoin':'miter',
+      opacity: n.isLatest?'1':'0.75',
       'data-branch':n.id},gBranches);
+    // Bright hairline on top for edge-lit PCB feel
+    el('path',{d:pcb,fill:'none',stroke:tree.light,'stroke-width':'0.6',
+      'stroke-linecap':'butt','stroke-linejoin':'miter',
+      opacity: n.isLatest?'0.5':'0.2'},gBranches);
 
     // Animate growth
     if(animate){
@@ -721,6 +795,11 @@ function drawTree(provKey, animate=true){
         requestAnimationFrame(()=>{ bEl.style.strokeDashoffset='0'; });
       } catch(e){}
     }
+    // PCB elbow joint dot (solder point at the corner)
+    const midY2 = p.y + (n.y - p.y) * 0.52;
+    el('circle',{cx:n.x,cy:midY2,r:'2',
+      fill:tree.color,opacity:'0.5'},gBranches);
+
     branchEls.push({el:bEl,nodeId:n.id});
   });
 
@@ -759,41 +838,44 @@ function drawTree(provKey, animate=true){
       'data-nid':n.id
     },gNodes);
 
-    // Outer pulse ring (latest nodes)
+    // Outer glow aura (large soft halo — solder point on PCB)
+    const auraR = isLatest ? n.r+14 : isRoot ? n.r+10 : n.r+7;
+    el('circle',{cx:0,cy:0,r:auraR,
+      fill:tree.color,opacity: isLatest?'0.12':isRoot?'0.10':'0.07',
+      filter:'url(#fgS)'},nodeG);
+
+    // Outer pulse ring (latest nodes only)
     if(isLatest){
-      el('circle',{cx:0,cy:0,r:n.r+8,fill:'none',
-        stroke:tree.light,'stroke-width':'1',
-        opacity:'0.35',
+      el('circle',{cx:0,cy:0,r:n.r+9,fill:'none',
+        stroke:tree.light,'stroke-width':'1.2',
+        opacity:'0.4',
         style:`animation:pulse-ring ${2+n.r*0.1}s ease-in-out infinite`},nodeG);
       el('circle',{cx:0,cy:0,r:n.r+18,fill:'none',
-        stroke:tree.color,'stroke-width':'0.5',opacity:'0.12',
-        style:`animation:pulse-ring ${3+n.r*0.12}s ease-in-out 0.5s infinite`},nodeG);
+        stroke:tree.color,'stroke-width':'0.6',opacity:'0.15',
+        style:`animation:pulse-ring ${3+n.r*0.12}s ease-in-out 0.6s infinite`},nodeG);
     }
 
-    // Node body — dark glass with provider glow
-    const fillC = isRoot   ? `rgba(10,18,40,0.9)` :
-                  isLatest ? `rgba(8,16,38,0.95)` :
-                  depth<=1 ? `rgba(8,15,34,0.85)` :
-                  depth<=2 ? `rgba(8,14,32,0.8)` : `rgba(7,13,30,0.75)`;
+    // Node body — dark core with bright rim (solder pad feel)
+    const fillC = `rgba(5,10,26,0.95)`;
     const strokeC = isLatest ? tree.light : isRoot ? tree.color : tree.color;
-    const strokeW = isLatest ? '2.5' : isRoot ? '2' : '1.5';
-    const strokeOp = isLatest ? '1' : isRoot ? '0.9' : '0.5';
+    const strokeW = isLatest ? '2' : isRoot ? '2' : '1.2';
+    const strokeOp = isLatest ? '0.95' : isRoot ? '0.85' : '0.55';
     el('circle',{cx:0,cy:0,r:n.r,fill:fillC,stroke:strokeC,
       'stroke-width':strokeW,'stroke-opacity':strokeOp,
       filter: isLatest?'url(#fgS)':'url(#fg)',
       style: isTerm?`animation:breathe ${2.5+depth*0.2}s ease-in-out ${n.x%1.5}s infinite`:''
     },nodeG);
 
-    // Inner glow disc
-    const innerFill=el('circle',{cx:0,cy:0,r:Math.max(2,n.r-4),
-      fill:tree.color,
-      opacity: isRoot?'0.2': isLatest?'0.18':'0.1'},nodeG);
+    // Inner colored ring (second PCB pad ring)
+    el('circle',{cx:0,cy:0,r:n.r-3,fill:'none',
+      stroke:tree.color,'stroke-width':'1',
+      opacity: isLatest?'0.35':isRoot?'0.25':'0.15'},nodeG);
 
-    // Bright center dot (data point feel)
-    if(!isRoot){
-      el('circle',{cx:0,cy:0,r:'1.8',
-        fill:tree.light,opacity: isLatest?'0.9':'0.5'},nodeG);
-    }
+    // Bright center dot (via hole on PCB)
+    const dotR = isRoot ? 3 : isLatest ? 2.5 : 1.8;
+    el('circle',{cx:0,cy:0,r:dotR,
+      fill: isLatest ? tree.light : tree.color,
+      opacity: isLatest?'1':'0.7'},nodeG);
 
     // Label above node — light text on dark node
     const lines=n.label.split('\n');
@@ -934,21 +1016,21 @@ function showFeatChips(node, tree, nMap, group){
 
     const chipG=el('g',{transform:`translate(${node.x},${node.y})`,opacity:'0'},group);
 
-    // Chip background — dark glass with provider accent
-    const w=feat.length*5.5+18, h=18;
-    el('rect',{x:-w/2,y:-h/2,width:w,height:h,rx:'9',
-      fill:'rgba(6,12,30,0.92)',stroke:tree.color,'stroke-width':'0.8','stroke-opacity':'0.7'},chipG);
+    // Chip background — dark glass with provider accent (compact)
+    const w=feat.length*4.8+16, h=15;
+    el('rect',{x:-w/2,y:-h/2,width:w,height:h,rx:'7',
+      fill:'rgba(6,12,30,0.92)',stroke:tree.color,'stroke-width':'0.7','stroke-opacity':'0.65'},chipG);
     // Data dot
-    el('circle',{cx:-w/2+8,cy:0,r:2.5,fill:tree.light,opacity:'0.8'},chipG);
+    el('circle',{cx:-w/2+7,cy:0,r:2,fill:tree.light,opacity:'0.75'},chipG);
     // Text
-    const ft=el('text',{x:-w/2+17,y:3.5,'font-size':'9','font-weight':'600',
-      fill:'#a8ccf0'},chipG);
+    const ft=el('text',{x:-w/2+14,y:3,'font-size':'7.5','font-weight':'600',
+      fill:'#90b8e0'},chipG);
     ft.textContent=feat;
 
-    // Connector line
+    // Connector line (behind chip)
     el('line',{x1:0,y1:0,x2:tx-node.x,y2:ty-node.y,
-      stroke:tree.color,'stroke-width':'0.5',opacity:'0.25',
-      'stroke-dasharray':'3,3'},chipG);
+      stroke:tree.color,'stroke-width':'0.5',opacity:'0.2',
+      'stroke-dasharray':'2,3'},chipG);
 
     // Animate out
     chipG.style.transition=`transform .5s cubic-bezier(.34,1.56,.64,1) ${i*60}ms, opacity .3s ${i*60}ms`;
@@ -1045,9 +1127,10 @@ async function showDetail(n, tree){
   const inner=document.getElementById('detail-inner');
   const isRoot = n.id==='root';
   // Tier colours adapted to light theme (readable on cream background)
-  const tc={ haiku:'#c07830',sonnet:'#2d7ab8',opus:'#7040b0',
-    standard:'#1d8a52',mini:'#2d8a52',reasoning:'#3a85c8','mini-r':'#2d6ea8',
-    pro:'#3a85c8',flash:'#1d8a52',gemini:'#2d6ea8',early:'#8a7a6a',root:'#6b3c18' }[n.tier]||tree.color;
+  const tc={ haiku:'#e08858',sonnet:'#5aabf0',opus:'#b080f0',
+    standard:'#3ab870',mini:'#3ab870',reasoning:'#68aae8','mini-r':'#60a0e0',
+    flagship:'#f0c060',pro:'#5aabf0',flash:'#3ab870',gemini:'#60a0e0',
+    early:'#6898c8',root:tree.color }[n.tier]||tree.color;
 
   const feats=TREES[currentProvider].feats?.[n.id]||[];
   const uc=USECASES[n.id]; // use-case decision data
@@ -1084,13 +1167,25 @@ async function showDetail(n, tree){
     d2.setMonth(d2.getMonth()+5); dateTo=d2.toISOString().slice(0,10);
   }
 
+  // Capability badges row
+  const caps = CAPS[n.id];
+  const speedColor = !caps ? '#7aa8e0' : caps.speed==='Fast' ? '#6ee7b7' : caps.speed==='Slow' ? '#fca5a5' : '#93c5fd';
+  const speedBg   = !caps ? 'rgba(40,80,180,.2)' : caps.speed==='Fast' ? 'rgba(16,185,129,.2)' : caps.speed==='Slow' ? 'rgba(239,68,68,.18)' : 'rgba(59,130,246,.2)';
+  const capBadgesHtml = caps ? [
+    `<span style="font-size:9px;padding:2px 8px;border-radius:9px;background:rgba(40,80,180,.2);color:#7dd3fc;border:1px solid rgba(40,80,200,.35);white-space:nowrap">📏 ${caps.ctx}</span>`,
+    `<span style="font-size:9px;padding:2px 8px;border-radius:9px;background:${speedBg};color:${speedColor};border:1px solid ${speedColor}44;white-space:nowrap">⚡ ${caps.speed}</span>`,
+    ...caps.caps.map(c=>{const d=CAP_DEF[c]; return `<span style="font-size:9px;padding:2px 7px 2px 5px;border-radius:9px;background:${d.bg};color:${d.color};border:1px solid ${d.border};white-space:nowrap;display:inline-flex;align-items:center;gap:2px"><span>${d.icon}</span><span>${d.label}</span></span>`;})
+  ].join('') : '';
+  const capRow = capBadgesHtml ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px;padding-bottom:7px;border-bottom:1px solid rgba(40,80,180,.18)">${capBadgesHtml}</div>` : '';
+
   const ucSection = uc ? `
     <div class="usecase-section">
       <div class="usecase-title">Decision Guide</div>
+      ${capRow}
       <div class="uc-grid">${uc.chips.map(([label,cls])=>`<span class="uc-chip ${cls}">${label}</span>`).join('')}</div>
-      <div class="choose-when">✓ Choose when: ${uc.when}</div>
+      <div class="choose-when">✓ Use when: ${uc.when}</div>
       <div class="skip-if" style="margin-top:5px">✗ Skip if: ${uc.skip}</div>
-    </div>` : (feats.length?`<div class="detail-feats" style="margin-top:8px">${feats.map(f=>`<span class="dfeat">✦ ${f}</span>`).join('')}</div>`:'');
+    </div>` : (feats.length?`<div class="detail-feats" style="margin-top:8px">${feats.map(f=>`<span class="dfeat">⬡ ${f}</span>`).join('')}</div>`:'');
 
   inner.innerHTML=`
     <div style="min-width:170px">
@@ -1105,7 +1200,7 @@ async function showDetail(n, tree){
     </div>
     ${ucSection}
     <div class="mile-section">
-      <div class="mile-section-title">🌿 Context at launch</div>
+      <div class="mile-section-title">📡 Context at launch</div>
       <div class="mile-list" id="mile-list"><div class="mile-loading">Fetching…</div></div>
     </div>
     <button class="close-btn" onclick="zoomOut()" title="Close">×</button>
