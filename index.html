@@ -137,6 +137,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .rc-strat { font-size: 12px; color: #374151; margin-top: 8px; background: #f8fafc; padding: 9px 12px; border-radius: 6px; border-left: 3px solid var(--accent); line-height: 1.55; }
 mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 
+/* ── Evidence quality badges ── */
+.eq-3 { background:#d1fae5; color:#065f46; }
+.eq-2 { background:#dbeafe; color:#1d4ed8; }
+.eq-1 { background:#fef9c3; color:#854d0e; }
+
+/* ── Similar entities ── */
+.sim-list { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }
+.sim-tag  { font-size:11px; padding:2px 8px; border-radius:12px; background:#eef2ff; color:var(--accent); border:1px solid #c7d2fe; white-space:nowrap; }
+
 /* ── Loading / empty ── */
 .loader { text-align: center; padding: 80px 20px; color: var(--muted); }
 .spin { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
@@ -325,8 +334,8 @@ async function get(table, qs='') {
 
 async function loadAll() {
   const [entities, milestones, relationships, metrics] = await Promise.all([
-    get('entities', 'select=*&order=name'),
-    get('milestones', 'select=*&order=date.desc&limit=500'),
+    get('entities', 'select=*,similar_entities&order=name'),
+    get('milestones', 'select=*,evidence_quality&order=date.desc&limit=500'),
     get('relationships', 'select=*'),
     get('key_metrics', 'select=*'),
   ]);
@@ -410,6 +419,43 @@ function renderOverview() {
   const mc = {};
   D.milestones.forEach(m => mc[m.entity_id] = (mc[m.entity_id]||0)+1);
 
+  // ── Velocity: milestones per entity in last 90d vs prior 90d ─────────────
+  const now   = Date.now();
+  const d90   = 90*24*3600*1000;
+  const veloc = {};   // entity_id → { recent, prior, arrow, color, label }
+  D.entities.forEach(e => {
+    const ms = D.milestones.filter(m => m.entity_id === e.id);
+    const recent = ms.filter(m => now - new Date(m.date).getTime() < d90).length;
+    const prior  = ms.filter(m => {
+      const age = now - new Date(m.date).getTime();
+      return age >= d90 && age < d90*2;
+    }).length;
+    const delta  = recent - prior;
+    veloc[e.id]  = {
+      recent, prior,
+      arrow : delta > 0 ? '↑' : delta < 0 ? '↓' : '→',
+      color : delta > 0 ? '#059669' : delta < 0 ? '#dc2626' : '#64748b',
+      label : delta > 0 ? `+${delta} vs prior 90d` : delta < 0 ? `${delta} vs prior 90d` : 'stable'
+    };
+  });
+
+  // ── Competitive pressure: sum FIS of milestones where entity is displaced ─
+  const pressure = {};   // entity_name → total FIS score
+  D.milestones.forEach(m => {
+    (m.displacement_entities||[]).forEach(name => {
+      pressure[name] = (pressure[name]||0) + (m.forward_implication_score||1);
+    });
+  });
+  // Map name → id for lookup
+  const nameToId = {};
+  D.entities.forEach(e => nameToId[e.name] = e.id);
+  const pressureById = {};
+  Object.entries(pressure).forEach(([name, score]) => {
+    const id = nameToId[name];
+    if (id) pressureById[id] = score;
+  });
+  const maxPressure = Math.max(...Object.values(pressureById), 1);
+
   document.getElementById('stats').innerHTML = [
     [D.entities.length, 'Entities'],
     [D.milestones.length, 'Milestones'],
@@ -420,11 +466,29 @@ function renderOverview() {
   const sorted = [...D.entities].sort((a,b)=>(mc[b.id]||0)-(mc[a.id]||0));
 
   document.getElementById('eg').innerHTML = sorted.map(e => {
-    const cnt = mc[e.id]||0;
-    const ms  = D.milestones.filter(m=>m.entity_id===e.id).slice(0,6);
+    const cnt  = mc[e.id]||0;
+    const ms   = D.milestones.filter(m=>m.entity_id===e.id).slice(0,6);
     const mets = D.metrics.filter(m=>m.entity_id===e.id);
-    const tc = e.type==='person'?'b-pe':'b-co';
-    const tl = e.type==='person'?'Person':(e.category||'Company');
+    const tc   = e.type==='person'?'b-pe':'b-co';
+    const tl   = e.type==='person'?'Person':(e.category||'Company');
+
+    // Velocity badge
+    const v = veloc[e.id];
+    const velBadge = v && (v.recent>0||v.prior>0)
+      ? `<span title="${v.label}" style="font-size:11px;font-weight:700;color:${v.color};margin-left:6px;cursor:default">${v.arrow} ${v.recent}</span>`
+      : '';
+
+    // Competitive pressure heat bar (only if non-zero)
+    const ps = pressureById[e.id]||0;
+    const pressureBar = ps > 0
+      ? `<div title="Competitive pressure score: ${ps} (sum of FIS from milestones displacing this entity)" style="margin-top:6px;display:flex;align-items:center;gap:6px">
+           <span style="font-size:10px;color:var(--muted);white-space:nowrap">🎯 pressure</span>
+           <div style="flex:1;height:4px;background:#fee2e2;border-radius:2px;max-width:100px">
+             <div style="height:4px;background:#ef4444;border-radius:2px;width:${Math.round((ps/maxPressure)*100)}%"></div>
+           </div>
+           <span style="font-size:10px;font-weight:600;color:#ef4444">${ps}</span>
+         </div>`
+      : '';
 
     const msHtml = ms.map(m=>`
       <div class="mi">
@@ -438,15 +502,33 @@ function renderOverview() {
       ${mets.map(m=>`<div class="m-row"><span class="m-key">${esc(m.metric_name)}</span><span class="m-val">${esc(m.metric_value)}</span></div>`).join('')}
     </div>` : '';
 
-    const val = e.current_valuation ? ` · ${esc(e.current_valuation)}` : '';
+    const val  = e.current_valuation ? ` · ${esc(e.current_valuation)}` : '';
     const traj = e.trajectory_summary ? `<div class="ec-traj">${esc(e.trajectory_summary.slice(0,130))}…</div>` : '';
 
     return `<div class="ec" id="ec-${e.id}" onclick="toggleCard('${e.id}')">
-      <div class="ec-hdr"><div class="ec-name">${esc(e.name)}</div>${badge(tl,tc)}</div>
+      <div class="ec-hdr">
+        <div style="display:flex;align-items:center;gap:2px"><div class="ec-name">${esc(e.name)}</div>${velBadge}</div>
+        ${badge(tl,tc)}
+      </div>
       <div class="ec-meta">${esc(e.headquarters||'')}${e.founded?' · est. '+e.founded:''}</div>
       <div class="ec-count">${cnt} milestones${val}</div>
+      ${pressureBar}
       ${traj}
       <div class="ec-expand" id="ex-${e.id}">
+        ${(() => {
+          try {
+            const sim = typeof e.similar_entities === 'string'
+              ? JSON.parse(e.similar_entities) : (e.similar_entities||[]);
+            if (!sim.length) return '';
+            const tags = sim.slice(0,4).map(s =>
+              `<span class="sim-tag" title="Similarity: ${s.similarity}">${esc(s.name)}</span>`
+            ).join('');
+            return `<div style="margin-bottom:12px">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px;font-weight:600">🔗 Strategically similar to</div>
+              <div class="sim-list">${tags}</div>
+            </div>`;
+          } catch(e2) { return ''; }
+        })()}
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;font-weight:600">Recent Milestones</div>
         ${msHtml}${metHtml}
       </div>
@@ -923,12 +1005,15 @@ function search() {
     const ent=emap[m.entity_id];
     const dispTag=m.displacement_entities?.length
       ? `<span class="b" style="background:#fee2e2;color:#991b1b">🌅 ${esc(m.displacement_entities.join(', '))}</span>` : '';
+    const eqMap = {3:['eq-3','✓ Confirmed'],2:['eq-2','◎ Reported'],1:['eq-1','~ Speculative']};
+    const eqTag = m.evidence_quality && eqMap[m.evidence_quality]
+      ? `<span class="b ${eqMap[m.evidence_quality][0]}" title="Evidence quality">${eqMap[m.evidence_quality][1]}</span>` : '';
     return `<div class="rc">
       <div class="rc-hdr"><div class="rc-ent">${esc(ent?.name||'')}</div><div class="rc-date">${(m.date||'').slice(0,10)}</div></div>
       <div class="rc-evt">${hl(m.event,q)}</div>
       ${m.significance?`<div class="rc-sig">${hl(m.significance,q)}</div>`:''}
       ${m.strategic_signal?`<div class="rc-strat">${hl(m.strategic_signal,q)}</div>`:''}
-      <div class="mi-foot" style="margin-top:10px">${claimB(m.claim_type)}${layerB(m.stack_layer)}${m.is_contested?badge('contested','b-con'):''}${pips(m.forward_implication_score)}${dispTag}</div>
+      <div class="mi-foot" style="margin-top:10px">${claimB(m.claim_type)}${eqTag}${layerB(m.stack_layer)}${m.is_contested?badge('contested','b-con'):''}${pips(m.forward_implication_score)}${dispTag}</div>
     </div>`;
   }).join('');
 
@@ -1255,6 +1340,25 @@ async function init() {
 }
 
 init();
+
+// Hash-based tab activation — e.g. index.html#tree from model-advisor nav
+(function activateHashTab() {
+  const hash = location.hash.replace('#','');
+  const valid = ['overview','search','models','intel','tree'];
+  if (!hash || !valid.includes(hash)) return;
+  // Wait for DOM to be ready then switch tab
+  const trySwitch = () => {
+    const btn = [...document.querySelectorAll('.ntab')].find(b => {
+      const oc = b.getAttribute('onclick')||'';
+      return oc.includes(`'${hash}'`) || oc.includes(`"${hash}"`);
+    });
+    if (btn) btn.click();
+  };
+  // Run after init completes (data may not be loaded yet, but tab UI can switch)
+  trySwitch();
+  // Also re-try after data loads in case search/tree needs data
+  document.addEventListener('DOMContentLoaded', trySwitch);
+})();
 
 // Re-render map on window resize
 let _resizeTimer;
