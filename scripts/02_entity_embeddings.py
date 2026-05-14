@@ -2,23 +2,23 @@
 """
 Script 2: Entity aggregate embeddings + cosine similarity
 ----------------------------------------------------------
-1. Averages all milestone embeddings per entity → entity "strategic DNA" vector
-2. Stores in entities.aggregate_embedding (adds column if missing)
-3. Computes pairwise cosine similarity matrix
-4. Stores top-3 most similar entities per entity in entities.similar_entities (JSON array)
+1. Averages all milestone embeddings per entity → "strategic DNA" vector (in memory only)
+2. Computes pairwise cosine similarity matrix
+3. Writes top-5 most similar entities per entity → entities.similar_entities (jsonb)
 
-This powers the "Strategically similar to X, Y" feature on entity cards.
+Prerequisite: run 00_migrations.sql in Supabase SQL editor first.
+Run AFTER 01_enrich_embeddings.py for best quality.
 
-Run AFTER 01_enrich_embeddings.py for best results.
 Run:  python3 scripts/02_entity_embeddings.py
 """
 
-import json, math, urllib.request
+import json, math, urllib.request, urllib.error, sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from _config import SB_URL, SB_KEY
 
-SB_URL = "https://yjupiuxuoxmycehkbmwl.supabase.co"
-SB_KEY = "sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr"
-SB_HDR = {"apikey": SB_KEY, "Authorization": f"Bearer {SB_KEY}",
-          "Content-Type": "application/json"}
+SB_HDR  = {"apikey": SB_KEY, "Authorization": f"Bearer {SB_KEY}",
+           "Content-Type": "application/json"}
+SB_WRIT = {**SB_HDR, "Prefer": "return=minimal"}
 
 def sb_get(path, qs=""):
     url = f"{SB_URL}/rest/v1/{path}?{qs}"
@@ -27,15 +27,22 @@ def sb_get(path, qs=""):
         return json.loads(r.read())
 
 def sb_patch(path, match_qs, body):
-    url = f"{SB_URL}/rest/v1/{path}?{match_qs}"
+    url  = f"{SB_URL}/rest/v1/{path}?{match_qs}"
     data = json.dumps(body).encode()
-    hdrs = {**SB_HDR, "Prefer": "return=minimal"}
-    req  = urllib.request.Request(url, data=data, headers=hdrs, method="PATCH")
-    with urllib.request.urlopen(req) as r:
-        return r.status
+    req  = urllib.request.Request(url, data=data, headers=SB_WRIT, method="PATCH")
+    try:
+        with urllib.request.urlopen(req) as r:
+            return r.status
+    except urllib.error.HTTPError as e:
+        msg = e.read().decode()
+        if "does not exist" in msg:
+            print("\n✗  Column missing — run 00_migrations.sql in Supabase SQL editor first:")
+            print("   https://supabase.com/dashboard → SQL editor → paste 00_migrations.sql\n")
+            sys.exit(1)
+        raise
 
 def cosine(a, b):
-    dot  = sum(x*y for x,y in zip(a,b))
+    dot  = sum(x*y for x,y in zip(a, b))
     magA = math.sqrt(sum(x*x for x in a))
     magB = math.sqrt(sum(x*x for x in b))
     return dot / (magA * magB) if magA and magB else 0.0
@@ -43,13 +50,12 @@ def cosine(a, b):
 def avg_vec(vecs):
     if not vecs:
         return None
-    n = len(vecs[0])
+    n   = len(vecs[0])
     avg = [sum(v[i] for v in vecs) / len(vecs) for i in range(n)]
-    # L2-normalise
     mag = math.sqrt(sum(x*x for x in avg))
     return [x/mag for x in avg] if mag else avg
 
-# ── Fetch milestones WITH embeddings ─────────────────────────────────────────
+# ── Fetch milestones with embeddings ─────────────────────────────────────────
 print("Fetching milestone embeddings...")
 rows, offset, page = [], 0, 500
 while True:
@@ -62,66 +68,61 @@ while True:
     offset += page
 print(f"  {len(rows)} milestones with embeddings")
 
-# ── Fetch entities ────────────────────────────────────────────────────────────
-entities = sb_get("entities", "select=id,name&order=name&limit=100")
-eid_to_name = {e["id"]: e["name"] for e in entities}
-print(f"  {len(entities)} entities")
+if not rows:
+    print("\n✗  No milestone embeddings found. Run 01_enrich_embeddings.py first.")
+    sys.exit(1)
 
-# ── Compute per-entity average embedding ─────────────────────────────────────
-entity_vecs = {}   # entity_id → avg embedding
-by_entity   = {}
+# ── Fetch entities ────────────────────────────────────────────────────────────
+entities   = sb_get("entities", "select=id,name&order=name&limit=100")
+eid_to_name = {e["id"]: e["name"] for e in entities}
+print(f"  {len(entities)} entities\n")
+
+# ── Per-entity average embedding ─────────────────────────────────────────────
+by_entity = {}
 for m in rows:
-    eid = m["entity_id"]
     emb = m.get("embedding")
     if not emb:
         continue
-    # embedding may be stored as string in some Supabase setups
     if isinstance(emb, str):
         emb = json.loads(emb)
-    by_entity.setdefault(eid, []).append(emb)
+    by_entity.setdefault(m["entity_id"], []).append(emb)
 
+entity_vecs = {}
 for eid, vecs in by_entity.items():
     entity_vecs[eid] = avg_vec(vecs)
-    print(f"  {eid_to_name.get(eid,'?')} — {len(vecs)} milestone vectors averaged")
+
+print("Entity vectors computed:")
+for eid, vecs in by_entity.items():
+    print(f"  {eid_to_name.get(eid,'?'):<30} {len(vecs)} milestone vectors")
 
 # ── Pairwise cosine similarity ────────────────────────────────────────────────
-print("\nComputing pairwise similarity...")
-eids  = list(entity_vecs.keys())
-sims  = {}   # eid → list of (other_name, score) sorted desc
-for i, a in enumerate(eids):
+print("\nComputing pairwise cosine similarity...")
+eids = list(entity_vecs.keys())
+sims = {}
+for a in eids:
     scores = []
     for b in eids:
         if a == b:
             continue
         s = cosine(entity_vecs[a], entity_vecs[b])
-        scores.append((eid_to_name.get(b, b), round(s, 4)))
-    scores.sort(key=lambda x: -x[1])
-    sims[a] = scores[:5]   # top 5 similar entities
+        scores.append({"name": eid_to_name.get(b, b), "similarity": round(s, 4)})
+    scores.sort(key=lambda x: -x["similarity"])
+    sims[a] = scores[:5]
 
-# ── Write aggregate embedding + similar_entities back to Supabase ─────────────
-print("\nWriting to Supabase entities table...")
-updated = 0
-for eid, vec in entity_vecs.items():
-    payload = {
-        "aggregate_embedding": vec,
-        "similar_entities": json.dumps([
-            {"name": n, "similarity": s} for n, s in sims.get(eid, [])
-        ])
-    }
+# ── Write similar_entities to Supabase ───────────────────────────────────────
+print("\nWriting similar_entities to Supabase...")
+updated, failed = 0, 0
+for eid in eids:
     try:
-        sb_patch("entities", f"id=eq.{eid}", payload)
+        sb_patch("entities", f"id=eq.{eid}", {"similar_entities": sims.get(eid, [])})
         updated += 1
         top = sims.get(eid, [])[:3]
-        top_str = ", ".join(f"{n} ({s:.3f})" for n,s in top)
-        print(f"  ✓ {eid_to_name.get(eid,'?'):<30} similar: {top_str}")
+        top_str = ", ".join(f"{s['name']} ({s['similarity']:.3f})" for s in top)
+        print(f"  ✓ {eid_to_name.get(eid,'?'):<28}  →  {top_str}")
     except Exception as ex:
         print(f"  ✗ {eid_to_name.get(eid,'?')}: {ex}")
+        failed += 1
 
-print(f"\n✓ Done: {updated}/{len(entity_vecs)} entity vectors written")
-print("\nNote: requires aggregate_embedding (vector) and similar_entities (jsonb)")
-print("columns on entities table. Run migration SQL below if they don't exist:")
-print("""
-  ALTER TABLE entities
-    ADD COLUMN IF NOT EXISTS aggregate_embedding vector(1536),
-    ADD COLUMN IF NOT EXISTS similar_entities    jsonb;
-""")
+print(f"\n{'✓' if not failed else '!'} Done: {updated} updated, {failed} failed")
+if failed:
+    print("  → Run 00_migrations.sql in Supabase SQL editor, then retry.")

@@ -1,55 +1,69 @@
 #!/usr/bin/env python3
 """
-Script 3: Add evidence_quality field and backfill
----------------------------------------------------
-evidence_quality (1–3) captures HOW certain we are of a milestone:
-  3 = Confirmed    — published paper, shipped product, public announcement with details
-  2 = Reported     — announced but unverified; press release without demo
-  1 = Speculative  — inferred from signals, rumour, or analyst estimate
+Script 3: Backfill evidence_quality on all milestones
+------------------------------------------------------
+evidence_quality (1–3):
+  3 = Confirmed    — demonstrated in production / published paper
+  2 = Reported     — announced but unverified (default)
+  1 = Speculative  — inferred from signals or analyst estimate
 
 Backfill logic:
-  demonstrated  → 3
-  announced     → 2
-  inferred      → 1
-  null          → 2 (default)
+  claim_type=demonstrated  → 3
+  claim_type=announced     → 2
+  claim_type=inferred      → 1  (also any is_contested milestone drops 1 point, floor 1)
 
+Prerequisite: run 00_migrations.sql in Supabase SQL editor first.
 Run:  python3 scripts/03_evidence_quality.py
-
-After running, the dashboard search will show quality badges automatically.
 """
 
-import json, urllib.request
+import json, urllib.request, urllib.error, sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from _config import SB_URL, SB_KEY
 
-SB_URL = "https://yjupiuxuoxmycehkbmwl.supabase.co"
-SB_KEY = "sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr"
-SB_HDR = {"apikey": SB_KEY, "Authorization": f"Bearer {SB_KEY}",
-          "Content-Type": "application/json", "Prefer": "return=minimal"}
+SB_HDR  = {"apikey": SB_KEY, "Authorization": f"Bearer {SB_KEY}",
+           "Content-Type": "application/json"}
+SB_WRIT = {**SB_HDR, "Prefer": "return=minimal"}
 
 def sb_get(path, qs=""):
     url = f"{SB_URL}/rest/v1/{path}?{qs}"
-    req = urllib.request.Request(url, headers={k:v for k,v in SB_HDR.items() if k!="Prefer"})
+    req = urllib.request.Request(url, headers=SB_HDR)
     with urllib.request.urlopen(req) as r:
         return json.loads(r.read())
 
-def sb_patch(match_qs, body):
-    url  = f"{SB_URL}/rest/v1/milestones?{match_qs}"
-    data = json.dumps(body).encode()
-    req  = urllib.request.Request(url, data=data, headers=SB_HDR, method="PATCH")
-    with urllib.request.urlopen(req) as r:
-        return r.status
+def sb_patch_bulk(ids, quality):
+    """Patch a batch of milestone IDs to the given evidence_quality."""
+    if not ids:
+        return 0
+    id_csv = ",".join(str(i) for i in ids)
+    url    = f"{SB_URL}/rest/v1/milestones?id=in.({id_csv})"
+    data   = json.dumps({"evidence_quality": quality}).encode()
+    req    = urllib.request.Request(url, data=data, headers=SB_WRIT, method="PATCH")
+    try:
+        with urllib.request.urlopen(req) as r:
+            return len(ids)
+    except urllib.error.HTTPError as e:
+        msg = e.read().decode()
+        if "does not exist" in msg:
+            print("\n✗  Column 'evidence_quality' missing.")
+            print("   Run 00_migrations.sql in Supabase SQL editor first:")
+            print("   https://supabase.com/dashboard → SQL editor → paste scripts/00_migrations.sql\n")
+            sys.exit(1)
+        # Batch may be too large for URL — fall back to individual updates
+        print(f"  Batch of {len(ids)} too large, updating individually...")
+        ok = 0
+        for mid in ids:
+            try:
+                url2  = f"{SB_URL}/rest/v1/milestones?id=eq.{mid}"
+                data2 = json.dumps({"evidence_quality": quality}).encode()
+                req2  = urllib.request.Request(url2, data=data2, headers=SB_WRIT, method="PATCH")
+                with urllib.request.urlopen(req2):
+                    ok += 1
+            except:
+                pass
+        return ok
 
-print("Step 1: Add evidence_quality column (run this SQL in Supabase SQL editor if not done):")
-print("""
-  ALTER TABLE milestones
-    ADD COLUMN IF NOT EXISTS evidence_quality INTEGER DEFAULT 2
-    CHECK (evidence_quality BETWEEN 1 AND 3);
-  COMMENT ON COLUMN milestones.evidence_quality IS
-    '3=Confirmed, 2=Reported/Announced, 1=Speculative/Inferred';
-""")
-input("Press Enter once column exists (or if it already does)...")
-
-# ── Fetch all milestones ──────────────────────────────────────────────────────
-print("\nFetching milestones...")
+# ── Fetch milestones ──────────────────────────────────────────────────────────
+print("Fetching milestones...")
 rows, offset = [], 0
 while True:
     batch = sb_get("milestones",
@@ -58,46 +72,40 @@ while True:
     if len(batch) < 500:
         break
     offset += 500
-print(f"  {len(rows)} milestones loaded")
+print(f"  {len(rows)} milestones loaded\n")
 
-# ── Backfill mapping ──────────────────────────────────────────────────────────
+# ── Score every milestone ─────────────────────────────────────────────────────
 def score(m):
     ct = (m.get("claim_type") or "").lower()
     s  = {"demonstrated": 3, "announced": 2, "inferred": 1}.get(ct, 2)
-    # Contested claims lose one quality point (floor 1)
     if m.get("is_contested"):
         s = max(1, s - 1)
     return s
 
-# Group by score to batch updates (3 API calls instead of N)
-by_score = {1:[], 2:[], 3:[]}
+by_score = {1: [], 2: [], 3: []}
 for m in rows:
     by_score[score(m)].append(m["id"])
 
-# ── Apply updates ─────────────────────────────────────────────────────────────
-print("\nApplying evidence_quality scores...")
-for q, ids in sorted(by_score.items()):
-    if not ids:
-        continue
-    label = {3:"Confirmed", 2:"Reported", 1:"Speculative"}[q]
-    # Supabase in() filter
-    id_list = ",".join(str(i) for i in ids)
-    try:
-        sb_patch(f"id=in.({id_list})", {"evidence_quality": q})
-        print(f"  ✓ quality={q} ({label:<12}): {len(ids):>4} milestones updated")
-    except Exception as e:
-        # Fallback: update one by one if batch too large
-        print(f"  Batch failed for q={q}, updating individually...")
-        ok = 0
-        for mid in ids:
-            try:
-                sb_patch(f"id=eq.{mid}", {"evidence_quality": q})
-                ok += 1
-            except:
-                pass
-        print(f"  ✓ quality={q} ({label:<12}): {ok}/{len(ids)} updated individually")
+labels = {3: "Confirmed   ", 2: "Reported    ", 1: "Speculative "}
+total  = 0
 
-print(f"\n✓ Done: {len(rows)} milestones now have evidence_quality scores")
-print("\nQuality distribution:")
-for q, ids in sorted(by_score.items()):
-    print(f"  {q} — {len(ids):>4} milestones")
+# ── Apply in bulk (one PATCH per quality level) ───────────────────────────────
+print("Applying evidence_quality scores (3 bulk updates)...")
+
+# Split into chunks of 200 IDs to stay within URL length limits
+def chunks(lst, n=200):
+    for i in range(0, len(lst), n):
+        yield lst[i:i+n]
+
+for q in [3, 2, 1]:
+    ids = by_score[q]
+    if not ids:
+        print(f"  quality={q} ({labels[q]}): 0 milestones — skipped")
+        continue
+    updated = 0
+    for chunk in chunks(ids):
+        updated += sb_patch_bulk(chunk, q)
+    total += updated
+    print(f"  quality={q} ({labels[q]}): {updated:>4} milestones ✓")
+
+print(f"\n✓ Done: {total}/{len(rows)} milestones updated with evidence_quality")

@@ -10,11 +10,10 @@ Run:  python3 scripts/01_enrich_embeddings.py
 Cost: ~$0.02-0.05 for ~400 milestones at text-embedding-3-small pricing
 """
 
-import json, time, urllib.request, urllib.parse
-
-SB_URL  = "https://yjupiuxuoxmycehkbmwl.supabase.co"
-SB_KEY  = "sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr"
-OAI_KEY = input("Enter your OpenAI API key: ").strip()
+import json, time, urllib.request, urllib.parse, sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).parent))
+from _config import SB_URL, SB_KEY, get_openai_key
+OAI_KEY = get_openai_key()
 
 SB_HDR  = {"apikey": SB_KEY, "Authorization": f"Bearer {SB_KEY}",
            "Content-Type": "application/json"}
