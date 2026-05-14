@@ -88,9 +88,10 @@ body {
   z-index:50; position:relative;
 }
 .detail-panel.open {
-  max-height:160px;
+  max-height:320px;
   padding:14px 24px;
 }
+.detail-inner { overflow-y:auto; max-height:290px; }
 .detail-inner { display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap; }
 .detail-name  { font-size:18px; font-weight:800; line-height:1; }
 .detail-api   { font-size:10px; color:#475569; font-family:monospace; margin-top:4px; }
@@ -103,6 +104,22 @@ body {
 .dfeat        { font-size:10px; padding:3px 9px; border-radius:12px; background:rgba(255,255,255,.05); color:#94a3b8; border:1px solid rgba(255,255,255,.07); white-space:nowrap; }
 .close-btn    { margin-left:auto; background:none; border:none; color:#475569; cursor:pointer; font-size:18px; padding:4px; line-height:1; transition:color .2s; align-self:flex-start; flex-shrink:0; }
 .close-btn:hover { color:#e2e8f0; }
+
+/* ── MILESTONE LIST ── */
+.mile-section { margin-top:12px; border-top:1px solid rgba(255,255,255,.07); padding-top:10px; flex:1; min-width:260px; max-width:100%; }
+.mile-section-title { font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:#475569; font-weight:700; margin-bottom:7px; }
+.mile-list { display:flex; flex-direction:column; gap:5px; max-height:160px; overflow-y:auto; padding-right:4px; }
+.mile-list::-webkit-scrollbar { width:3px; }
+.mile-list::-webkit-scrollbar-track { background:transparent; }
+.mile-list::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+.mile-item { background:rgba(255,255,255,.03); border-radius:6px; padding:6px 9px; border-left:2px solid; cursor:default; transition:background .15s; }
+.mile-item:hover { background:rgba(255,255,255,.06); }
+.mile-date  { font-size:9px; color:#475569; margin-bottom:2px; }
+.mile-evt   { font-size:11px; color:#cbd5e1; line-height:1.4; }
+.mile-sig   { font-size:10px; color:#64748b; margin-top:3px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.mile-chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
+.mile-chip  { font-size:9px; padding:1px 6px; border-radius:8px; background:rgba(255,255,255,.06); color:#64748b; }
+.mile-loading { color:#334155; font-size:11px; padding:8px 0; }
 
 /* ── TOOLTIP ── */
 .tooltip {
@@ -179,6 +196,45 @@ body {
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE — live milestones
+// ═══════════════════════════════════════════════════════════
+const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
+const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
+const SBH = { apikey:KEY, Authorization:'Bearer '+KEY };
+const _provNameMap = { anthropic:'Anthropic', openai:'OpenAI', google:'Google DeepMind' };
+let _entCache = {};   // name → entity object
+let _mileCache = {};  // entityId → milestones[]
+
+async function sbGet(table, qs) {
+  const r = await fetch(`${SB}/rest/v1/${table}?${qs}`, { headers:SBH });
+  if (!r.ok) return [];
+  return r.json();
+}
+
+async function getEntityId(provKey) {
+  const name = _provNameMap[provKey];
+  if (_entCache[name]) return _entCache[name].id;
+  const rows = await sbGet('entities', `select=id,name&name=eq.${encodeURIComponent(name)}&limit=1`);
+  if (rows[0]) _entCache[name] = rows[0];
+  return rows[0]?.id || null;
+}
+
+async function getMilestones(provKey) {
+  const id = await getEntityId(provKey);
+  if (!id) return [];
+  if (_mileCache[id]) return _mileCache[id];
+  const rows = await sbGet('milestones',
+    `select=date,event,significance,strategic_signal,forward_implication_score,claim_type,stack_layer,tags`+
+    `&entity_id=eq.${id}&order=date.desc&limit=40`);
+  _mileCache[id] = rows;
+  return rows;
+}
+
+function claimColor(ct) {
+  return ct==='demonstrated'?'#10b981':ct==='announced'?'#3b82f6':'#f59e0b';
+}
+
 // ═══════════════════════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════════════════════
@@ -622,9 +678,9 @@ function drawTree(provKey, animate=true){
       if(selectedNodeId===n.id && isZoomed){ zoomOut(); return; }
       selectedNodeId=n.id;
       ripple(n.x, n.y, tree.color, gRipples);
-      zoomToNode(n);
+      if(!n.id||n.id!=='root') zoomToNode(n);
       showFeatChips(n, tree, nMap, gFeatChips);
-      showDetail(n, tree);
+      showDetail(n, tree);  // async — renders panel immediately, then fills milestones
     });
   });
 
@@ -788,16 +844,52 @@ function zoomOut(){
 // ═══════════════════════════════════════════════════════════
 //  DETAIL PANEL
 // ═══════════════════════════════════════════════════════════
-function showDetail(n, tree){
+async function showDetail(n, tree){
   const panel=document.getElementById('detail-panel');
   const inner=document.getElementById('detail-inner');
-  if(!n.api){ panel.classList.remove('open'); return; }
-
+  const isRoot = n.id==='root';
   const tc={ haiku:'#f87171',sonnet:'#fb923c',opus:'#c084fc',
     standard:'#34d399',mini:'#86efac',reasoning:'#60a5fa','mini-r':'#a5f3fc',
-    pro:'#60a5fa',flash:'#34d399',gemini:'#93c5fd',early:'#94a3b8' }[n.tier]||tree.color;
+    pro:'#60a5fa',flash:'#34d399',gemini:'#93c5fd',early:'#94a3b8',root:'#94a3b8' }[n.tier]||tree.color;
 
   const feats=TREES[currentProvider].feats?.[n.id]||[];
+
+  if(isRoot){
+    // Company root: show company overview + milestones
+    inner.innerHTML=`
+      <div style="min-width:200px">
+        <div class="detail-name" style="color:${tree.light}">${tree.name}</div>
+        <div class="detail-api">Intelligence Knowledge Graph</div>
+        <span class="detail-tier" style="color:${tree.color};border-color:${tree.color}">company</span>
+      </div>
+      <div class="mile-section" style="border-color:${tree.color}">
+        <div class="mile-section-title">📡 Major Milestones & Announcements</div>
+        <div class="mile-list" id="mile-list"><div class="mile-loading">Loading live data…</div></div>
+      </div>
+      <button class="close-btn" onclick="zoomOut()" title="Zoom out">×</button>
+    `;
+    panel.classList.add('open');
+    _renderMilestones(currentProvider, tree, null, null);
+    return;
+  }
+
+  if(!n.api){ panel.classList.remove('open'); return; }
+
+  // Model node: parse date range ±5 months around launch
+  const launchYear = parseInt((n.sub||'').match(/\d{4}/)?.[0]||'0');
+  const launchMonth = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    .findIndex(m=>(n.sub||'').includes(m));
+  const hasDates = launchYear > 2010;
+  let dateFrom=null, dateTo=null;
+  if(hasDates){
+    const d=new Date(launchYear, launchMonth>=0?launchMonth:0, 1);
+    d.setMonth(d.getMonth()-5);
+    dateFrom=d.toISOString().slice(0,10);
+    const d2=new Date(launchYear, launchMonth>=0?launchMonth:0, 1);
+    d2.setMonth(d2.getMonth()+5);
+    dateTo=d2.toISOString().slice(0,10);
+  }
+
   inner.innerHTML=`
     <div style="min-width:180px">
       <div class="detail-name" style="color:${tree.light}">${n.label.replace('\n',' ')}</div>
@@ -810,9 +902,51 @@ function showDetail(n, tree){
       <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.price?'$'+n.price:'—'}</div><div class="dstat-lbl">Price /M out</div></div>
     </div>
     ${feats.length?`<div class="detail-feats">${feats.map(f=>`<span class="dfeat">✦ ${f}</span>`).join('')}</div>`:''}
+    <div class="mile-section" style="border-color:${tree.color}">
+      <div class="mile-section-title">🌿 What was happening around this launch</div>
+      <div class="mile-list" id="mile-list"><div class="mile-loading">Fetching context…</div></div>
+    </div>
     <button class="close-btn" onclick="zoomOut()" title="Zoom out">×</button>
   `;
   panel.classList.add('open');
+  _renderMilestones(currentProvider, tree, dateFrom, dateTo);
+}
+
+async function _renderMilestones(provKey, tree, dateFrom, dateTo){
+  const list = document.getElementById('mile-list');
+  if(!list) return;
+  try {
+    let rows = await getMilestones(provKey);
+    // Filter by date range if provided (model context window)
+    if(dateFrom && dateTo){
+      rows = rows.filter(m=>m.date>=dateFrom && m.date<=dateTo);
+      if(!rows.length){
+        // Fall back to top 6 high-signal milestones if no date match
+        rows = [..._mileCache[Object.keys(_mileCache).at(-1)]||[]]
+          .sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0))
+          .slice(0,6);
+      }
+    } else {
+      // Company root: show top 12 by score
+      rows = [...rows].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0)).slice(0,12);
+    }
+    if(!rows.length){ list.innerHTML='<div class="mile-loading">No milestones found</div>'; return; }
+
+    list.innerHTML = rows.map(m=>{
+      const cc = claimColor(m.claim_type);
+      const score = m.forward_implication_score;
+      const scoreDots = score ? '◆'.repeat(score)+'◇'.repeat(5-score) : '';
+      const tags = (m.tags||[]).slice(0,3).map(t=>`<span class="mile-chip">${t}</span>`).join('');
+      return `<div class="mile-item" style="border-color:${cc}20;border-left-color:${cc}">
+        <div class="mile-date">${(m.date||'').slice(0,7)} ${m.claim_type?`<span style="color:${cc};font-size:9px">${m.claim_type}</span>`:''} ${score?`<span style="color:#334155;letter-spacing:1px;font-size:8px">${scoreDots}</span>`:''}</div>
+        <div class="mile-evt">${m.event||''}</div>
+        ${m.significance?`<div class="mile-sig">${m.significance}</div>`:''}
+        ${tags?`<div class="mile-chips">${tags}</div>`:''}
+      </div>`;
+    }).join('');
+  } catch(e){
+    if(list) list.innerHTML=`<div class="mile-loading" style="color:#ef4444">Could not load — ${e.message}</div>`;
+  }
 }
 
 function closeDetail(){

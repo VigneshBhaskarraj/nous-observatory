@@ -188,6 +188,7 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
   <button class="ntab" onclick="sw(event,'signals')">Signals</button>
   <button class="ntab" onclick="sw(event,'search')">Search</button>
   <button class="ntab" onclick="sw(event,'models')">⚗️ Models</button>
+  <button class="ntab" onclick="sw(event,'tree')">🌳 Model Tree</button>
 </nav>
 
 <!-- ── OVERVIEW ── -->
@@ -255,6 +256,11 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
     </div>
   </div>
   <div class="res-list" id="results"><div class="empty">Type to search across 299 milestones</div></div>
+</div>
+
+<!-- ── TREE ── -->
+<div class="tab" id="t-tree" style="padding:0;height:calc(100vh - 97px);overflow:hidden">
+  <iframe id="tree-frame" src="" style="width:100%;height:100%;border:none;display:block" allow="fullscreen"></iframe>
 </div>
 
 <!-- ── MODELS ── -->
@@ -340,6 +346,10 @@ async function sw(ev, id) {
   document.querySelectorAll('.ntab').forEach(b => b.classList.remove('on'));
   document.getElementById('t-'+id).classList.add('on');
   ev.target.classList.add('on');
+  if (id === 'tree') {
+    const fr = document.getElementById('tree-frame');
+    if (!fr.src || fr.src === window.location.href) fr.src = 'model-tree.html';
+  }
   if (id === 'models' && !MF.loaded) {
     try {
       await loadMF();
