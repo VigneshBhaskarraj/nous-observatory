@@ -6,17 +6,18 @@
 <title>Model Evolution Tree — Nous Observatory</title>
 <style>
 :root {
-  --bg: #04080f;
-  --pc: #cf6679;
-  --pc-dim: #6b2232;
-  --pc-light: #f0a0b5;
-  --pc-glow: rgba(207,102,121,0.35);
+  --bg: #c8e8d8;
+  --pc: #c0622f;
+  --pc-dim: #7a3418;
+  --pc-light: #f4a87a;
+  --pc-glow: rgba(192,98,47,0.3);
 }
 * { box-sizing:border-box; margin:0; padding:0; }
 html, body { width:100%; height:100%; overflow:hidden; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg); color:#e2e8f0;
+  background: linear-gradient(180deg,#a8d8f0 0%,#c8eaf8 22%,#d8f0e0 55%,#9ecf80 100%);
+  color:#2d1a0a;
   display:flex; flex-direction:column;
   transition: background 0.8s;
 }
@@ -24,115 +25,115 @@ body {
 /* ── HEADER ── */
 .hdr {
   flex-shrink:0;
-  background:rgba(4,8,15,0.92); border-bottom:1px solid rgba(255,255,255,.06);
-  padding:10px 24px; display:flex; align-items:center; justify-content:space-between;
-  backdrop-filter:blur(12px); z-index:200; position:relative;
+  background:rgba(255,252,240,0.90); border-bottom:1px solid rgba(90,140,60,0.22);
+  padding:9px 24px; display:flex; align-items:center; justify-content:space-between;
+  backdrop-filter:blur(14px); z-index:200; position:relative;
+  box-shadow:0 1px 6px rgba(45,74,26,.07);
 }
 .hdr-left { display:flex; align-items:center; gap:14px; }
-.hdr-title { font-size:15px; font-weight:800; letter-spacing:-.3px; }
-.hdr-sub   { font-size:11px; color:#475569; }
+.hdr-title { font-size:15px; font-weight:800; letter-spacing:-.3px; color:#2a4a18; }
+.hdr-sub   { font-size:11px; color:#6a8a5a; }
 .hdr-links { display:flex; gap:12px; }
-.hdr-link  { font-size:11px; color:#4285f4; text-decoration:none; opacity:.7; transition:opacity .2s; }
+.hdr-link  { font-size:11px; color:#2d6ea8; text-decoration:none; opacity:.7; transition:opacity .2s; }
 .hdr-link:hover { opacity:1; }
 
 /* ── PROVIDER TABS ── */
 .ptabs {
   flex-shrink:0; display:flex; justify-content:center; gap:10px;
-  padding:12px 0 6px; position:relative; z-index:10;
+  padding:10px 0 5px; position:relative; z-index:10;
 }
 .ptab {
-  padding:6px 26px; border-radius:20px; border:1.5px solid;
-  font-size:12px; font-weight:700; cursor:pointer;
+  padding:5px 24px; border-radius:20px; border:1.5px solid;
+  font-size:11px; font-weight:700; cursor:pointer;
   transition:all .3s cubic-bezier(.34,1.56,.64,1);
-  background:transparent; opacity:.4; transform:scale(.95);
+  background:rgba(255,255,255,0.55); opacity:.5; transform:scale(.95);
 }
 .ptab.on { opacity:1; transform:scale(1); }
-.ptab.ant { border-color:#cf6679; color:#cf6679; }
-.ptab.ant.on { background:rgba(207,102,121,.12); box-shadow:0 0 20px rgba(207,102,121,.2); }
-.ptab.oai { border-color:#10a37f; color:#10a37f; }
-.ptab.oai.on { background:rgba(16,163,127,.12); box-shadow:0 0 20px rgba(16,163,127,.2); }
-.ptab.goo { border-color:#4285f4; color:#4285f4; }
-.ptab.goo.on { background:rgba(66,133,244,.12); box-shadow:0 0 20px rgba(66,133,244,.2); }
+.ptab.ant { border-color:#c0622f; color:#c0622f; }
+.ptab.ant.on { background:rgba(192,98,47,.1); box-shadow:0 2px 14px rgba(192,98,47,.22); }
+.ptab.oai { border-color:#1d8a52; color:#1d8a52; }
+.ptab.oai.on { background:rgba(29,138,82,.1); box-shadow:0 2px 14px rgba(29,138,82,.22); }
+.ptab.goo { border-color:#3a85c8; color:#3a85c8; }
+.ptab.goo.on { background:rgba(58,133,200,.1); box-shadow:0 2px 14px rgba(58,133,200,.22); }
 
 /* ── MAIN STAGE ── */
-.stage {
-  flex:1; position:relative; overflow:hidden;
-  display:flex; flex-direction:column;
-}
-#particle-canvas {
-  position:absolute; inset:0; pointer-events:none; z-index:1;
-}
-#tree-svg {
-  position:relative; z-index:2;
-  width:100%; height:100%;
-  cursor:default;
-  transition:filter .5s;
-}
+.stage { flex:1; position:relative; overflow:hidden; display:flex; flex-direction:column; }
+#particle-canvas { position:absolute; inset:0; pointer-events:none; z-index:1; }
+#tree-svg { position:relative; z-index:2; width:100%; height:100%; cursor:default; transition:filter .4s; }
 #tree-svg.zoomed { cursor:zoom-out; }
 
-/* Zoom hint */
 .zoom-hint {
-  position:absolute; bottom:12px; left:50%; transform:translateX(-50%);
-  font-size:11px; color:#334155; z-index:5; pointer-events:none;
-  transition:opacity .4s;
+  position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+  font-size:10px; color:rgba(45,74,26,0.45); z-index:5; pointer-events:none;
+  transition:opacity .4s; font-style:italic;
 }
 
-/* ── DETAIL PANEL (slides up) ── */
+/* ── DETAIL PANEL ── */
 .detail-panel {
   flex-shrink:0;
-  background:rgba(8,15,28,.97);
-  border-top:1px solid rgba(255,255,255,.07);
+  background:rgba(255,253,242,0.97);
+  border-top:2px solid rgba(90,140,60,0.22);
   padding:0; max-height:0; overflow:hidden;
   transition: max-height .45s cubic-bezier(.4,0,.2,1), padding .45s;
-  backdrop-filter:blur(16px);
-  z-index:50; position:relative;
+  backdrop-filter:blur(16px); z-index:50; position:relative;
+  box-shadow:0 -4px 20px rgba(45,74,26,.08);
 }
-.detail-panel.open {
-  max-height:320px;
-  padding:14px 24px;
-}
-.detail-inner { overflow-y:auto; max-height:290px; }
-.detail-inner { display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap; }
-.detail-name  { font-size:18px; font-weight:800; line-height:1; }
-.detail-api   { font-size:10px; color:#475569; font-family:monospace; margin-top:4px; }
-.detail-tier  { font-size:10px; font-weight:700; padding:2px 10px; border-radius:10px; border:1px solid; margin-top:6px; display:inline-block; }
-.detail-stats { display:flex; gap:10px; flex-wrap:wrap; }
-.dstat        { background:rgba(255,255,255,.04); border-radius:8px; padding:8px 14px; min-width:80px; }
-.dstat-val    { font-size:16px; font-weight:700; }
-.dstat-lbl    { font-size:9px; color:#64748b; text-transform:uppercase; letter-spacing:.4px; margin-top:1px; }
-.detail-feats { display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
-.dfeat        { font-size:10px; padding:3px 9px; border-radius:12px; background:rgba(255,255,255,.05); color:#94a3b8; border:1px solid rgba(255,255,255,.07); white-space:nowrap; }
-.close-btn    { margin-left:auto; background:none; border:none; color:#475569; cursor:pointer; font-size:18px; padding:4px; line-height:1; transition:color .2s; align-self:flex-start; flex-shrink:0; }
-.close-btn:hover { color:#e2e8f0; }
+.detail-panel.open { max-height:320px; padding:12px 22px; }
+.detail-inner { overflow-y:auto; max-height:292px; display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap; }
+.detail-name  { font-size:17px; font-weight:800; line-height:1; color:#2d1a0a; }
+.detail-api   { font-size:10px; color:#8a7a6a; font-family:monospace; margin-top:3px; }
+.detail-tier  { font-size:10px; font-weight:700; padding:2px 9px; border-radius:10px; border:1px solid; margin-top:5px; display:inline-block; }
+.detail-stats { display:flex; gap:8px; flex-wrap:wrap; }
+.dstat        { background:rgba(90,140,60,.08); border:1px solid rgba(90,140,60,.15); border-radius:8px; padding:7px 12px; min-width:76px; }
+.dstat-val    { font-size:15px; font-weight:700; }
+.dstat-lbl    { font-size:9px; color:#7a8a6a; text-transform:uppercase; letter-spacing:.4px; margin-top:1px; }
+.detail-feats { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
+.dfeat        { font-size:10px; padding:2px 8px; border-radius:11px; background:rgba(90,140,60,.1); color:#3a5a2a; border:1px solid rgba(90,140,60,.2); white-space:nowrap; }
+.close-btn    { margin-left:auto; background:none; border:none; color:#9aaa8a; cursor:pointer; font-size:17px; padding:4px; line-height:1; transition:color .2s; align-self:flex-start; flex-shrink:0; }
+.close-btn:hover { color:#2d1a0a; }
+
+/* ── USE CASE SECTION ── */
+.usecase-section { border-top:1px solid rgba(90,140,60,.18); padding-top:9px; margin-top:8px; min-width:190px; flex:1; }
+.usecase-title { font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:#6a8a5a; font-weight:700; margin-bottom:7px; }
+.uc-grid { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:7px; }
+.uc-chip { font-size:10px; padding:3px 9px; border-radius:11px; font-weight:600; white-space:nowrap; }
+.uc-code     { background:#dbeafe; color:#1e40af; }
+.uc-reason   { background:#d1fae5; color:#065f46; }
+.uc-write    { background:#fef3c7; color:#92400e; }
+.uc-analysis { background:#ede9fe; color:#5b21b6; }
+.uc-agent    { background:#fee2e2; color:#991b1b; }
+.uc-speed    { background:#ecfdf5; color:#065f46; }
+.uc-vision   { background:#e0f2fe; color:#0369a1; }
+.choose-when { font-size:10px; color:#3a5a2a; line-height:1.5; border-left:2px solid rgba(90,140,60,.35); padding-left:8px; margin-bottom:4px; }
+.skip-if     { font-size:10px; color:#7a5a3a; line-height:1.5; border-left:2px solid rgba(192,98,47,.3); padding-left:8px; font-style:italic; }
 
 /* ── MILESTONE LIST ── */
-.mile-section { margin-top:12px; border-top:1px solid rgba(255,255,255,.07); padding-top:10px; flex:1; min-width:260px; max-width:100%; }
-.mile-section-title { font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:#475569; font-weight:700; margin-bottom:7px; }
-.mile-list { display:flex; flex-direction:column; gap:5px; max-height:160px; overflow-y:auto; padding-right:4px; }
+.mile-section { border-top:1px solid rgba(90,140,60,.18); padding-top:9px; margin-top:8px; flex:1; min-width:240px; }
+.mile-section-title { font-size:9px; text-transform:uppercase; letter-spacing:.6px; color:#6a8a5a; font-weight:700; margin-bottom:6px; }
+.mile-list { display:flex; flex-direction:column; gap:4px; max-height:130px; overflow-y:auto; padding-right:3px; }
 .mile-list::-webkit-scrollbar { width:3px; }
 .mile-list::-webkit-scrollbar-track { background:transparent; }
-.mile-list::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
-.mile-item { background:rgba(255,255,255,.03); border-radius:6px; padding:6px 9px; border-left:2px solid; cursor:default; transition:background .15s; }
-.mile-item:hover { background:rgba(255,255,255,.06); }
-.mile-date  { font-size:9px; color:#475569; margin-bottom:2px; }
-.mile-evt   { font-size:11px; color:#cbd5e1; line-height:1.4; }
-.mile-sig   { font-size:10px; color:#64748b; margin-top:3px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.mile-chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
-.mile-chip  { font-size:9px; padding:1px 6px; border-radius:8px; background:rgba(255,255,255,.06); color:#64748b; }
-.mile-loading { color:#334155; font-size:11px; padding:8px 0; }
+.mile-list::-webkit-scrollbar-thumb { background:rgba(90,140,60,.3); border-radius:3px; }
+.mile-item { background:rgba(90,140,60,.05); border-radius:6px; padding:5px 8px; border-left:2px solid; cursor:default; transition:background .15s; }
+.mile-item:hover { background:rgba(90,140,60,.1); }
+.mile-date  { font-size:9px; color:#8a9a7a; margin-bottom:1px; }
+.mile-evt   { font-size:10px; color:#2d3a2a; line-height:1.4; }
+.mile-sig   { font-size:9px; color:#5a7a4a; margin-top:2px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.mile-chips { display:flex; gap:3px; flex-wrap:wrap; margin-top:3px; }
+.mile-chip  { font-size:9px; padding:1px 5px; border-radius:7px; background:rgba(90,140,60,.1); color:#4a6a3a; }
+.mile-loading { color:#8a9a7a; font-size:10px; padding:6px 0; }
 
 /* ── TOOLTIP ── */
 .tooltip {
-  position:fixed; background:rgba(8,16,30,.95);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:8px; padding:7px 12px; font-size:11px;
-  pointer-events:none; z-index:300; opacity:0;
-  transition:opacity .15s; backdrop-filter:blur(8px);
-  max-width:180px;
+  position:fixed; background:rgba(255,253,240,.97);
+  border:1px solid rgba(90,140,60,.25); border-radius:8px; padding:6px 11px; font-size:11px;
+  pointer-events:none; z-index:300; opacity:0; transition:opacity .15s;
+  backdrop-filter:blur(8px); max-width:180px; box-shadow:0 4px 12px rgba(45,74,26,.12);
+  color:#2d1a0a;
 }
 .tooltip.show { opacity:1; }
-.tt-name { font-weight:700; margin-bottom:2px; }
-.tt-year { color:#64748b; font-size:10px; }
+.tt-name { font-weight:700; margin-bottom:2px; color:#2d1a0a; }
+.tt-year { color:#8a9a7a; font-size:10px; }
 
 /* ── ANIMATIONS ── */
 @keyframes breathe {
@@ -140,7 +141,7 @@ body {
   50%      { transform:scale(1.08); opacity:.85; }
 }
 @keyframes ripple-out {
-  0%   { r:6px;  opacity:.9; stroke-width:2; }
+  0%   { r:6px;  opacity:.7; stroke-width:2; }
   100% { r:40px; opacity:0;  stroke-width:0.5; }
 }
 @keyframes feat-pop {
@@ -149,8 +150,8 @@ body {
   100% { transform:scale(1) translate(-50%,-50%); opacity:1; }
 }
 @keyframes leaf-sway {
-  0%,100% { transform:rotate(-3deg); }
-  50%      { transform:rotate(3deg); }
+  0%,100% { transform:rotate(-4deg); }
+  50%      { transform:rotate(4deg); }
 }
 </style>
 </head>
@@ -165,7 +166,6 @@ body {
     </div>
   </div>
   <div class="hdr-links">
-    <a href="event.html" class="hdr-link">⚡ Google I/O Brief</a>
     <a href="index.html" class="hdr-link">← Observatory</a>
   </div>
 </div>
@@ -238,9 +238,38 @@ function claimColor(ct) {
 // ═══════════════════════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════════════════════
+// Use-case decision data keyed by node id
+const USECASES = {
+  // Anthropic
+  c3h:  { chips:[['Speed','uc-speed'],['High volume','uc-code'],['APIs','uc-code']], when:'You need sub-200ms latency at massive scale — customer chat, classification pipelines, or real-time tagging under $0.50/M tokens.', skip:'Complex multi-step reasoning or tasks needing deep judgment. Use Sonnet or Opus instead.' },
+  c3s:  { chips:[['Balanced','uc-reason'],['General tasks','uc-analysis']], when:'Solid all-rounder when you want reliable Claude quality without Opus pricing. Good for drafting, summarisation, and lightweight coding.', skip:'If speed is the only constraint (use Haiku), or if the task requires frontier reasoning (use Opus).' },
+  c3o:  { chips:[['Complex reasoning','uc-reason'],['Research','uc-analysis'],['Long docs','uc-analysis']], when:'Tasks requiring nuanced judgment: evaluating arguments, scientific reasoning, complex legal analysis. Claude 3\'s ceiling.', skip:'High-throughput or latency-sensitive use cases. At $75/M output, budget carefully.' },
+  c35sj:{ chips:[['Coding','uc-code'],['Artifacts','uc-write'],['Vision','uc-vision']], when:'First Claude to reliably build interactive artifacts and handle PDF/image inputs. Good upgrade from Sonnet 3.', skip:'The Oct \'24 version supersedes this. Migrate to 3.5 Sonnet Oct for the same price.' },
+  c35so:{ chips:[['Coding agent','uc-agent'],['Computer Use','uc-code'],['Tools','uc-code']], when:'Agentic software workflows: automated code review, CI/CD integration, computer-use pipelines. SWE-bench 49%.', skip:'Simple one-shot queries. The agentic strength is wasted on single-turn tasks.' },
+  c35h: { chips:[['Fast','uc-speed'],['Affordable','uc-code'],['Vision','uc-vision']], when:'Cheapest Claude with vision and tool use. Perfect for image-description APIs, mobile AI features, or classification at scale.', skip:'Complex coding or reasoning — this is speed-optimised, not capability-optimised.' },
+  ch45: { chips:[['Consumer apps','uc-speed'],['MCP native','uc-agent'],['Low latency','uc-speed']], when:'Consumer-facing Claude apps via MCP. Fastest modern Claude for real-time streaming interactions.', skip:'Tasks needing extended thinking or complex multi-step planning.' },
+  cs45: { chips:[['Advanced coding','uc-code'],['Extended thinking','uc-reason'],['Hard problems','uc-reason']], when:'Extended thinking mode for problems that need step-by-step deliberation: competition math, architectural decisions, research-grade code. SWE-bench ~72%.', skip:'Straightforward tasks. Extended thinking costs extra tokens — only worth it when the problem is genuinely hard.' },
+  cs46: { chips:[['Latest Sonnet','uc-reason'],['Coding','uc-code'],['Extended thinking','uc-reason']], when:'Current best Sonnet. Choose for anything you\'d use Claude Sonnet for — now with the latest capability and safety improvements.', skip:'If cost is very tight, cs45 performs similarly at the same price.' },
+  co45: { chips:[['Research grade','uc-analysis'],['Complex reasoning','uc-reason'],['Long context','uc-analysis']], when:'Highest-stakes reasoning: legal review, medical research synthesis, financial modelling with nuanced judgment. Best Claude for deep thinking.', skip:'Anything requiring fast turnaround or high throughput. Opus is for quality-over-speed workflows.' },
+  co46: { chips:[['Best Claude','uc-reason'],['Research','uc-analysis'],['Judgment','uc-reason']], when:'When you need the absolute best Anthropic can offer. Frontier research, complex multi-document analysis, or critical decisions where quality is everything.', skip:'Routine tasks. Use this when you\'ve already tried Sonnet and it wasn\'t enough.' },
+  // OpenAI
+  gpt4: { chips:[['General','uc-analysis'],['Foundation','uc-reason']], when:'Historical reference — GPT-4 set the standard. Most use cases better served by gpt-4o now.', skip:'Modern use: gpt-4o outperforms at lower cost.' },
+  gpt4om:{ chips:[['Multimodal','uc-vision'],['Fast','uc-speed'],['Native audio','uc-write']], when:'Native audio/video processing or real-time multimodal tasks. First GPT-4 class model with genuine voice capability.', skip:'Text-only tasks — gpt-4o Aug or gpt-4o-mini is cheaper.' },
+  gpt4oa:{ chips:[['Structured output','uc-code'],['Best GPT-4o','uc-reason'],['JSON mode','uc-code']], when:'Current recommended GPT-4o. Reliable structured outputs and improved instruction following. Good default for most OpenAI use cases.', skip:'Heavy reasoning tasks — the o-series models are dramatically better.' },
+  gpt4mini:{ chips:[['Cheap','uc-speed'],['Fast','uc-speed'],['Vision','uc-vision']], when:'Budget-constrained high-volume tasks. GPT-4o class vision at 1/25th the price. Best OpenAI option for classification and extraction at scale.', skip:'Complex reasoning, long-chain problems, or when you need o-series quality.' },
+  o1:   { chips:[['Chain of thought','uc-reason'],['Science','uc-analysis'],['Math','uc-reason']], when:'First "reasoning model" — deliberately thinks before responding. Use for STEM problems, code debugging, or multi-step logic where GPT-4o makes errors.', skip:'Quick factual queries or creative writing. o1 is slower and more expensive than GPT-4o.' },
+  o3:   { chips:[['Best reasoning','uc-reason'],['Research','uc-analysis'],['SWE-bench 71%','uc-code']], when:'OpenAI\'s current reasoning frontier. Complex software engineering, advanced research, and problems that stumped o1. GPQA 87.7%.', skip:'Cost-sensitive tasks. o3 is expensive — use o4-mini for most coding/reasoning needs.' },
+  o4mini:{ chips:[['Fast reasoning','uc-reason'],['Coding','uc-code'],['Affordable','uc-speed']], when:'Best price-performance for reasoning tasks. 80%+ of o3 quality at 1/10th the cost. Most enterprise reasoning use cases.', skip:'Creative writing, simple Q&A. The reasoning overhead isn\'t needed.' },
+  // Google
+  g15pro:{ chips:[['2M context','uc-analysis'],['Video','uc-vision'],['Grounding','uc-code']], when:'Very long documents or video understanding at scale. 2M token context handles entire codebases, hour-long recordings, or huge PDF collections.', skip:'Cost-sensitive tasks or shorter context — Gemini 2.5 Flash offers better price/performance.' },
+  g20flash:{ chips:[['Fast','uc-speed'],['Real-time audio','uc-vision'],['Live API','uc-agent']], when:'Real-time streaming applications: voice assistants, live video analysis, interactive agents via the Live API.', skip:'Tasks needing the deepest reasoning — use Gemini 2.5 Pro instead.' },
+  g25pro:{ chips:[['Best Gemini','uc-reason'],['Think mode','uc-reason'],['Long context','uc-analysis']], when:'Google\'s frontier model. Use for the hardest reasoning tasks, complex coding, or whenever you need 1M context with deep thinking. SWE-bench 63.8%.', skip:'Simple queries or cost-sensitive workloads. 2.5 Flash offers 90% quality at 1/67th the price.' },
+  g25flash:{ chips:[['Best value','uc-speed'],['Think mode','uc-reason'],['Fast','uc-speed']], when:'Best price-performance in the Google lineup. Think mode + 1M context at $0.15/M input. Excellent default for most tasks.', skip:'If you genuinely need frontier reasoning ceiling — 2.5 Pro has higher cap.' },
+};
+
 const TREES = {
   anthropic: {
-    color:'#cf6679', dim:'#6b2232', light:'#f9c8d2', glow:'rgba(207,102,121,0.4)',
+    color:'#c0622f', dim:'#7a3418', light:'#f4d0a8', glow:'rgba(192,98,47,0.35)',
     name:'Anthropic',
     nodes:[
       {id:'root', x:410,y:510, label:'Anthropic',        sub:'Founded 2021', parent:null, r:13, tier:'root'},
@@ -273,7 +302,7 @@ const TREES = {
     }
   },
   openai:{
-    color:'#10a37f', dim:'#064e3b', light:'#6ee7b7', glow:'rgba(16,163,127,0.4)',
+    color:'#1d8a52', dim:'#0d4a2a', light:'#7be4a8', glow:'rgba(29,138,82,0.35)',
     name:'OpenAI',
     nodes:[
       {id:'root',    x:410,y:510, label:'OpenAI',         sub:'Founded 2015',  parent:null,    r:13, tier:'root'},
@@ -298,7 +327,7 @@ const TREES = {
     }
   },
   google:{
-    color:'#4285f4', dim:'#1a3a6b', light:'#93c5fd', glow:'rgba(66,133,244,0.4)',
+    color:'#3a85c8', dim:'#1a4a7a', light:'#90c8f0', glow:'rgba(58,133,200,0.35)',
     name:'Google DeepMind',
     nodes:[
       {id:'root',    x:410,y:510, label:'Google DeepMind', sub:'Merged 2023',    parent:null,    r:13, tier:'root'},
@@ -361,70 +390,106 @@ function resizeCanvas(){
   canvas.height = stage.offsetHeight;
 }
 
+// Daylight particle palette: pollen + floating petals + butterflies
 class Particle {
   constructor(type){ this.type=type; this.reset(true); }
   reset(init=false){
-    if(this.type==='firefly'){
-      this.x = 60 + Math.random()*(canvas.width-120);
-      this.y = init ? Math.random()*canvas.height : 50+Math.random()*(canvas.height-100);
-      this.baseX=this.x; this.baseY=this.y;
+    if(this.type==='pollen'){
+      this.x = 40+Math.random()*(canvas.width-80);
+      this.y = init ? Math.random()*canvas.height : canvas.height*0.85+Math.random()*40;
+      this.vy = -(0.3+Math.random()*0.5);
+      this.vx = (Math.random()-.5)*0.4;
+      this.size = 1.2+Math.random()*1.8;
+      this.alpha = 0; this.targetAlpha = 0.35+Math.random()*0.55;
       this.t = Math.random()*Math.PI*2;
-      this.speed = 0.004+Math.random()*0.006;
-      this.radius = 20+Math.random()*60;
-      this.size = 1.5+Math.random()*2;
-      this.alpha = 0; this.targetAlpha = 0.2+Math.random()*0.7;
-      this.alphaSpeed = 0.008+Math.random()*0.015;
-    } else {
-      this.x = 80+Math.random()*(canvas.width-160);
-      this.y = init ? Math.random()*canvas.height*0.6 : -15;
-      this.vx = (Math.random()-.5)*0.6;
-      this.vy = 0.4+Math.random()*0.7;
-      this.rot=Math.random()*360; this.rotSpd=(Math.random()-.5)*1.5;
-      this.w=6+Math.random()*7; this.h=(4+Math.random()*5);
-      this.alpha=0.5+Math.random()*0.4;
-      this.swing=Math.random()*Math.PI*2; this.swingSpeed=0.02+Math.random()*0.02;
+      this.wobble = 0.02+Math.random()*0.02;
+    } else if(this.type==='petal'){
+      this.x = 60+Math.random()*(canvas.width-120);
+      this.y = init ? Math.random()*canvas.height*0.7 : -12;
+      this.vx = (Math.random()-.5)*0.7;
+      this.vy = 0.35+Math.random()*0.6;
+      this.rot = Math.random()*360; this.rotSpd=(Math.random()-.5)*1.2;
+      this.w = 5+Math.random()*6; this.h = (3+Math.random()*4);
+      this.alpha = 0.5+Math.random()*0.4;
+      this.swing = Math.random()*Math.PI*2; this.swingSpd=0.025+Math.random()*0.02;
+      // petal colour: pale green, yellow, cream, soft pink
+      const cols=['rgba(180,220,140','rgba(240,210,100','rgba(255,240,200','rgba(230,190,180'];
+      this.color = cols[Math.floor(Math.random()*cols.length)];
+    } else { // butterfly
+      this.x = 60+Math.random()*(canvas.width-120);
+      this.y = 40+Math.random()*(canvas.height*0.7);
+      this.vx = (Math.random()-.5)*0.5; this.vy=(Math.random()-.5)*0.3;
+      this.t = Math.random()*Math.PI*2; this.speed=0.02+Math.random()*0.02;
+      this.flapT = Math.random()*Math.PI*2; this.flapSpd=0.12+Math.random()*0.08;
+      this.size = 6+Math.random()*5;
+      this.alpha = 0.5+Math.random()*0.4;
+      const bCols=[['#f97316','#7c2d12'],['#84cc16','#365314'],['#38bdf8','#0c4a6e'],['#f0abfc','#701a75']];
+      this.colors = bCols[Math.floor(Math.random()*bCols.length)];
     }
   }
   update(){
-    if(this.type==='firefly'){
-      this.t += this.speed;
-      this.x = this.baseX + Math.cos(this.t)*this.radius;
-      this.y = this.baseY + Math.sin(this.t*0.7)*this.radius*0.5;
-      // drift
-      this.baseX += (Math.random()-.5)*0.08;
-      this.baseY += (Math.random()-.5)*0.06;
-      this.baseX = Math.max(40, Math.min(canvas.width-40, this.baseX));
-      this.baseY = Math.max(30, Math.min(canvas.height-60, this.baseY));
-      // alpha flicker
-      this.alpha += (this.targetAlpha-this.alpha)*0.04;
-      if(Math.random()<0.003) this.targetAlpha = 0.1+Math.random()*0.8;
-    } else {
-      this.swing+=this.swingSpeed;
-      this.x += this.vx + Math.sin(this.swing)*0.4;
-      this.y += this.vy;
+    const t=TREES[currentProvider];
+    if(this.type==='pollen'){
+      this.t+=this.wobble;
+      this.x+=this.vx+Math.sin(this.t)*0.5;
+      this.y+=this.vy;
+      this.alpha+=(this.targetAlpha-this.alpha)*0.03;
+      if(Math.random()<0.004) this.targetAlpha=0.1+Math.random()*0.6;
+      if(this.y<-10) this.reset();
+    } else if(this.type==='petal'){
+      this.swing+=this.swingSpd;
+      this.x+=this.vx+Math.sin(this.swing)*0.5;
+      this.y+=this.vy;
       this.rot+=this.rotSpd;
-      if(this.y>canvas.height+20) this.reset();
+      if(this.y>canvas.height+15) this.reset();
+    } else {
+      this.t+=this.speed;
+      this.flapT+=this.flapSpd;
+      this.x+=this.vx+Math.sin(this.t)*0.8;
+      this.y+=this.vy+Math.cos(this.t*0.6)*0.4;
+      if(this.x<-20||this.x>canvas.width+20||this.y<-20||this.y>canvas.height+20) this.reset();
     }
   }
   draw(){
-    const t = TREES[currentProvider];
+    const t=TREES[currentProvider];
     ctx.save(); ctx.globalAlpha=this.alpha;
-    if(this.type==='firefly'){
-      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*5);
-      g.addColorStop(0,t.light); g.addColorStop(0.3,t.color); g.addColorStop(1,'transparent');
+    if(this.type==='pollen'){
+      // Soft golden glow dot
+      const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*3.5);
+      g.addColorStop(0,'rgba(255,220,80,0.9)'); g.addColorStop(0.4,'rgba(255,180,40,0.5)'); g.addColorStop(1,'transparent');
       ctx.fillStyle=g;
-      ctx.beginPath(); ctx.arc(this.x,this.y,this.size*5,0,Math.PI*2); ctx.fill();
-      ctx.fillStyle='#ffffff';
-      ctx.beginPath(); ctx.arc(this.x,this.y,this.size*0.4,0,Math.PI*2); ctx.fill();
-    } else {
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.size*3.5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='rgba(255,240,160,0.9)';
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.size*0.5,0,Math.PI*2); ctx.fill();
+    } else if(this.type==='petal'){
       ctx.translate(this.x,this.y); ctx.rotate(this.rot*Math.PI/180);
-      // Bodhi heart-shaped leaf
       ctx.beginPath();
       ctx.moveTo(0,-this.h);
-      ctx.bezierCurveTo(this.w,-this.h, this.w,this.h*0.3, 0,this.h);
-      ctx.bezierCurveTo(-this.w,this.h*0.3, -this.w,-this.h, 0,-this.h);
-      ctx.fillStyle='#4ade80'; ctx.fill();
-      ctx.strokeStyle='rgba(74,222,128,0.3)'; ctx.lineWidth=0.5; ctx.stroke();
+      ctx.bezierCurveTo(this.w,-this.h,this.w,this.h*0.3,0,this.h);
+      ctx.bezierCurveTo(-this.w,this.h*0.3,-this.w,-this.h,0,-this.h);
+      ctx.fillStyle=this.color+',0.7)'; ctx.fill();
+      ctx.strokeStyle=this.color+',0.3)'; ctx.lineWidth=0.4; ctx.stroke();
+    } else {
+      // Butterfly: two curved wings
+      const flap=Math.sin(this.flapT)*0.7;
+      ctx.translate(this.x,this.y);
+      ctx.fillStyle=this.colors[0];
+      // Left wing
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.bezierCurveTo(-this.size,this.size*flap,-this.size*1.5,-this.size*0.5,-this.size*0.5,-this.size*0.3);
+      ctx.bezierCurveTo(-this.size*0.3,-this.size*0.1,0,-this.size*0.2,0,0);
+      ctx.fill();
+      // Right wing (mirrored)
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.bezierCurveTo(this.size,this.size*flap,this.size*1.5,-this.size*0.5,this.size*0.5,-this.size*0.3);
+      ctx.bezierCurveTo(this.size*0.3,-this.size*0.1,0,-this.size*0.2,0,0);
+      ctx.fill();
+      // Wing detail
+      ctx.fillStyle=this.colors[1]; ctx.globalAlpha=this.alpha*0.4;
+      ctx.beginPath(); ctx.arc(-this.size*0.5,0,this.size*0.25,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(this.size*0.5,0,this.size*0.25,0,Math.PI*2); ctx.fill();
     }
     ctx.restore();
   }
@@ -432,8 +497,9 @@ class Particle {
 
 function initParticles(){
   particles=[];
-  for(let i=0;i<22;i++) particles.push(new Particle('firefly'));
-  for(let i=0;i<12;i++) particles.push(new Particle('leaf'));
+  for(let i=0;i<30;i++) particles.push(new Particle('pollen'));
+  for(let i=0;i<10;i++) particles.push(new Particle('petal'));
+  for(let i=0;i<5;i++)  particles.push(new Particle('butterfly'));
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -478,37 +544,75 @@ function drawTree(provKey, animate=true){
   const fm3=el('feMerge',{},fLeaf);
   el('feMergeNode',{in:'bl'},fm3); el('feMergeNode',{in:'SourceGraphic'},fm3);
 
-  // Ground gradient
+  // Ground radial glow
   const rg=el('radialGradient',{id:'rg',cx:'50%',cy:'100%',r:'40%'},defs);
-  el('stop',{offset:'0%','stop-color':tree.color,'stop-opacity':'0.15'},rg);
+  el('stop',{offset:'0%','stop-color':tree.color,'stop-opacity':'0.12'},rg);
   el('stop',{offset:'100%','stop-color':tree.color,'stop-opacity':'0'},rg);
 
-  // Branch gradient (warm root → provider tip)
+  // Branch gradient (bark brown root → provider colour at tips)
   const bg=el('linearGradient',{id:'bgrad',x1:'0',y1:'1',x2:'0',y2:'0'},defs);
-  el('stop',{offset:'0%','stop-color':'#5a3810'},bg);
-  el('stop',{offset:'40%','stop-color':'#7a4e22'},bg);
+  el('stop',{offset:'0%','stop-color':'#6b3c18'},bg);
+  el('stop',{offset:'35%','stop-color':'#8b5220'},bg);
   el('stop',{offset:'100%','stop-color':tree.color},bg);
 
-  // ── Background elements ───────────────────────────────────
-  el('rect',{x:0,y:0,width:820,height:540,fill:'#04080f'},svg);
+  // ── Background: nature meadow scene ─────────────────────────
+  // Sky gradient
+  const skyG=el('linearGradient',{id:'skyG',x1:'0',y1:'0',x2:'0',y2:'1'},defs);
+  el('stop',{offset:'0%','stop-color':'#a8d8f0'},skyG);
+  el('stop',{offset:'55%','stop-color':'#c8eaf8'},skyG);
+  el('stop',{offset:'100%','stop-color':'#d8f0e0'},skyG);
+  el('rect',{x:0,y:0,width:820,height:540,fill:'url(#skyG)'},svg);
 
-  // Atmospheric mist layers
-  for(let i=0;i<3;i++){
-    el('ellipse',{cx:200+i*210,cy:520,rx:140+i*20,ry:18,
-      fill:tree.color,opacity:(0.04+i*0.02).toString()},svg);
-  }
-  el('rect',{x:0,y:0,width:820,height:540,fill:'url(#rg)'},svg);
+  // Sun glow (upper-right)
+  const sunG=el('radialGradient',{id:'sunG',cx:'78%',cy:'8%',r:'28%'},defs);
+  el('stop',{offset:'0%','stop-color':'#fffde8','stop-opacity':'0.9'},sunG);
+  el('stop',{offset:'40%','stop-color':'#fef3c7','stop-opacity':'0.35'},sunG);
+  el('stop',{offset:'100%','stop-color':'#c8eaf8','stop-opacity':'0'},sunG);
+  el('rect',{x:0,y:0,width:820,height:540,fill:'url(#sunG)'},svg);
 
-  // Stars
-  const starData=[
-    [45,32],[112,18],[198,45],[287,12],[356,38],[443,8],[521,29],[614,16],
-    [698,41],[742,11],[780,28],[66,68],[157,82],[244,55],[388,72],[478,49],
-    [562,77],[645,52],[720,68],[798,44],[30,15],[169,5],[304,25],[467,18],[596,7]
-  ];
-  starData.forEach(([sx,sy],i)=>{
-    const sr=i%4===0?1.2:0.6;
-    el('circle',{cx:sx,cy:sy,r:sr,fill:'#fff',opacity:(0.12+i%5*0.05).toString()},svg);
+  // Sun disc
+  el('circle',{cx:655,cy:44,r:22,fill:'#fff7c0',opacity:'0.75'},svg);
+  el('circle',{cx:655,cy:44,r:14,fill:'#ffec8b',opacity:'0.85'},svg);
+
+  // Clouds
+  const clouds=[[100,55,60,22],[260,38,80,24],[490,30,90,26],[680,62,55,18]];
+  clouds.forEach(([cx,cy,rx,ry])=>{
+    el('ellipse',{cx,cy,rx,ry,fill:'#fff',opacity:'0.72'},svg);
+    el('ellipse',{cx:cx-rx*0.3,cy:cy+4,rx:rx*0.6,ry:ry*0.7,fill:'#fff',opacity:'0.55'},svg);
+    el('ellipse',{cx:cx+rx*0.3,cy:cy+3,rx:rx*0.5,ry:ry*0.65,fill:'#fff',opacity:'0.5'},svg);
   });
+
+  // Distant hills
+  const hillPath=`M0,390 Q100,350 200,370 Q320,340 440,365 Q560,335 680,360 Q750,345 820,355 L820,540 L0,540 Z`;
+  const hillG=el('linearGradient',{id:'hillG',x1:'0',y1:'0',x2:'0',y2:'1'},defs);
+  el('stop',{offset:'0%','stop-color':'#6aaa55'},hillG);
+  el('stop',{offset:'100%','stop-color':'#4a8a35'},hillG);
+  el('path',{d:hillPath,fill:'url(#hillG)',opacity:'0.55'},svg);
+
+  // Ground / meadow
+  const meadowG=el('linearGradient',{id:'meadowG',x1:'0',y1:'0',x2:'0',y2:'1'},defs);
+  el('stop',{offset:'0%','stop-color':'#7ebe5a'},meadowG);
+  el('stop',{offset:'100%','stop-color':'#4a8c35'},meadowG);
+  el('rect',{x:0,y:462,width:820,height:78,fill:'url(#meadowG)'},svg);
+
+  // Grass blade texture at very bottom
+  for(let i=0;i<40;i++){
+    const gx=10+i*20+Math.sin(i*2.1)*5;
+    el('path',{d:`M${gx},540 Q${gx-4},524 ${gx+2},514`,
+      stroke:'#3a7a28','stroke-width':'1.5',fill:'none',opacity:'0.5','stroke-linecap':'round'},svg);
+    el('path',{d:`M${gx+8},540 Q${gx+14},520 ${gx+10},510`,
+      stroke:'#4a8c35','stroke-width':'1',fill:'none',opacity:'0.4','stroke-linecap':'round'},svg);
+  }
+
+  // Distant birds (tiny V-shapes in sky)
+  const birds=[[120,80],[180,65],[195,72],[340,52],[355,60],[600,45],[612,52]];
+  birds.forEach(([bx,by])=>{
+    el('path',{d:`M${bx-5},${by} Q${bx},${by-3} ${bx+5},${by}`,
+      stroke:'#5a8a9a','stroke-width':'1',fill:'none',opacity:'0.4'},svg);
+  });
+
+  // Ground glow under tree
+  el('rect',{x:0,y:0,width:820,height:540,fill:'url(#rg)'},svg);
 
   // ── Groups ────────────────────────────────────────────────
   const gBranches  = el('g',{id:'branches'},svg);
@@ -614,42 +718,45 @@ function drawTree(provKey, animate=true){
         stroke:tree.light,'stroke-width':'0.5',opacity:'0.15'},nodeG);
     }
 
-    // Node body
-    const fillC = isRoot   ? tree.dim :
+    // Node body — cream/ivory fills on nature background
+    const fillC = isRoot   ? '#6b3c18' :
                   isLatest ? tree.color :
-                  depth<=1 ? '#4a2810' :
-                  depth<=2 ? '#6b3d18' : tree.dim;
-    const strokeC = isLatest ? tree.light : isRoot ? tree.color : tree.color;
+                  depth<=1 ? '#f9f3e8' :
+                  depth<=2 ? '#f4efe0' : '#efe8d8';
+    const strokeC = isLatest ? tree.color : isRoot ? tree.light : tree.color;
+    const strokeW = isLatest ? '2.5' : isRoot ? '2' : '1.5';
     el('circle',{cx:0,cy:0,r:n.r,fill:fillC,stroke:strokeC,
-      'stroke-width': isLatest?'2.5':'1.5',
+      'stroke-width':strokeW,
       filter: isLatest?'url(#fgS)':'url(#fg)',
       style: isTerm?`animation:breathe ${2.5+depth*0.2}s ease-in-out ${n.x%1.5}s infinite`:''
     },nodeG);
 
-    // Inner bright core
+    // Inner accent dot
     if(!isRoot){
       el('circle',{cx:0,cy:0,r:Math.max(2,n.r-5),
-        fill: isLatest ? tree.light : tree.color,
-        opacity: isLatest ? '0.4':'0.2'},nodeG);
+        fill: tree.color,
+        opacity: isLatest ? '0.5':'0.25'},nodeG);
     }
 
-    // Label above node
+    // Label above node — dark text, readable on light background
     const lines=n.label.split('\n');
     lines.forEach((line,idx)=>{
-      const offset = lines.length>1 ? (idx===0?-(n.r+13):-(n.r+4)) : -(n.r+10);
+      const offset = lines.length>1 ? (idx===0?-(n.r+12):-(n.r+4)) : -(n.r+9);
       const t=el('text',{x:0,y:offset,'text-anchor':'middle',
-        'font-size': isRoot?'11':'10',
+        'font-size': isRoot?'9':'8',
         'font-weight': isLatest||isRoot?'800':'600',
-        fill: isLatest?tree.light:isRoot?'#94a3b8':'#cbd5e1',
-        'paint-order':'stroke',stroke:'#04080f','stroke-width':'3','stroke-linejoin':'round'
+        fill: isRoot?'#f9f3e8': isLatest?tree.dim:'#2d1a0a',
+        'paint-order':'stroke',
+        stroke: isRoot?tree.dim:'rgba(255,253,240,0.85)',
+        'stroke-width':'2.5','stroke-linejoin':'round'
       },nodeG);
       t.textContent=line;
     });
 
     // Year below
     if(!isRoot){
-      const yt=el('text',{x:0,y:n.r+12,'text-anchor':'middle',
-        'font-size':'8.5', fill:'#3d5068'
+      const yt=el('text',{x:0,y:n.r+11,'text-anchor':'middle',
+        'font-size':'7.5', fill:'#7a6a5a'
       },nodeG);
       yt.textContent=n.sub.split('·')[0].trim();
     }
@@ -770,15 +877,15 @@ function showFeatChips(node, tree, nMap, group){
 
     const chipG=el('g',{transform:`translate(${node.x},${node.y})`,opacity:'0'},group);
 
-    // Chip background
+    // Chip background — light cream for nature theme
     const w=feat.length*5.5+16, h=18;
     el('rect',{x:-w/2,y:-h/2,width:w,height:h,rx:'9',
-      fill:'rgba(4,8,15,0.88)',stroke:tree.color,'stroke-width':'1',opacity:'0.9'},chipG);
+      fill:'rgba(255,253,245,0.92)',stroke:tree.color,'stroke-width':'1',opacity:'0.95'},chipG);
     // Leaf dot
-    el('circle',{cx:-w/2+8,cy:0,r:3,fill:'#4ade80',opacity:'0.8'},chipG);
+    el('circle',{cx:-w/2+8,cy:0,r:3,fill:'#4ade80',opacity:'0.9'},chipG);
     // Text
-    const ft=el('text',{x:-w/2+16,y:4,'font-size':'9.5','font-weight':'600',
-      fill:tree.light},chipG);
+    const ft=el('text',{x:-w/2+16,y:4,'font-size':'9','font-weight':'700',
+      fill:tree.dim},chipG);
     ft.textContent=feat;
 
     // Connector line
@@ -798,10 +905,10 @@ function showFeatChips(node, tree, nMap, group){
     // Hover effect
     chipG.style.cursor='pointer';
     chipG.addEventListener('mouseenter',()=>{
-      chipG.querySelector('rect')?.setAttribute('fill',tree.dim);
+      chipG.querySelector('rect')?.setAttribute('fill','rgba(255,252,235,0.98)');
     });
     chipG.addEventListener('mouseleave',()=>{
-      chipG.querySelector('rect')?.setAttribute('fill','rgba(4,8,15,0.88)');
+      chipG.querySelector('rect')?.setAttribute('fill','rgba(255,253,245,0.92)');
     });
   });
 }
@@ -809,26 +916,57 @@ function showFeatChips(node, tree, nMap, group){
 // ═══════════════════════════════════════════════════════════
 //  ZOOM
 // ═══════════════════════════════════════════════════════════
-function animVB(from, to, dur=550, cb){
+// easeOutBack — slight organic overshoot at destination (dolly-settle feel)
+function easeOutBack(t){
+  const c1=1.50158, c3=c1+1;
+  return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);
+}
+// easeInOutQuart — smooth pull-back on zoom-out
+function easeInOutQuart(t){
+  return t<.5?8*t*t*t*t:1-Math.pow(-2*t+2,4)/2;
+}
+
+function animVB(from, to, dur=520, easing=easeOutBack, cb){
   const start=performance.now();
   function frame(now){
     const t=Math.min((now-start)/dur,1);
-    const e=t<.5?2*t*t:-1+(4-2*t)*t;
+    const e=easing(t);
     const cur=from.map((f,i)=>f+(to[i]-f)*e);
     svg.setAttribute('viewBox',cur.join(' '));
     currentVB=[...cur];
     if(t<1) requestAnimationFrame(frame);
-    else if(cb) cb();
+    else { currentVB=[...to]; svg.setAttribute('viewBox',to.join(' ')); if(cb) cb(); }
   }
   requestAnimationFrame(frame);
+}
+
+// Scale all text labels inversely to keep them small & readable when zoomed
+function scaleLabels(zoomFactor){
+  svg.querySelectorAll('text').forEach(t=>{
+    const base = parseFloat(t.getAttribute('data-bfs') || t.getAttribute('font-size') || 9);
+    if(!t.getAttribute('data-bfs')) t.setAttribute('data-bfs', base);
+    t.setAttribute('font-size', Math.max(5.5, base/zoomFactor));
+  });
+}
+function restoreLabels(){
+  svg.querySelectorAll('text').forEach(t=>{
+    const base=t.getAttribute('data-bfs');
+    if(base) t.setAttribute('font-size', base);
+  });
 }
 
 function zoomToNode(n){
   isZoomed=true;
   svg.classList.add('zoomed');
-  document.getElementById('zoom-hint').style.opacity='0.4';
-  const zw=320, zh=260;
-  animVB(currentVB,[n.x-zw/2,n.y-zh/2,zw,zh]);
+  document.getElementById('zoom-hint').style.opacity='0.3';
+  // Brief motion blur during travel
+  svg.style.filter='blur(1.5px)';
+  const zw=300, zh=240;
+  const zoomFactor = VB_FULL[2]/zw; // ~2.73x
+  animVB(currentVB,[n.x-zw/2,n.y-zh/2,zw,zh],540,easeOutBack,()=>{
+    svg.style.filter='none';
+    scaleLabels(zoomFactor);
+  });
 }
 
 function zoomOut(){
@@ -837,7 +975,8 @@ function zoomOut(){
   document.getElementById('zoom-hint').style.opacity='1';
   document.getElementById('feat-chips').innerHTML='';
   clearPathHighlight();
-  animVB(currentVB,VB_FULL,600);
+  restoreLabels();
+  animVB(currentVB,VB_FULL,560,easeInOutQuart);
   closeDetail();
 }
 
@@ -848,25 +987,26 @@ async function showDetail(n, tree){
   const panel=document.getElementById('detail-panel');
   const inner=document.getElementById('detail-inner');
   const isRoot = n.id==='root';
-  const tc={ haiku:'#f87171',sonnet:'#fb923c',opus:'#c084fc',
-    standard:'#34d399',mini:'#86efac',reasoning:'#60a5fa','mini-r':'#a5f3fc',
-    pro:'#60a5fa',flash:'#34d399',gemini:'#93c5fd',early:'#94a3b8',root:'#94a3b8' }[n.tier]||tree.color;
+  // Tier colours adapted to light theme (readable on cream background)
+  const tc={ haiku:'#c07830',sonnet:'#2d7ab8',opus:'#7040b0',
+    standard:'#1d8a52',mini:'#2d8a52',reasoning:'#3a85c8','mini-r':'#2d6ea8',
+    pro:'#3a85c8',flash:'#1d8a52',gemini:'#2d6ea8',early:'#8a7a6a',root:'#6b3c18' }[n.tier]||tree.color;
 
   const feats=TREES[currentProvider].feats?.[n.id]||[];
+  const uc=USECASES[n.id]; // use-case decision data
 
   if(isRoot){
-    // Company root: show company overview + milestones
     inner.innerHTML=`
       <div style="min-width:200px">
-        <div class="detail-name" style="color:${tree.light}">${tree.name}</div>
-        <div class="detail-api">Intelligence Knowledge Graph</div>
+        <div class="detail-name">${tree.name}</div>
+        <div class="detail-api">AI Knowledge Graph · ${new Date().getFullYear()}</div>
         <span class="detail-tier" style="color:${tree.color};border-color:${tree.color}">company</span>
       </div>
-      <div class="mile-section" style="border-color:${tree.color}">
+      <div class="mile-section">
         <div class="mile-section-title">📡 Major Milestones & Announcements</div>
         <div class="mile-list" id="mile-list"><div class="mile-loading">Loading live data…</div></div>
       </div>
-      <button class="close-btn" onclick="zoomOut()" title="Zoom out">×</button>
+      <button class="close-btn" onclick="zoomOut()" title="Close">×</button>
     `;
     panel.classList.add('open');
     _renderMilestones(currentProvider, tree, null, null);
@@ -875,38 +1015,43 @@ async function showDetail(n, tree){
 
   if(!n.api){ panel.classList.remove('open'); return; }
 
-  // Model node: parse date range ±5 months around launch
-  const launchYear = parseInt((n.sub||'').match(/\d{4}/)?.[0]||'0');
-  const launchMonth = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  // Date window ±5 months around launch for contextual milestones
+  const launchYear=parseInt((n.sub||'').match(/\d{4}/)?.[0]||'0');
+  const launchMonth=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     .findIndex(m=>(n.sub||'').includes(m));
-  const hasDates = launchYear > 2010;
   let dateFrom=null, dateTo=null;
-  if(hasDates){
-    const d=new Date(launchYear, launchMonth>=0?launchMonth:0, 1);
-    d.setMonth(d.getMonth()-5);
-    dateFrom=d.toISOString().slice(0,10);
-    const d2=new Date(launchYear, launchMonth>=0?launchMonth:0, 1);
-    d2.setMonth(d2.getMonth()+5);
-    dateTo=d2.toISOString().slice(0,10);
+  if(launchYear>2010){
+    const d=new Date(launchYear,launchMonth>=0?launchMonth:0,1);
+    d.setMonth(d.getMonth()-5); dateFrom=d.toISOString().slice(0,10);
+    const d2=new Date(launchYear,launchMonth>=0?launchMonth:0,1);
+    d2.setMonth(d2.getMonth()+5); dateTo=d2.toISOString().slice(0,10);
   }
 
+  const ucSection = uc ? `
+    <div class="usecase-section">
+      <div class="usecase-title">Decision Guide</div>
+      <div class="uc-grid">${uc.chips.map(([label,cls])=>`<span class="uc-chip ${cls}">${label}</span>`).join('')}</div>
+      <div class="choose-when">✓ Choose when: ${uc.when}</div>
+      <div class="skip-if" style="margin-top:5px">✗ Skip if: ${uc.skip}</div>
+    </div>` : (feats.length?`<div class="detail-feats" style="margin-top:8px">${feats.map(f=>`<span class="dfeat">✦ ${f}</span>`).join('')}</div>`:'');
+
   inner.innerHTML=`
-    <div style="min-width:180px">
-      <div class="detail-name" style="color:${tree.light}">${n.label.replace('\n',' ')}</div>
+    <div style="min-width:170px">
+      <div class="detail-name">${n.label.replace('\n',' ')}</div>
       <div class="detail-api">${n.api}</div>
       <span class="detail-tier" style="color:${tc};border-color:${tc}">${n.tier||'model'}</span>
     </div>
     <div class="detail-stats">
-      <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.gpqa||'—'}<span style="font-size:10px;color:#475569">${n.gpqa&&n.gpqa!=='—'?'%':''}</span></div><div class="dstat-lbl">GPQA Diamond</div></div>
-      <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.heval||'—'}<span style="font-size:10px;color:#475569">${n.heval&&n.heval!=='—'?'%':''}</span></div><div class="dstat-lbl">HumanEval</div></div>
-      <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.price?'$'+n.price:'—'}</div><div class="dstat-lbl">Price /M out</div></div>
+      <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.gpqa&&n.gpqa!=='—'?n.gpqa+'%':'—'}</div><div class="dstat-lbl">GPQA</div></div>
+      <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.heval&&n.heval!=='—'?n.heval+'%':'—'}</div><div class="dstat-lbl">HumanEval</div></div>
+      <div class="dstat"><div class="dstat-val" style="color:${tc}">${n.price?'$'+n.price+'/M':'—'}</div><div class="dstat-lbl">Output price</div></div>
     </div>
-    ${feats.length?`<div class="detail-feats">${feats.map(f=>`<span class="dfeat">✦ ${f}</span>`).join('')}</div>`:''}
-    <div class="mile-section" style="border-color:${tree.color}">
-      <div class="mile-section-title">🌿 What was happening around this launch</div>
-      <div class="mile-list" id="mile-list"><div class="mile-loading">Fetching context…</div></div>
+    ${ucSection}
+    <div class="mile-section">
+      <div class="mile-section-title">🌿 Context at launch</div>
+      <div class="mile-list" id="mile-list"><div class="mile-loading">Fetching…</div></div>
     </div>
-    <button class="close-btn" onclick="zoomOut()" title="Zoom out">×</button>
+    <button class="close-btn" onclick="zoomOut()" title="Close">×</button>
   `;
   panel.classList.add('open');
   _renderMilestones(currentProvider, tree, dateFrom, dateTo);
@@ -978,13 +1123,8 @@ function setProvider(key, btn){
 // ═══════════════════════════════════════════════════════════
 //  PARTICLE RENDER LOOP
 // ═══════════════════════════════════════════════════════════
-let lastLeafSpawn=0;
 function renderParticles(ts){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(ts-lastLeafSpawn>4200 && particles.filter(p=>p.type==='leaf').length<14){
-    particles.push(new Particle('leaf'));
-    lastLeafSpawn=ts;
-  }
   particles.forEach(p=>{ p.update(); p.draw(); });
   animFrameId=requestAnimationFrame(renderParticles);
 }
