@@ -172,7 +172,6 @@ body {
     </div>
   </div>
   <div class="hdr-links">
-    <a href="index.html" class="hdr-link">🔭 Observatory</a>
     <a href="model-advisor.html" class="hdr-link">🤖 Advisor</a>
   </div>
 </div>
@@ -761,11 +760,6 @@ function drawTree(provKey, animate=true){
     const depth=getDepth(nMap,n.id);
     const swMap=[12,8,5.5,4,3,2.5];
     const sw=swMap[Math.min(depth,swMap.length-1)];
-
-    const dx=n.x-p.x, dy=n.y-p.y;
-    const cp1x=p.x+dx*0.15, cp1y=p.y+dy*0.42;
-    const cp2x=p.x+dx*0.82, cp2y=p.y+dy*0.58;
-    const d=`M${p.x} ${p.y} C${cp1x} ${cp1y},${cp2x} ${cp2y},${n.x} ${n.y}`;
 
     // Organic bezier — natural growth feel
     const dx=n.x-p.x, dy=n.y-p.y;
