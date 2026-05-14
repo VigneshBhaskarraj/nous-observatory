@@ -185,13 +185,11 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 
 <nav class="nav">
   <button class="ntab on" onclick="sw(event,'overview')">Overview</button>
-  <button class="ntab" onclick="sw(event,'signals')">Signals</button>
   <button class="ntab" onclick="sw(event,'search')">Search</button>
   <button class="ntab" onclick="sw(event,'models')">⚗️ Models</button>
   <button class="ntab" onclick="sw(event,'intel')">📡 Live Intel</button>
   <button class="ntab" onclick="sw(event,'tree')">⬡ Model Tree</button>
-  <a href="model-advisor.html" style="padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🤖 Advisor</a>
-  <a href="power-map.html"    style="padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🔥 Power Map</a>
+  <a href="model-advisor.html" class="ntab" style="text-decoration:none;">🤖 Advisor</a>
 </nav>
 
 <!-- ── OVERVIEW ── -->
@@ -201,35 +199,6 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
     <div class="stats" id="stats"></div>
     <div class="sh">Entities <span style="font-size:12px;color:var(--muted);font-weight:400">— click to expand milestones & metrics</span></div>
     <div class="eg" id="eg"></div>
-  </div>
-</div>
-
-<!-- ── SIGNALS ── -->
-<div class="tab" id="t-signals">
-  <div class="loader" id="sg-load"><div class="spin"></div>Analysing signals…</div>
-  <div id="sg-c" style="display:none">
-    <div class="sg">
-      <div class="panel sf">
-        <div class="panel-t">🌅 Sunset Map — who's in the displacement danger zone</div>
-        <div id="sunset"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-t">⚡ Highest-Impact Milestones (score 5)</div>
-        <div id="hi5"></div>
-      </div>
-      <div class="panel">
-        <div class="panel-t">📊 Claim Type Breakdown</div>
-        <canvas id="c-claim"></canvas>
-      </div>
-      <div class="panel">
-        <div class="panel-t">🧱 Stack Layer Distribution</div>
-        <canvas id="c-layer"></canvas>
-      </div>
-      <div class="panel sf">
-        <div class="panel-t">🚩 Contested Milestones</div>
-        <div id="contested"></div>
-      </div>
-    </div>
   </div>
 </div>
 
