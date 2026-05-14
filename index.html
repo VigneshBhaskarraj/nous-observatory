@@ -565,11 +565,20 @@ const EDGE_COLORS = {
   default:'#94a3b8'
 };
 
-function renderRelMap() {
+function renderRelMap(attempt) {
   const canvas = document.getElementById('rel-canvas');
   if (!canvas || !D.entities.length) return;
 
   const W = canvas.parentElement.offsetWidth;
+
+  // PC Chrome can return 0 before layout settles — retry up to 8 times
+  if (!W || W < 100) {
+    if ((attempt||0) < 8) {
+      setTimeout(() => renderRelMap((attempt||0)+1), 120);
+    }
+    return;
+  }
+
   const H = Math.min(520, Math.max(380, W * 0.42));
   canvas.width = W * (window.devicePixelRatio||1);
   canvas.height = H * (window.devicePixelRatio||1);
@@ -1331,7 +1340,7 @@ async function init() {
   try { renderOverview(); } catch(e) {
     document.getElementById('ov-load').innerHTML=`<div style="color:var(--red);padding:40px">Overview error: ${e.message}</div>`;
   }
-  try { requestAnimationFrame(() => renderRelMap()); } catch(e) { /* map non-fatal */ }
+  try { setTimeout(() => renderRelMap(0), 80); } catch(e) { /* map non-fatal */ }
   try { renderSignals(); } catch(e) {
     document.getElementById('sg-load').innerHTML=`<div style="color:var(--red);padding:40px">Signals error: ${e.message}</div>`;
     document.getElementById('sg-load').style.display='block';
