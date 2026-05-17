@@ -436,9 +436,8 @@ def main():
             "tags": m["tags"],
             "claim_type": m["claim_type"],
             "source_event": SOURCE_EVENT_LABEL,
+            "displacement_entities": m.get("displacement_entities"),
         }
-        if "displacement_entities" in m:
-            record["displacement_entities"] = m["displacement_entities"]
         to_insert.append(record)
         print(f"  QUEUE: {m['date']} — {m['event'][:60]}")
 
