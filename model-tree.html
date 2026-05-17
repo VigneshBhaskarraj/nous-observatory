@@ -261,6 +261,7 @@ const USECASES = {
   cs46: { chips:[['Latest Sonnet','uc-reason'],['Coding','uc-code'],['Extended thinking','uc-reason']], when:'Current best Sonnet. Choose for anything you\'d use Claude Sonnet for — now with the latest capability and safety improvements.', skip:'If cost is very tight, cs45 performs similarly at the same price.' },
   co45: { chips:[['Research grade','uc-analysis'],['Complex reasoning','uc-reason'],['Long context','uc-analysis']], when:'Highest-stakes reasoning: legal review, medical research synthesis, financial modelling with nuanced judgment. Best Claude for deep thinking.', skip:'Anything requiring fast turnaround or high throughput. Opus is for quality-over-speed workflows.' },
   co46: { chips:[['Best Claude','uc-reason'],['Research','uc-analysis'],['Judgment','uc-reason']], when:'When you need the absolute best Anthropic can offer. Frontier research, complex multi-document analysis, or critical decisions where quality is everything.', skip:'Routine tasks. Use this when you\'ve already tried Sonnet and it wasn\'t enough.' },
+  co47: { chips:[['Frontier Claude','uc-reason'],['Coding','uc-code'],['Vision','uc-analysis']], when:'Latest Opus with benchmark-leading coding and 3x vision capacity (3.75 megapixel image resolution). Available simultaneously on Anthropic API, Amazon Bedrock, Google Vertex AI, and Microsoft Foundry.', skip:'Routine tasks. Use Sonnet 4.6 unless you need Opus-tier quality.' },
   // OpenAI
   gpt4: { chips:[['General','uc-analysis'],['Foundation','uc-reason']], when:'Historical reference — GPT-4 set the standard. Most use cases better served by gpt-4o now.', skip:'Modern use: gpt-4o outperforms at lower cost.' },
   gpt4om:{ chips:[['Multimodal','uc-vision'],['Fast','uc-speed'],['Native audio','uc-write']], when:'Native audio/video processing or real-time multimodal tasks. First GPT-4 class model with genuine voice capability.', skip:'Text-only tasks — gpt-4o Aug or gpt-4o-mini is cheaper.' },
@@ -319,6 +320,7 @@ const CAPS = {
   cs46:  {ctx:'200K',speed:'Med',  caps:['vision','tools','think','code']},
   co45:  {ctx:'200K',speed:'Slow', caps:['vision','tools','think']},
   co46:  {ctx:'200K',speed:'Slow', caps:['vision','tools','think']},
+  co47:  {ctx:'200K',speed:'Slow', caps:['vision','tools','think']},
   // OpenAI
   gpt4:     {ctx:'8K',   speed:'Med',  caps:['vision','tools','code']},
   gpt4om:   {ctx:'128K', speed:'Fast', caps:['vision','audio','tools']},
@@ -370,7 +372,8 @@ const TREES = {
       {id:'cs45', x:524,y:128, label:'Sonnet 4.5',       sub:'May 2025 ✦',   parent:'c35so',r:12, tier:'sonnet', api:'claude-sonnet-4-5',             gpqa:'—',heval:'—',price:'3',    isLatest:true},
       {id:'cs46', x:544,y:74,  label:'Sonnet 4.6',       sub:'May 2025 ✦',   parent:'cs45', r:12, tier:'sonnet', api:'claude-sonnet-4-6',             gpqa:'—',heval:'—',price:'3',    isLatest:true},
       {id:'co45', x:188,y:228, label:'Opus 4.5',         sub:'May 2025 ✦',   parent:'c3o',  r:13, tier:'opus',   api:'claude-opus-4-5',               gpqa:'—',heval:'—',price:'75',   isLatest:true},
-      {id:'co46', x:160,y:158, label:'Opus 4.6',         sub:'May 2025 ✦',   parent:'co45', r:13, tier:'opus',   api:'claude-opus-4-6',               gpqa:'—',heval:'—',price:'75',   isLatest:true},
+      {id:'co46', x:160,y:158, label:'Opus 4.6',         sub:'May 2025',     parent:'co45', r:13, tier:'opus',   api:'claude-opus-4-6',               gpqa:'—',heval:'—',price:'75',   isLatest:false},
+      {id:'co47', x:140,y:88,  label:'Opus 4.7',         sub:'Apr 2026 ✦',   parent:'co46', r:13, tier:'opus',   api:'claude-opus-4-7',               gpqa:'—',heval:'—',price:'75',   isLatest:true},
     ],
     feats:{
       c3h:  ['200K context','Vision','Batch API','Tool use','Fast responses'],
@@ -383,7 +386,8 @@ const TREES = {
       cs45: ['200K context','Extended thinking','SWE-bench ~72%','Best coding'],
       cs46: ['200K context','Extended thinking','Latest Sonnet','Max coding'],
       co45: ['200K context','Extended thinking','Research grade','Complex reasoning'],
-      co46: ['200K context','Extended thinking','Latest Opus','Highest capability'],
+      co46: ['200K context','Extended thinking','Previous Opus','High capability'],
+      co47: ['200K context','Extended thinking','Latest Opus','Benchmark-leading code','3x vision capacity'],
     }
   },
   openai:{
