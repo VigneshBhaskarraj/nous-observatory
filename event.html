@@ -205,9 +205,121 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lc-ripple { background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 11px; margin-bottom: 9px; font-size: 12px; color: #64748b; line-height: 1.6; }
 .lc-ripple-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: .6px; font-weight: 700; color: var(--muted); margin-bottom: 3px; }
 .lc-footer { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; padding-top: 8px; border-top: 1px solid #edf1f7; margin-top: 8px; }
+
+/* ── BRIEF / SYNTHESIS TAB ── */
+.brief-status { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.brief-status .live-now { color: #991b1b; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; padding: 1px 9px; border-radius: 10px; margin-right: 6px; }
+.brief-status .upcoming { color: #92400e; font-weight: 700; background: #fef3c7; border: 1px solid #fde68a; padding: 1px 9px; border-radius: 10px; margin-right: 6px; }
+.brief-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; }
+.brief-h { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.brief-h-count { font-size: 10px; font-weight: 600; color: #fff; padding: 1px 7px; border-radius: 8px; background: var(--muted); }
+.brief-headline { font-size: 17px; font-weight: 700; line-height: 1.4; color: var(--text); margin-bottom: 10px; }
+.brief-prose { font-size: 13.5px; color: #334155; line-height: 1.7; margin-bottom: 10px; }
+.brief-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 14px; }
+@media(max-width:700px){ .brief-stats { grid-template-columns: repeat(2,1fr); } }
+.brief-stat { background: #f8fafc; border-radius: 8px; padding: 10px 12px; }
+.brief-stat-n { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1; }
+.brief-stat-l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
+.theme-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.theme-row:last-child { border-bottom: none; }
+.theme-bullet { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+.theme-body { flex: 1; }
+.theme-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; text-transform: capitalize; }
+.theme-evidence { font-size: 12px; color: var(--muted); line-height: 1.55; }
+.theme-pop { font-size: 10px; font-weight: 600; color: #fff; padding: 1px 8px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+.chain-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.chain-row:last-child { border-bottom: none; }
+.chain-cell { background: #f8fafc; border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.5; }
+.chain-cell-lbl { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+.chain-cell-title { font-size: 12px; font-weight: 600; color: var(--text); }
+.chain-cell-tags { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.chain-arrow { color: var(--indigo); font-size: 16px; font-weight: 700; text-align: center; }
+@media(max-width:700px){ .chain-row { grid-template-columns: 1fr; } .chain-arrow { transform: rotate(90deg); text-align: left; padding-left: 12px; } }
+.dis-rollup { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.dis-rollup:last-child { border-bottom: none; }
+.dis-rollup-name { font-weight: 700; font-size: 13px; min-width: 180px; color: #991b1b; }
+.dis-rollup-bar { flex: 1; height: 6px; background: #fee2e2; border-radius: 3px; overflow: hidden; }
+.dis-rollup-fill { height: 100%; background: var(--red); border-radius: 3px; }
+.dis-rollup-count { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.cite-list { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+@media(max-width:700px){ .cite-list { grid-template-columns: 1fr; } }
+.cite-item { font-size: 11px; line-height: 1.65; color: #475569; padding: 2px 0; border-bottom: 1px dotted var(--border); }
+.cite-item-date { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; }
+.live-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-size: 11px; font-weight: 700; }
+.live-indicator .live-pulse { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.5s ease-in-out infinite; }
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e; color-scheme:dark;
+}
+[data-theme="dark"] body { background:var(--bg); }
+[data-theme="dark"] .hero { background:linear-gradient(135deg,#0d1117,#1a2233); border-color:#30363d; }
+[data-theme="dark"] .hero::before { background:radial-gradient(ellipse at 70% 50%,rgba(79,70,229,.12) 0%,transparent 60%); }
+[data-theme="dark"] .hero-title { color:#c9d1d9; }
+[data-theme="dark"] .subnav { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .footer { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .chip { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .status-badge { background:#1c2128; border-color:#30363d; color:#c9d1d9; }
+[data-theme="dark"] .status-badge.live { background:rgba(153,27,27,.25); border-color:#fca5a5; }
+[data-theme="dark"] .milestone { border-left-color:#30363d; }
+[data-theme="dark"] .bench th { background:#1c2128; }
+[data-theme="dark"] .bench tr:hover td { background:#1c2128; }
+[data-theme="dark"] .bench td { border-color:#30363d; }
+[data-theme="dark"] .watch-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .watch-signal { background:rgba(29,42,90,.7); border-color:#1d4ed8; color:#93c5fd; }
+[data-theme="dark"] .live-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .live-card:hover { border-color:#388bfd40; }
+[data-theme="dark"] .lc-detail { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .lc-signal { background:rgba(29,42,90,.7); }
+[data-theme="dark"] .lc-ripple { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .live-cat-group { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .live-cat-hdr { background:#1c2128; border-color:#30363d; }
+[data-theme="dark"] .live-cat-hdr:hover { background:#21262d; }
+[data-theme="dark"] .live-spotlight { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .signal-box { background:rgba(29,42,90,.6); border-color:#1d4ed8; }
+[data-theme="dark"] .ripple-box { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .lf-pill { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .brief-block { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .brief-stat { background:#1c2128; }
+[data-theme="dark"] .chain-cell { background:#1c2128; }
+[data-theme="dark"] .freshness-ts { background:rgba(255,255,255,.04); border-color:#30363d; }
+[data-theme="dark"] code { background:rgba(255,255,255,.08); color:#a5f3fc; border-radius:3px; padding:0 3px; }
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-toggle { background:none; border:1px solid rgba(100,116,139,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; flex-shrink:0; }
+.theme-toggle:hover { border-color:rgba(100,116,139,.6); background:rgba(100,116,139,.08); }
+[data-theme="dark"] .theme-toggle { border-color:rgba(148,163,184,.25); color:#c9d1d9; }
+[data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); }
+
+/* ── LIVE BANNER ── */
+.live-banner { background: linear-gradient(90deg,#b91c1c,#991b1b); color:#fff; padding:9px 28px; display:none; align-items:center; gap:12px; font-size:13px; font-weight:700; position:sticky; top:0; z-index:200; }
+.live-banner.visible { display:flex; }
+.live-banner-pulse { width:8px; height:8px; border-radius:50%; background:#fff; flex-shrink:0; animation:pulse 1.5s ease-in-out infinite; }
+.live-banner-text { flex:1; }
+.live-banner-dismiss { background:none; border:none; color:#fff; font-size:18px; cursor:pointer; opacity:.7; line-height:1; padding:0 4px; }
+.live-banner-dismiss:hover { opacity:1; }
+
+/* ── FRESHNESS INDICATOR ── */
+.freshness-ts { font-size:11px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; background:rgba(100,116,139,.08); border:1px solid var(--border); }
+
+/* ── NEW BADGE (recently inserted milestone) ── */
+.new-badge { display:inline-block; font-size:9px; font-weight:800; background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:1px 7px; border-radius:10px; margin-right:4px; vertical-align:middle; text-transform:uppercase; letter-spacing:.3px; animation:pulse 2s ease-in-out infinite; }
+
+/* ── TOAST ── */
+.toast { position:fixed; bottom:24px; right:24px; z-index:9999; background:#1e293b; color:#f1f5f9; border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; box-shadow:0 4px 24px rgba(0,0,0,.22); transform:translateY(80px); opacity:0; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s; pointer-events:none; max-width:320px; }
+.toast.show { transform:translateY(0); opacity:1; }
+.toast-icon { margin-right:6px; }
 </style>
 </head>
 <body>
+
+<div class="live-banner" id="live-banner">
+  <div class="live-banner-pulse"></div>
+  <div class="live-banner-text" id="live-banner-text"></div>
+  <button class="live-banner-dismiss" onclick="document.getElementById('live-banner').classList.remove('visible')" title="Dismiss">×</button>
+</div>
+<div class="toast" id="toast"></div>
 
 <div class="hero">
   <div class="hero-top">
@@ -216,7 +328,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="hero-title"><span>AI Conference</span> Intelligence Brief</div>
       <div class="hero-sub">Longitudinal milestone context across major AI conferences — Google I/O, Cloud Next, GTC, Microsoft Build, and more. Switch between events to explore what was announced, what it signals, and who it threatens.</div>
     </div>
-    <button class="reload-btn" onclick="reload()">↺ Refresh</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+      <button class="reload-btn" id="reload-btn" onclick="reload()">↺ Refresh</button>
+    </div>
   </div>
   <div class="hero-meta">
     <div class="hero-stat"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Google milestones tracked</div></div>
@@ -235,6 +350,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <button class="snav" onclick="showSection('watch',this)">🔭 What To Watch</button>
   <button class="snav" onclick="showSection('benchmarks',this)">⚡ Benchmark Snapshot</button>
   <button class="snav" onclick="showSection('live',this)">🔴 Live Updates <span id="live-count" style="display:none;background:#ea4335;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px"></span></button>
+  <button class="snav" onclick="showSection('brief',this)">📋 Brief</button>
   <button class="snav" onclick="showSection('impact',this)">🌊 Impact Map</button>
 </div>
 
@@ -279,10 +395,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="sh">
       🔴 Live Event Updates
       <span id="live-active-label" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px"></span>
+      <span class="freshness-ts" id="freshness-ts" style="display:none">Updated just now</span>
     </div>
     <div class="sh-sub">Select a conference to see its milestones grouped by category and impact. Data is seeded via the <code>source_event</code> field on milestones.</div>
     <div class="event-pills" id="event-pills"><div class="loading-msg"><span class="spinner"></span>Loading events…</div></div>
     <div id="live-updates"><div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div></div>
+  </div>
+
+  <div class="section" id="brief">
+    <div class="sh">
+      📋 Synthesis Brief
+      <span id="brief-active-label" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px"></span>
+    </div>
+    <div class="sh-sub">Analyst-style synthesis generated deterministically from the milestone corpus — themes, hardware→software chains, displacement rollup, citation index. Validates that the same pipeline will work on I/O 2026 data as it lands.</div>
+    <div class="event-pills" id="brief-event-pills"></div>
+    <div class="brief-status" id="brief-status"></div>
+    <div id="brief-body"><div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Loading…</div></div></div>
   </div>
 
   <div class="section" id="impact">
@@ -337,13 +465,25 @@ function scoreBar(val, max, color){
 /* ── LIVE TAB ENGINE ───────────────────────────────────────────────── */
 
 const EVENTS = [
-  { key:'google-io',  label:'Google I/O 2026',  pattern:'I/O',        color:'#4285f4', icon:'🔵', date:'May 19–20, 2026' },
-  { key:'cloud-next', label:'Cloud Next 2026',   pattern:'Cloud Next', color:'#34a853', icon:'☁️', date:'Apr 22–24, 2026' },
-  { key:'nvidia-gtc', label:'NVIDIA GTC',        pattern:'GTC',        color:'#76b900', icon:'🟢', date:'Mar 2025' },
-  { key:'ms-build',   label:'Microsoft Build',   pattern:'Build',      color:'#00adef', icon:'🪟', date:'May 2025' },
-  { key:'openai-dev', label:'OpenAI Dev Day',    pattern:'Dev Day',    color:'#10a37f', icon:'🤖', date:'Nov 2024' },
-  { key:'apple-wwdc', label:'Apple WWDC',        pattern:'WWDC',       color:'#555555', icon:'🍎', date:'Jun 2025' },
+  { key:'google-io',  label:'Google I/O 2026',  pattern:'I/O',        color:'#4285f4', icon:'🔵', date:'May 19–20, 2026',  liveDates:['2026-05-19','2026-05-20'] },
+  { key:'cloud-next', label:'Cloud Next 2026',   pattern:'Cloud Next', color:'#34a853', icon:'☁️', date:'Apr 22–24, 2026',  liveDates:['2026-04-22','2026-04-23','2026-04-24'] },
+  { key:'nvidia-gtc', label:'NVIDIA GTC',        pattern:'GTC',        color:'#76b900', icon:'🟢', date:'Mar 2025',          liveDates:[] },
+  { key:'ms-build',   label:'Microsoft Build',   pattern:'Build',      color:'#00adef', icon:'🪟', date:'May 2025',          liveDates:[] },
+  { key:'openai-dev', label:'OpenAI Dev Day',    pattern:'Dev Day',    color:'#10a37f', icon:'🤖', date:'Nov 2024',          liveDates:[] },
+  { key:'apple-wwdc', label:'Apple WWDC',        pattern:'WWDC',       color:'#555555', icon:'🍎', date:'Jun 2025',          liveDates:[] },
 ];
+// I/O 2025 retrospective — same Google entity, distinct source_event label
+EVENTS.push({ key:'google-io-2025', label:'Google I/O 2025', pattern:'I/O 2025', color:'#7c3aed', icon:'🟣', date:'May 20–21, 2025', liveDates:[] });
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function isLiveNow(ev){ return (ev.liveDates||[]).includes(todayISO()); }
+function daysUntilLive(ev){
+  if(!ev.liveDates?.length) return null;
+  const today=new Date(todayISO());
+  const first=new Date(ev.liveDates[0]);
+  const diff=Math.round((first-today)/(86400*1000));
+  return diff>0 ? diff : null;
+}
 
 const LIVE_CATS = {
   'Model':           {icon:'🧠',color:'#4f46e5',tags:['model-release','frontier-model','reasoning','gemini','thinking','vision','coding','flash','pro','ultra']},
@@ -400,27 +540,42 @@ function pickDefaultEvent(){
 }
 
 function buildEventPills(){
-  document.getElementById('event-pills').innerHTML = EVENTS.map(ev=>{
+  const render = (prefix) => EVENTS.map(ev=>{
     const n = msForEvent(ev).length;
     const isOn = ev.key===_activeEv;
-    return `<button class="event-pill${isOn?' on':''}" id="ep-${ev.key}" onclick="setEvent('${ev.key}')"
+    return `<button class="event-pill${isOn?' on':''}" id="${prefix}${ev.key}" onclick="setEvent('${ev.key}')"
       style="${isOn?`background:${ev.color};border-color:${ev.color};`:`color:${ev.color};border-color:${ev.color}30;`}">
       ${ev.icon} ${ev.label}<span class="ep-count">${n}</span>
     </button>`;
   }).join('');
+  document.getElementById('event-pills').innerHTML = render('ep-');
+  const bp = document.getElementById('brief-event-pills');
+  if(bp) bp.innerHTML = render('ep2-');
 }
 
 function setEvent(key){
   _activeEv = key;
   const ev = EVENTS.find(e=>e.key===key);
-  EVENTS.forEach(e=>{
-    const btn=document.getElementById('ep-'+e.key); if(!btn) return;
-    if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
-    else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
+  // Sync both Live tab pills and Brief tab pills
+  ['ep-','ep2-'].forEach(prefix=>{
+    EVENTS.forEach(e=>{
+      const btn=document.getElementById(prefix+e.key); if(!btn) return;
+      if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
+      else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
+    });
   });
   const lbl=document.getElementById('live-active-label');
   if(lbl) lbl.textContent = ev ? `· ${ev.label} · ${ev.date}` : '';
-  renderLive(msForEvent(ev), ev);
+  const lbl2=document.getElementById('brief-active-label');
+  if(lbl2) lbl2.textContent = ev ? `· ${ev.label}` : '';
+  const ms = msForEvent(ev);
+  renderLive(ms, ev);
+  renderBrief(ms, ev);
+}
+
+function isNewMilestone(m){
+  if(!m.created_at) return false;
+  return (Date.now()-new Date(m.created_at).getTime()) < 60*60*1000;
 }
 
 function buildCard(m, evColor){
@@ -428,11 +583,12 @@ function buildCard(m, evColor){
   const cat=inferCat(m); const cfg=LIVE_CATS[cat]||{icon:'●',color:'#64748b'};
   const pred=getPred(m); const ent=_eMap[m.entity_id]?.name||'';
   const hasDetail=!!(m.significance||m.strategic_signal||m.ripple_effects||(m.displacement_entities||[]).length);
-  return `<div class="live-card" id="${id}" ${hasDetail?`onclick="toggleCard('${id}')"`:'style="cursor:default"'}>
+  const isNew=isNewMilestone(m);
+  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`onclick="toggleCard('${id}')"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
     <div class="lc-row">
       <div class="lc-stripe" style="background:${cfg.color}"></div>
       <span class="lc-date">${(m.date||'').slice(5,10)}</span>
-      <span class="lc-title">${esc(m.event)}</span>
+      <span class="lc-title">${isNew?'<span class="new-badge">new</span>':''}${esc(m.event)}</span>
       <div class="lc-meta">
         ${pred?`<span class="pred-tag">✓ ${pred.short}</span>`:''}
         <span class="tag" style="background:${cfg.color}15;color:${cfg.color};font-size:9px">${cfg.icon} ${cat}</span>
@@ -463,6 +619,187 @@ function filterCat(btn, cat, evColor){
   btn.classList.add('on'); btn.style.background=evColor; btn.style.borderColor=evColor; btn.style.color='#fff';
   const sp=document.querySelector('.live-spotlight'); if(sp) sp.style.display = cat==='all'?'':'none';
   document.querySelectorAll('.live-cat-group').forEach(g=>g.classList.toggle('hidden', cat!=='all'&&g.dataset.cat!==cat));
+}
+
+/* ── BRIEF / SYNTHESIS ENGINE ──────────────────────────────────────
+   Deterministic synthesis: zero LLM, zero hallucination. Everything below
+   is derived from milestone records via counting + tag clustering. */
+
+// Tags too generic to be useful as a "theme" — these appear on most
+// milestones and don't differentiate. Tune as the corpus grows.
+const THEME_STOPWORDS = new Set([
+  'gemini','google','model-release','announced','preview','experimental',
+  'developer','sdk','api','tools','cloud-next'
+]);
+
+function humanizeTheme(tag){
+  return tag.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+function clusterThemes(ms){
+  const tagCount={}, tagBack={};
+  ms.forEach(m=>(m.tags||[]).forEach(raw=>{
+    const t=String(raw).toLowerCase();
+    if(THEME_STOPWORDS.has(t)) return;
+    tagCount[t]=(tagCount[t]||0)+1;
+    if(!tagBack[t]) tagBack[t]=[];
+    tagBack[t].push(m);
+  }));
+  return Object.entries(tagCount)
+    .filter(([,c])=>c>=2)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,8)
+    .map(([tag,count])=>({tag, count, milestones:tagBack[tag]}));
+}
+
+function hardwareToSoftwareChains(ms){
+  const infra = ms.filter(m=>(m.stack_layer||'').toLowerCase()==='infrastructure');
+  const downstream = ms.filter(m=>{
+    const sl=(m.stack_layer||'').toLowerCase();
+    return sl==='model'||sl==='application'||sl==='developer tools';
+  });
+  const chains=[];
+  infra.forEach(src=>{
+    const srcTags=new Set((src.tags||[]).map(t=>String(t).toLowerCase()));
+    downstream.forEach(dst=>{
+      const dstTags=(dst.tags||[]).map(t=>String(t).toLowerCase());
+      const overlap=dstTags.filter(t=>srcTags.has(t) && !THEME_STOPWORDS.has(t));
+      if(overlap.length>=1) chains.push({src,dst,overlap});
+    });
+  });
+  // De-dupe: keep highest-overlap chain per (src,dst) and limit total
+  const seen=new Set();
+  return chains
+    .sort((a,b)=>b.overlap.length-a.overlap.length)
+    .filter(c=>{ const k=c.src.id+':'+c.dst.id; if(seen.has(k)) return false; seen.add(k); return true; })
+    .slice(0,6);
+}
+
+function displacementRollup(ms){
+  const counts={}, back={};
+  ms.forEach(m=>(m.displacement_entities||[]).forEach(e=>{
+    counts[e]=(counts[e]||0)+1;
+    if(!back[e]) back[e]=[];
+    back[e].push(m);
+  }));
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([name,count])=>({name,count,milestones:back[name]}));
+}
+
+function dominantCategory(ms){
+  const cnt={}; ms.forEach(m=>{ const c=inferCat(m); cnt[c]=(cnt[c]||0)+1; });
+  return Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+}
+
+function liveStatusFor(ev){
+  if(isLiveNow(ev)){
+    return `<span class="live-now">● LIVE NOW</span> Auto-refresh every 5 min during ${esc(ev.date)}.`;
+  }
+  const d=daysUntilLive(ev);
+  if(d!==null){
+    return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} scheduled for ${esc(ev.date)}. Auto-refresh activates on conference day.`;
+  }
+  if(ev.liveDates?.length===0){
+    return `Past event · ${esc(ev.date)}. Historical milestones only.`;
+  }
+  return '';
+}
+
+function renderBrief(ms, ev){
+  const el=document.getElementById('brief-body');
+  const status=document.getElementById('brief-status');
+  if(status) status.innerHTML = liveStatusFor(ev);
+
+  if(!ms.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No milestones to synthesize yet</div><div class="empty-body">Seed milestones with <code>source_event</code> matching "${esc(ev?.pattern||'')}" — the brief will populate automatically. For I/O 2025 retrospective data, run <code>python3 seed_io_2025.py</code>.</div></div>`;
+    return;
+  }
+
+  const evColor=ev?.color||'#4f46e5';
+  const top=[...ms].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0))[0];
+  const highSig=ms.filter(m=>(m.forward_implication_score||0)>=4).length;
+  const claimCounts={
+    demonstrated:ms.filter(m=>m.claim_type==='demonstrated').length,
+    announced:ms.filter(m=>m.claim_type==='announced').length,
+    inferred:ms.filter(m=>m.claim_type==='inferred').length,
+  };
+  const dates=ms.map(m=>m.date).filter(Boolean).sort();
+  const dateSpan = dates.length ? `${dates[0]} → ${dates[dates.length-1]}` : '—';
+  const dom=dominantCategory(ms);
+
+  // 1. Executive Summary
+  const exec = `<div class="brief-block">
+    <div class="brief-h">📌 Executive Summary <span class="brief-h-count" style="background:${evColor}">${ms.length}</span></div>
+    <div class="brief-headline">${esc(top.event)}</div>
+    <div class="brief-prose">Across ${ms.length} milestones spanning ${esc(dateSpan)}, <strong>${esc(top.event.slice(0,80))}${top.event.length>80?'…':''}</strong> is the highest-signal anchor (FIS ${top.forward_implication_score||'?'}/5). The dominant theme is <strong style="color:${evColor}">${esc(dom?.[0]||'mixed')}</strong> (${dom?.[1]||0} of ${ms.length} milestones). ${highSig} milestone${highSig===1?'':'s'} cleared the FIS≥4 threshold — meaning ${highSig===0?'no':highSig===1?'one':highSig+' separate'} development${highSig===1?'':'s'} likely to materially reshape the competitive landscape.</div>
+    <div class="brief-stats">
+      <div class="brief-stat"><div class="brief-stat-n" style="color:${evColor}">${ms.length}</div><div class="brief-stat-l">Milestones</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:var(--warn)">${highSig}</div><div class="brief-stat-l">High-Signal (≥4)</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#34a853">${claimCounts.demonstrated}</div><div class="brief-stat-l">Demonstrated</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#4285f4">${claimCounts.announced}</div><div class="brief-stat-l">Announced</div></div>
+    </div>
+  </div>`;
+
+  // 2. Themes
+  const themes=clusterThemes(ms);
+  const themesBlock = themes.length ? `<div class="brief-block">
+    <div class="brief-h">🧭 Emergent Themes <span class="brief-h-count">${themes.length}</span></div>
+    <div class="brief-prose">Tags co-occurring across ≥2 milestones, surfacing the underlying narrative threads without prescribed categories.</div>
+    ${themes.map(t=>{
+      const ex=t.milestones.slice(0,2).map(m=>esc((m.event||'').slice(0,50))+'…').join(' · ');
+      return `<div class="theme-row">
+        <div class="theme-bullet" style="background:${evColor}"></div>
+        <div class="theme-body">
+          <div class="theme-name">${esc(humanizeTheme(t.tag))}<span class="theme-pop" style="background:${evColor}">${t.count}×</span></div>
+          <div class="theme-evidence">${ex}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>` : '';
+
+  // 3. Hardware → Software chains
+  const chains=hardwareToSoftwareChains(ms);
+  const chainsBlock = chains.length ? `<div class="brief-block">
+    <div class="brief-h">⚙️ Hardware → Software Chains <span class="brief-h-count">${chains.length}</span></div>
+    <div class="brief-prose">Infrastructure milestones connected to downstream Model / App / Developer-Tool milestones via shared tags. These are the implication chains the underlying compute enables.</div>
+    ${chains.map(c=>`<div class="chain-row">
+      <div class="chain-cell">
+        <div class="chain-cell-lbl">⚡ Infrastructure</div>
+        <div class="chain-cell-title">${esc(c.src.event.slice(0,80))}${c.src.event.length>80?'…':''}</div>
+        <div class="chain-cell-tags">${(c.src.tags||[]).slice(0,4).map(t=>esc(t)).join(' · ')}</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-cell">
+        <div class="chain-cell-lbl">${esc(c.dst.stack_layer||'Downstream')}</div>
+        <div class="chain-cell-title">${esc(c.dst.event.slice(0,80))}${c.dst.event.length>80?'…':''}</div>
+        <div class="chain-cell-tags">shared: ${c.overlap.slice(0,3).map(t=>esc(t)).join(', ')}</div>
+      </div>
+    </div>`).join('')}
+  </div>` : '';
+
+  // 4. Displacement Rollup
+  const rollup=displacementRollup(ms);
+  const max=rollup[0]?.count||1;
+  const rollupBlock = rollup.length ? `<div class="brief-block">
+    <div class="brief-h">🎯 Displacement Rollup <span class="brief-h-count" style="background:var(--red)">${rollup.length}</span></div>
+    <div class="brief-prose">Entities or categories named as threatened across this event's milestones. Frequency ≈ strength of competitive pressure.</div>
+    ${rollup.map(r=>`<div class="dis-rollup">
+      <div class="dis-rollup-name">⚠ ${esc(r.name)}</div>
+      <div class="dis-rollup-bar"><div class="dis-rollup-fill" style="width:${(r.count/max)*100}%"></div></div>
+      <div class="dis-rollup-count">${r.count}×</div>
+    </div>`).join('')}
+  </div>` : '';
+
+  // 5. Citation Index
+  const sortedMs=[...ms].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const citeBlock = `<div class="brief-block">
+    <div class="brief-h">📚 Citation Index <span class="brief-h-count">${ms.length}</span></div>
+    <div class="brief-prose">All source milestones referenced above. Click a milestone in the Live Updates tab to see full significance, strategic signal, and ripple effects.</div>
+    <div class="cite-list">
+      ${sortedMs.map(m=>`<div class="cite-item"><span class="cite-item-date">${esc(m.date||'????-??-??')}</span>${esc(m.event||'')}</div>`).join('')}
+    </div>
+  </div>`;
+
+  el.innerHTML = exec + themesBlock + chainsBlock + rollupBlock + citeBlock;
 }
 
 function renderLive(updates, ev){
@@ -527,6 +864,9 @@ async function init(){
     let evMs=[], eOff=0;
     while(true){ const b=await get('milestones',`select=*&source_event=not.is.null&order=date.desc&limit=500&offset=${eOff}`); evMs=evMs.concat(b); if(b.length<500) break; eOff+=500; }
     _allEvMs=evMs;
+    _lastReloadTime=Date.now();
+    updateFreshnessTs();
+    showLiveBanner();
 
     // Hero stats — all dynamic
     document.getElementById('stat-milestones').textContent=gMs.length;
@@ -562,12 +902,12 @@ async function init(){
     document.getElementById('gemini-models').innerHTML=allModels.filter(m=>m.entity_id===gid).map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><span style="font-weight:700;font-size:13px">${esc(m.display_name)}</span><span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span></div><span style="font-size:11px;background:rgba(66,133,244,.12);color:#4285f4;padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span></div>`).join('');
 
     const wi=[
-      {area:'🧠 Gemini 2.5 Ultra — Flagship push',conf:90,context:'Gemini 2.5 Pro scored 84% GPQA and 97.1% MATH. Google consistently announces a higher-tier Ultra at I/O. Claude Opus 4.6 leads at 87.7% GPQA. The gap is closeable.',signal:'Longitudinal: Ultra announced at every major I/O since 2023. Gemini 2.0 Ultra was previewed but never widely released — expect a fully shipped version.'},
-      {area:'🔧 Agentic / Project Mariner expansion',conf:85,context:'Google launched Project Mariner and Jules in late 2024. The AI agent arms race with OpenAI Operator and Anthropic Computer Use is intensifying. Expect Mariner GA and deeper workspace integration.',signal:'Our displacement map: Anthropic and OpenAI both appear in Google\'s recent displacement targets around agentic milestones.'},
-      {area:'⚡ Gemini 2.5 Flash pricing pressure',conf:80,context:'Gemini 2.5 Flash (78% GPQA) competes directly with Claude Haiku 4.5 and GPT-4o mini. Flash is at $0.15/M input vs Haiku 4.5 at $0.80/M — further compression expected.',signal:'Track record: Flash pricing dropped ~70% between 1.5 and 2.5 generations.'},
-      {area:'🌐 Context & long-document leadership',conf:75,context:'Gemini 1.5 Pro established the 2M token context record. No other model has matched it publicly. Expect an announcement around practical long-context deployment at scale.',signal:'No displacement milestone for context window — Google still leads uncontested.'},
-      {area:'🎨 Multimodal: native video + audio I/O',conf:70,context:'GPT-4o leads on native multimodality in perception. Google has the underlying capability (Gemini was native multimodal from v1) but hasn\'t won the narrative.',signal:'Gemini Live and Imagen 3 shipped post-I/O 2024. The 2025 cycle surfaces deeper integration.'},
-      {area:'🔬 Research drops: AlphaFold successors / Veo 2+',conf:65,context:'DeepMind research announcements are a consistent I/O feature. AlphaFold 3 and Veo 2 were major 2024 drops. Expect at least one research-to-product bridge announcement.',signal:'Google\'s research pipeline has the highest FIS average across all entities in our DB.'},
+      {area:'🧠 Gemini 3.1 Pro GA + Ultra tier',conf:92,context:'Gemini 3.1 Pro entered preview at Cloud Next (Apr 22) with a new MEDIUM thinking_level parameter. I/O is the canonical GA launch window. Expect full availability plus a 3.1 Ultra SKU to answer Claude Opus 4.7 and GPT-5.5.',signal:'Every Gemini Pro generation previewed at Cloud Next has gone GA at I/O. Gemini 2.5 Ultra was previewed but never shipped — Google is due a fully released Ultra tier this cycle.'},
+      {area:'📱 Android Aluminium (17) — Gemini Intelligence at OS layer',conf:88,context:'Android 16 shipped Gemini Nano on-device. Android 17 (codename "Aluminium") expected to embed Gemini Intelligence at OS level: ambient AI across any app, predictive widgets, real-time camera translation, and Gemini-powered notifications.',signal:'Google announces a major Android version at I/O every year since 2014. Gemini-Intelligence branding has surfaced in Android 17 developer builds.'},
+      {area:'🥽 Android XR smart glasses — consumer hardware push',conf:83,context:'Google confirmed an XR eyewear partnership at Cloud Next 2026. Project Astra demonstrated real-time visual context on prototype glasses. I/O 2026 is the most visible launch window for a consumer reveal alongside form-factor partners.',signal:'LIVE_CATS "Hardware & XR" category tracks glasses, xr, spatial, device. Expect displacement of Meta Ray-Ban in the sub-$500 smart glasses segment.'},
+      {area:'⚡ Gemini 2.5 Flash — inference price floor drop',conf:80,context:'Gemini 2.5 Flash ($0.15/M input) already undercuts Claude Haiku 4.5 ($0.80/M) and GPT-4o mini ($0.60/M). TPU 8i (80% better inference $/perf vs prior gen) gives Google margin to absorb another cut.',signal:'Flash pricing dropped ~70% per generation. A 3.1 Flash at sub-$0.05/M would close the cost gap with self-hosted open models.'},
+      {area:'📚 Googlebooks AI — personalized AI reading assistant',conf:76,context:'A new Googlebooks AI product that ingests personal reading history for Socratic Q&A, summaries, and study guides was signalled in I/O planning leaks. Google Books has 40M+ titles; Gemini 2.0 1M context handles book-length inputs in a single pass.',signal:'"googlebooks" tag appears in LIVE_CATS Hardware & XR alongside Beam and spatial. Competes directly with Perplexity, Kindle AI Summaries, and NotebookLM.'},
+      {area:'🔧 ADK v2 + Agentspace 2.0 — on-device agentic runtime',conf:78,context:'ADK v1.0 GA shipped Apr 22 (Cloud Next). I/O typically delivers a v2 update at lower latency. Agentspace 2.0 likely adds on-device Gemini Nano for edge-first agentic workflows — closing the gap with Anthropic Managed Agents "dreaming" self-improvement.',signal:'A2A Protocol v1.2 has 150 orgs in production. An on-device ADK would be the first agentic framework to run without cloud round-trips, enabling new mobile and automotive use cases.'},
     ];
     document.getElementById('watch-cards').innerHTML=wi.map(w=>`<div class="watch-card"><div class="watch-area">${w.area}</div><div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?'#4285f4':w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label" style="margin-bottom:10px">Confidence: ${w.conf}%</div><div class="watch-context">${esc(w.context)}</div><div class="watch-signal">💡 ${esc(w.signal)}</div></div>`).join('');
 
@@ -603,16 +943,99 @@ async function init(){
   } catch(e){ console.error(e); }
 }
 
+let _lastReloadTime = null;
+let _prevEvMsCount = 0;
+
+function showToast(msg, ms=3500){
+  const t=document.getElementById('toast'); if(!t) return;
+  t.innerHTML=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+function updateFreshnessTs(){
+  const el=document.getElementById('freshness-ts'); if(!el||!_lastReloadTime) return;
+  const diff=Math.round((Date.now()-_lastReloadTime)/1000);
+  let label;
+  if(diff<10) label='Updated just now';
+  else if(diff<60) label=`Updated ${diff}s ago`;
+  else label=`Updated ${Math.round(diff/60)}m ago`;
+  el.textContent=label; el.style.display='inline-flex';
+}
+
+function showLiveBanner(){
+  const liveEvs=EVENTS.filter(isLiveNow);
+  const banner=document.getElementById('live-banner');
+  const btxt=document.getElementById('live-banner-text');
+  if(!banner||!btxt) return;
+  if(!liveEvs.length){ banner.classList.remove('visible'); return; }
+  const day1=liveEvs[0]; const today=todayISO();
+  const dayNum=(day1.liveDates||[]).indexOf(today)+1;
+  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · Auto-refreshing every 5 min`;
+  banner.classList.add('visible');
+}
+
 async function reload(){
-  // Reset stat counters and key panels to a loading state, then re-init.
+  const btn=document.getElementById('reload-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Refreshing…'; }
+  const prevCount=_prevEvMsCount;
   ['stat-milestones','stat-events','stat-ev-total','stat-new'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
   document.getElementById('status-text').textContent='Reloading event data…';
   document.getElementById('event-pills').innerHTML=`<div class="loading-msg"><span class="spinner"></span>Loading events…</div>`;
   document.getElementById('live-updates').innerHTML=`<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div>`;
   await init();
+  if(btn){ btn.disabled=false; btn.textContent='↺ Refresh'; }
+  const newCount=_allEvMs.length;
+  const diff=newCount-prevCount;
+  if(diff>0) showToast(`<span class="toast-icon">✦</span>${diff} new milestone${diff!==1?'s':''} loaded`);
+  else showToast('<span class="toast-icon">✓</span>Up to date');
+  _prevEvMsCount=newCount;
 }
 
-init();
+/* ── CONFERENCE-DAY AUTO-REFRESH ──────────────────────────────────────
+   Polls every 5 min only when today's ISO date matches a live event's
+   liveDates array. Outside conference windows, manual refresh only. */
+let _autoRefreshTimer = null;
+function setupAutoRefresh(){
+  if(_autoRefreshTimer){ clearInterval(_autoRefreshTimer); _autoRefreshTimer=null; }
+  const liveEvents = EVENTS.filter(isLiveNow);
+  if(!liveEvents.length) return;
+  _autoRefreshTimer = setInterval(()=>{
+    console.log('[auto-refresh] polling milestones (live event in progress)');
+    reload();
+  }, 5*60*1000);
+  // Show indicator in hero status badge
+  const stxt = document.getElementById('status-text');
+  if(stxt){
+    const labels = liveEvents.map(e=>e.label).join(' · ');
+    stxt.innerHTML = `<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} in progress · auto-refresh every 5 min`;
+  }
+}
+
+// Tick freshness indicator every 30 seconds
+setInterval(updateFreshnessTs, 30000);
+
+// ── THEME TOGGLE ──────────────────────────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('nous_theme');
+  if(saved) document.documentElement.setAttribute('data-theme',saved);
+  function syncBtn(){
+    const btn=document.getElementById('theme-toggle'); if(!btn) return;
+    const t=document.documentElement.getAttribute('data-theme')||'light';
+    btn.textContent=t==='dark'?'☀️':'🌙';
+    btn.title=t==='dark'?'Switch to light mode':'Switch to dark mode';
+  }
+  window.toggleTheme=function(){
+    const current=document.documentElement.getAttribute('data-theme')||'light';
+    const next=current==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('nous_theme',next);
+    syncBtn();
+  };
+  if(document.readyState!=='loading') syncBtn();
+  else document.addEventListener('DOMContentLoaded',syncBtn);
+})();
+
+init().then(setupAutoRefresh);
 </script>
 </body>
 </html>

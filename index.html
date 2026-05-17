@@ -186,14 +186,40 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
   .sf { grid-column: auto; }
   .tab { padding: 16px; }
 }
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e; --accent-bg:rgba(79,70,229,.15);
+  color-scheme:dark;
+}
+[data-theme="dark"] body { background:var(--bg); }
+[data-theme="dark"] .nav { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .stat { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .ec  { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .ec:hover { border-color:#388bfd60; }
+[data-theme="dark"] .srch-inp { background:#161b22; border-color:#30363d; color:#c9d1d9; }
+[data-theme="dark"] .srch-inp::placeholder { color:#8b949e; }
+[data-theme="dark"] .sf { background:#161b22; border-color:#30363d; color:#c9d1d9; }
+[data-theme="dark"] .sg-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .rc  { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .mfm td { background:#161b22; border-color:#30363d; color:#c9d1d9; }
+[data-theme="dark"] .mfm .cat-hdr td { background:#1c2128; }
+[data-theme="dark"] .theme-toggle { border-color:rgba(148,163,184,.3); color:#94a3b8; }
+[data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); color:#c9d1d9; }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle { background:none; border:1px solid rgba(148,163,184,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; color:#94a3b8; flex-shrink:0; }
+.theme-toggle:hover { background:rgba(148,163,184,.1); color:#fff; }
 </style>
 </head>
 <body>
 
 <div class="hdr">
   <div class="hdr-title">🔭 Nous Observatory</div>
-  <div style="display:flex;align-items:center;gap:14px">
+  <div style="display:flex;align-items:center;gap:10px">
     <span class="hdr-sub" id="hdr-meta">Loading…</span>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
     <button class="reload-btn" onclick="reload()">↺ Refresh</button>
   </div>
 </div>
@@ -1367,6 +1393,27 @@ init();
   trySwitch();
   // Also re-try after data loads in case search/tree needs data
   document.addEventListener('DOMContentLoaded', trySwitch);
+})();
+
+// ── THEME TOGGLE ──────────────────────────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('nous_theme');
+  if(saved) document.documentElement.setAttribute('data-theme',saved);
+  function syncBtn(){
+    const btn=document.getElementById('theme-toggle'); if(!btn) return;
+    const t=document.documentElement.getAttribute('data-theme')||'light';
+    btn.textContent=t==='dark'?'☀️':'🌙';
+    btn.title=t==='dark'?'Switch to light mode':'Switch to dark mode';
+  }
+  window.toggleTheme=function(){
+    const current=document.documentElement.getAttribute('data-theme')||'light';
+    const next=current==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('nous_theme',next);
+    syncBtn();
+  };
+  if(document.readyState!=='loading') syncBtn();
+  else document.addEventListener('DOMContentLoaded',syncBtn);
 })();
 
 // Re-render map on window resize
