@@ -205,6 +205,48 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lc-ripple { background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 11px; margin-bottom: 9px; font-size: 12px; color: #64748b; line-height: 1.6; }
 .lc-ripple-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: .6px; font-weight: 700; color: var(--muted); margin-bottom: 3px; }
 .lc-footer { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; padding-top: 8px; border-top: 1px solid #edf1f7; margin-top: 8px; }
+
+/* ── BRIEF / SYNTHESIS TAB ── */
+.brief-status { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.brief-status .live-now { color: #991b1b; font-weight: 700; background: #fee2e2; border: 1px solid #fca5a5; padding: 1px 9px; border-radius: 10px; margin-right: 6px; }
+.brief-status .upcoming { color: #92400e; font-weight: 700; background: #fef3c7; border: 1px solid #fde68a; padding: 1px 9px; border-radius: 10px; margin-right: 6px; }
+.brief-block { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; }
+.brief-h { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.brief-h-count { font-size: 10px; font-weight: 600; color: #fff; padding: 1px 7px; border-radius: 8px; background: var(--muted); }
+.brief-headline { font-size: 17px; font-weight: 700; line-height: 1.4; color: var(--text); margin-bottom: 10px; }
+.brief-prose { font-size: 13.5px; color: #334155; line-height: 1.7; margin-bottom: 10px; }
+.brief-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 14px; }
+@media(max-width:700px){ .brief-stats { grid-template-columns: repeat(2,1fr); } }
+.brief-stat { background: #f8fafc; border-radius: 8px; padding: 10px 12px; }
+.brief-stat-n { font-size: 18px; font-weight: 700; color: var(--text); line-height: 1; }
+.brief-stat-l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
+.theme-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.theme-row:last-child { border-bottom: none; }
+.theme-bullet { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+.theme-body { flex: 1; }
+.theme-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; text-transform: capitalize; }
+.theme-evidence { font-size: 12px; color: var(--muted); line-height: 1.55; }
+.theme-pop { font-size: 10px; font-weight: 600; color: #fff; padding: 1px 8px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+.chain-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.chain-row:last-child { border-bottom: none; }
+.chain-cell { background: #f8fafc; border-radius: 6px; padding: 8px 10px; font-size: 12px; line-height: 1.5; }
+.chain-cell-lbl { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+.chain-cell-title { font-size: 12px; font-weight: 600; color: var(--text); }
+.chain-cell-tags { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.chain-arrow { color: var(--indigo); font-size: 16px; font-weight: 700; text-align: center; }
+@media(max-width:700px){ .chain-row { grid-template-columns: 1fr; } .chain-arrow { transform: rotate(90deg); text-align: left; padding-left: 12px; } }
+.dis-rollup { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.dis-rollup:last-child { border-bottom: none; }
+.dis-rollup-name { font-weight: 700; font-size: 13px; min-width: 180px; color: #991b1b; }
+.dis-rollup-bar { flex: 1; height: 6px; background: #fee2e2; border-radius: 3px; overflow: hidden; }
+.dis-rollup-fill { height: 100%; background: var(--red); border-radius: 3px; }
+.dis-rollup-count { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.cite-list { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+@media(max-width:700px){ .cite-list { grid-template-columns: 1fr; } }
+.cite-item { font-size: 11px; line-height: 1.65; color: #475569; padding: 2px 0; border-bottom: 1px dotted var(--border); }
+.cite-item-date { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; }
+.live-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-size: 11px; font-weight: 700; }
+.live-indicator .live-pulse { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.5s ease-in-out infinite; }
 </style>
 </head>
 <body>
@@ -235,6 +277,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <button class="snav" onclick="showSection('watch',this)">🔭 What To Watch</button>
   <button class="snav" onclick="showSection('benchmarks',this)">⚡ Benchmark Snapshot</button>
   <button class="snav" onclick="showSection('live',this)">🔴 Live Updates <span id="live-count" style="display:none;background:#ea4335;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px"></span></button>
+  <button class="snav" onclick="showSection('brief',this)">📋 Brief</button>
   <button class="snav" onclick="showSection('impact',this)">🌊 Impact Map</button>
 </div>
 
@@ -283,6 +326,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="sh-sub">Select a conference to see its milestones grouped by category and impact. Data is seeded via the <code>source_event</code> field on milestones.</div>
     <div class="event-pills" id="event-pills"><div class="loading-msg"><span class="spinner"></span>Loading events…</div></div>
     <div id="live-updates"><div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div></div>
+  </div>
+
+  <div class="section" id="brief">
+    <div class="sh">
+      📋 Synthesis Brief
+      <span id="brief-active-label" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px"></span>
+    </div>
+    <div class="sh-sub">Analyst-style synthesis generated deterministically from the milestone corpus — themes, hardware→software chains, displacement rollup, citation index. Validates that the same pipeline will work on I/O 2026 data as it lands.</div>
+    <div class="event-pills" id="brief-event-pills"></div>
+    <div class="brief-status" id="brief-status"></div>
+    <div id="brief-body"><div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Loading…</div></div></div>
   </div>
 
   <div class="section" id="impact">
@@ -337,13 +391,25 @@ function scoreBar(val, max, color){
 /* ── LIVE TAB ENGINE ───────────────────────────────────────────────── */
 
 const EVENTS = [
-  { key:'google-io',  label:'Google I/O 2026',  pattern:'I/O',        color:'#4285f4', icon:'🔵', date:'May 19–20, 2026' },
-  { key:'cloud-next', label:'Cloud Next 2026',   pattern:'Cloud Next', color:'#34a853', icon:'☁️', date:'Apr 22–24, 2026' },
-  { key:'nvidia-gtc', label:'NVIDIA GTC',        pattern:'GTC',        color:'#76b900', icon:'🟢', date:'Mar 2025' },
-  { key:'ms-build',   label:'Microsoft Build',   pattern:'Build',      color:'#00adef', icon:'🪟', date:'May 2025' },
-  { key:'openai-dev', label:'OpenAI Dev Day',    pattern:'Dev Day',    color:'#10a37f', icon:'🤖', date:'Nov 2024' },
-  { key:'apple-wwdc', label:'Apple WWDC',        pattern:'WWDC',       color:'#555555', icon:'🍎', date:'Jun 2025' },
+  { key:'google-io',  label:'Google I/O 2026',  pattern:'I/O',        color:'#4285f4', icon:'🔵', date:'May 19–20, 2026',  liveDates:['2026-05-19','2026-05-20'] },
+  { key:'cloud-next', label:'Cloud Next 2026',   pattern:'Cloud Next', color:'#34a853', icon:'☁️', date:'Apr 22–24, 2026',  liveDates:['2026-04-22','2026-04-23','2026-04-24'] },
+  { key:'nvidia-gtc', label:'NVIDIA GTC',        pattern:'GTC',        color:'#76b900', icon:'🟢', date:'Mar 2025',          liveDates:[] },
+  { key:'ms-build',   label:'Microsoft Build',   pattern:'Build',      color:'#00adef', icon:'🪟', date:'May 2025',          liveDates:[] },
+  { key:'openai-dev', label:'OpenAI Dev Day',    pattern:'Dev Day',    color:'#10a37f', icon:'🤖', date:'Nov 2024',          liveDates:[] },
+  { key:'apple-wwdc', label:'Apple WWDC',        pattern:'WWDC',       color:'#555555', icon:'🍎', date:'Jun 2025',          liveDates:[] },
 ];
+// I/O 2025 retrospective — same Google entity, distinct source_event label
+EVENTS.push({ key:'google-io-2025', label:'Google I/O 2025', pattern:'I/O 2025', color:'#7c3aed', icon:'🟣', date:'May 20–21, 2025', liveDates:[] });
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function isLiveNow(ev){ return (ev.liveDates||[]).includes(todayISO()); }
+function daysUntilLive(ev){
+  if(!ev.liveDates?.length) return null;
+  const today=new Date(todayISO());
+  const first=new Date(ev.liveDates[0]);
+  const diff=Math.round((first-today)/(86400*1000));
+  return diff>0 ? diff : null;
+}
 
 const LIVE_CATS = {
   'Model':           {icon:'🧠',color:'#4f46e5',tags:['model-release','frontier-model','reasoning','gemini','thinking','vision','coding','flash','pro','ultra']},
@@ -400,27 +466,37 @@ function pickDefaultEvent(){
 }
 
 function buildEventPills(){
-  document.getElementById('event-pills').innerHTML = EVENTS.map(ev=>{
+  const render = (prefix) => EVENTS.map(ev=>{
     const n = msForEvent(ev).length;
     const isOn = ev.key===_activeEv;
-    return `<button class="event-pill${isOn?' on':''}" id="ep-${ev.key}" onclick="setEvent('${ev.key}')"
+    return `<button class="event-pill${isOn?' on':''}" id="${prefix}${ev.key}" onclick="setEvent('${ev.key}')"
       style="${isOn?`background:${ev.color};border-color:${ev.color};`:`color:${ev.color};border-color:${ev.color}30;`}">
       ${ev.icon} ${ev.label}<span class="ep-count">${n}</span>
     </button>`;
   }).join('');
+  document.getElementById('event-pills').innerHTML = render('ep-');
+  const bp = document.getElementById('brief-event-pills');
+  if(bp) bp.innerHTML = render('ep2-');
 }
 
 function setEvent(key){
   _activeEv = key;
   const ev = EVENTS.find(e=>e.key===key);
-  EVENTS.forEach(e=>{
-    const btn=document.getElementById('ep-'+e.key); if(!btn) return;
-    if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
-    else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
+  // Sync both Live tab pills and Brief tab pills
+  ['ep-','ep2-'].forEach(prefix=>{
+    EVENTS.forEach(e=>{
+      const btn=document.getElementById(prefix+e.key); if(!btn) return;
+      if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
+      else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
+    });
   });
   const lbl=document.getElementById('live-active-label');
   if(lbl) lbl.textContent = ev ? `· ${ev.label} · ${ev.date}` : '';
-  renderLive(msForEvent(ev), ev);
+  const lbl2=document.getElementById('brief-active-label');
+  if(lbl2) lbl2.textContent = ev ? `· ${ev.label}` : '';
+  const ms = msForEvent(ev);
+  renderLive(ms, ev);
+  renderBrief(ms, ev);
 }
 
 function buildCard(m, evColor){
@@ -463,6 +539,187 @@ function filterCat(btn, cat, evColor){
   btn.classList.add('on'); btn.style.background=evColor; btn.style.borderColor=evColor; btn.style.color='#fff';
   const sp=document.querySelector('.live-spotlight'); if(sp) sp.style.display = cat==='all'?'':'none';
   document.querySelectorAll('.live-cat-group').forEach(g=>g.classList.toggle('hidden', cat!=='all'&&g.dataset.cat!==cat));
+}
+
+/* ── BRIEF / SYNTHESIS ENGINE ──────────────────────────────────────
+   Deterministic synthesis: zero LLM, zero hallucination. Everything below
+   is derived from milestone records via counting + tag clustering. */
+
+// Tags too generic to be useful as a "theme" — these appear on most
+// milestones and don't differentiate. Tune as the corpus grows.
+const THEME_STOPWORDS = new Set([
+  'gemini','google','model-release','announced','preview','experimental',
+  'developer','sdk','api','tools','cloud-next'
+]);
+
+function humanizeTheme(tag){
+  return tag.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+function clusterThemes(ms){
+  const tagCount={}, tagBack={};
+  ms.forEach(m=>(m.tags||[]).forEach(raw=>{
+    const t=String(raw).toLowerCase();
+    if(THEME_STOPWORDS.has(t)) return;
+    tagCount[t]=(tagCount[t]||0)+1;
+    if(!tagBack[t]) tagBack[t]=[];
+    tagBack[t].push(m);
+  }));
+  return Object.entries(tagCount)
+    .filter(([,c])=>c>=2)
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,8)
+    .map(([tag,count])=>({tag, count, milestones:tagBack[tag]}));
+}
+
+function hardwareToSoftwareChains(ms){
+  const infra = ms.filter(m=>(m.stack_layer||'').toLowerCase()==='infrastructure');
+  const downstream = ms.filter(m=>{
+    const sl=(m.stack_layer||'').toLowerCase();
+    return sl==='model'||sl==='application'||sl==='developer tools';
+  });
+  const chains=[];
+  infra.forEach(src=>{
+    const srcTags=new Set((src.tags||[]).map(t=>String(t).toLowerCase()));
+    downstream.forEach(dst=>{
+      const dstTags=(dst.tags||[]).map(t=>String(t).toLowerCase());
+      const overlap=dstTags.filter(t=>srcTags.has(t) && !THEME_STOPWORDS.has(t));
+      if(overlap.length>=1) chains.push({src,dst,overlap});
+    });
+  });
+  // De-dupe: keep highest-overlap chain per (src,dst) and limit total
+  const seen=new Set();
+  return chains
+    .sort((a,b)=>b.overlap.length-a.overlap.length)
+    .filter(c=>{ const k=c.src.id+':'+c.dst.id; if(seen.has(k)) return false; seen.add(k); return true; })
+    .slice(0,6);
+}
+
+function displacementRollup(ms){
+  const counts={}, back={};
+  ms.forEach(m=>(m.displacement_entities||[]).forEach(e=>{
+    counts[e]=(counts[e]||0)+1;
+    if(!back[e]) back[e]=[];
+    back[e].push(m);
+  }));
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([name,count])=>({name,count,milestones:back[name]}));
+}
+
+function dominantCategory(ms){
+  const cnt={}; ms.forEach(m=>{ const c=inferCat(m); cnt[c]=(cnt[c]||0)+1; });
+  return Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+}
+
+function liveStatusFor(ev){
+  if(isLiveNow(ev)){
+    return `<span class="live-now">● LIVE NOW</span> Auto-refresh every 5 min during ${esc(ev.date)}.`;
+  }
+  const d=daysUntilLive(ev);
+  if(d!==null){
+    return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} scheduled for ${esc(ev.date)}. Auto-refresh activates on conference day.`;
+  }
+  if(ev.liveDates?.length===0){
+    return `Past event · ${esc(ev.date)}. Historical milestones only.`;
+  }
+  return '';
+}
+
+function renderBrief(ms, ev){
+  const el=document.getElementById('brief-body');
+  const status=document.getElementById('brief-status');
+  if(status) status.innerHTML = liveStatusFor(ev);
+
+  if(!ms.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No milestones to synthesize yet</div><div class="empty-body">Seed milestones with <code>source_event</code> matching "${esc(ev?.pattern||'')}" — the brief will populate automatically. For I/O 2025 retrospective data, run <code>python3 seed_io_2025.py</code>.</div></div>`;
+    return;
+  }
+
+  const evColor=ev?.color||'#4f46e5';
+  const top=[...ms].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0))[0];
+  const highSig=ms.filter(m=>(m.forward_implication_score||0)>=4).length;
+  const claimCounts={
+    demonstrated:ms.filter(m=>m.claim_type==='demonstrated').length,
+    announced:ms.filter(m=>m.claim_type==='announced').length,
+    inferred:ms.filter(m=>m.claim_type==='inferred').length,
+  };
+  const dates=ms.map(m=>m.date).filter(Boolean).sort();
+  const dateSpan = dates.length ? `${dates[0]} → ${dates[dates.length-1]}` : '—';
+  const dom=dominantCategory(ms);
+
+  // 1. Executive Summary
+  const exec = `<div class="brief-block">
+    <div class="brief-h">📌 Executive Summary <span class="brief-h-count" style="background:${evColor}">${ms.length}</span></div>
+    <div class="brief-headline">${esc(top.event)}</div>
+    <div class="brief-prose">Across ${ms.length} milestones spanning ${esc(dateSpan)}, <strong>${esc(top.event.slice(0,80))}${top.event.length>80?'…':''}</strong> is the highest-signal anchor (FIS ${top.forward_implication_score||'?'}/5). The dominant theme is <strong style="color:${evColor}">${esc(dom?.[0]||'mixed')}</strong> (${dom?.[1]||0} of ${ms.length} milestones). ${highSig} milestone${highSig===1?'':'s'} cleared the FIS≥4 threshold — meaning ${highSig===0?'no':highSig===1?'one':highSig+' separate'} development${highSig===1?'':'s'} likely to materially reshape the competitive landscape.</div>
+    <div class="brief-stats">
+      <div class="brief-stat"><div class="brief-stat-n" style="color:${evColor}">${ms.length}</div><div class="brief-stat-l">Milestones</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:var(--warn)">${highSig}</div><div class="brief-stat-l">High-Signal (≥4)</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#34a853">${claimCounts.demonstrated}</div><div class="brief-stat-l">Demonstrated</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#4285f4">${claimCounts.announced}</div><div class="brief-stat-l">Announced</div></div>
+    </div>
+  </div>`;
+
+  // 2. Themes
+  const themes=clusterThemes(ms);
+  const themesBlock = themes.length ? `<div class="brief-block">
+    <div class="brief-h">🧭 Emergent Themes <span class="brief-h-count">${themes.length}</span></div>
+    <div class="brief-prose">Tags co-occurring across ≥2 milestones, surfacing the underlying narrative threads without prescribed categories.</div>
+    ${themes.map(t=>{
+      const ex=t.milestones.slice(0,2).map(m=>esc((m.event||'').slice(0,50))+'…').join(' · ');
+      return `<div class="theme-row">
+        <div class="theme-bullet" style="background:${evColor}"></div>
+        <div class="theme-body">
+          <div class="theme-name">${esc(humanizeTheme(t.tag))}<span class="theme-pop" style="background:${evColor}">${t.count}×</span></div>
+          <div class="theme-evidence">${ex}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>` : '';
+
+  // 3. Hardware → Software chains
+  const chains=hardwareToSoftwareChains(ms);
+  const chainsBlock = chains.length ? `<div class="brief-block">
+    <div class="brief-h">⚙️ Hardware → Software Chains <span class="brief-h-count">${chains.length}</span></div>
+    <div class="brief-prose">Infrastructure milestones connected to downstream Model / App / Developer-Tool milestones via shared tags. These are the implication chains the underlying compute enables.</div>
+    ${chains.map(c=>`<div class="chain-row">
+      <div class="chain-cell">
+        <div class="chain-cell-lbl">⚡ Infrastructure</div>
+        <div class="chain-cell-title">${esc(c.src.event.slice(0,80))}${c.src.event.length>80?'…':''}</div>
+        <div class="chain-cell-tags">${(c.src.tags||[]).slice(0,4).map(t=>esc(t)).join(' · ')}</div>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-cell">
+        <div class="chain-cell-lbl">${esc(c.dst.stack_layer||'Downstream')}</div>
+        <div class="chain-cell-title">${esc(c.dst.event.slice(0,80))}${c.dst.event.length>80?'…':''}</div>
+        <div class="chain-cell-tags">shared: ${c.overlap.slice(0,3).map(t=>esc(t)).join(', ')}</div>
+      </div>
+    </div>`).join('')}
+  </div>` : '';
+
+  // 4. Displacement Rollup
+  const rollup=displacementRollup(ms);
+  const max=rollup[0]?.count||1;
+  const rollupBlock = rollup.length ? `<div class="brief-block">
+    <div class="brief-h">🎯 Displacement Rollup <span class="brief-h-count" style="background:var(--red)">${rollup.length}</span></div>
+    <div class="brief-prose">Entities or categories named as threatened across this event's milestones. Frequency ≈ strength of competitive pressure.</div>
+    ${rollup.map(r=>`<div class="dis-rollup">
+      <div class="dis-rollup-name">⚠ ${esc(r.name)}</div>
+      <div class="dis-rollup-bar"><div class="dis-rollup-fill" style="width:${(r.count/max)*100}%"></div></div>
+      <div class="dis-rollup-count">${r.count}×</div>
+    </div>`).join('')}
+  </div>` : '';
+
+  // 5. Citation Index
+  const sortedMs=[...ms].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const citeBlock = `<div class="brief-block">
+    <div class="brief-h">📚 Citation Index <span class="brief-h-count">${ms.length}</span></div>
+    <div class="brief-prose">All source milestones referenced above. Click a milestone in the Live Updates tab to see full significance, strategic signal, and ripple effects.</div>
+    <div class="cite-list">
+      ${sortedMs.map(m=>`<div class="cite-item"><span class="cite-item-date">${esc(m.date||'????-??-??')}</span>${esc(m.event||'')}</div>`).join('')}
+    </div>
+  </div>`;
+
+  el.innerHTML = exec + themesBlock + chainsBlock + rollupBlock + citeBlock;
 }
 
 function renderLive(updates, ev){
@@ -612,7 +869,27 @@ async function reload(){
   await init();
 }
 
-init();
+/* ── CONFERENCE-DAY AUTO-REFRESH ──────────────────────────────────────
+   Polls every 5 min only when today's ISO date matches a live event's
+   liveDates array. Outside conference windows, manual refresh only. */
+let _autoRefreshTimer = null;
+function setupAutoRefresh(){
+  if(_autoRefreshTimer){ clearInterval(_autoRefreshTimer); _autoRefreshTimer=null; }
+  const liveEvents = EVENTS.filter(isLiveNow);
+  if(!liveEvents.length) return;
+  _autoRefreshTimer = setInterval(()=>{
+    console.log('[auto-refresh] polling milestones (live event in progress)');
+    reload();
+  }, 5*60*1000);
+  // Show indicator in hero status badge
+  const stxt = document.getElementById('status-text');
+  if(stxt){
+    const labels = liveEvents.map(e=>e.label).join(' · ');
+    stxt.innerHTML = `<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} in progress · auto-refresh every 5 min`;
+  }
+}
+
+init().then(setupAutoRefresh);
 </script>
 </body>
 </html>
