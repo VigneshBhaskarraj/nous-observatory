@@ -441,14 +441,17 @@ def main():
         to_insert.append(record)
         print(f"  QUEUE: {m['date']} — {m['event'][:60]}")
 
-    if to_insert:
-        status = insert_batch(to_insert)
-        print(f"\n  ✓ Inserted {len(to_insert)} milestones (HTTP {status})")
-    else:
-        print("\n  Nothing new to insert.")
+    inserted = 0
+    for record in to_insert:
+        try:
+            status = insert_batch([record])
+            print(f"  ✓ INSERT ({status}): {record['date']} — {record['event'][:60]}")
+            inserted += 1
+        except RuntimeError as e:
+            print(f"  ✗ FAILED: {record['date']} — {record['event'][:60]}\n    {e}")
 
     print(f"\n=== Summary ===")
-    print(f"  Inserted: {len(to_insert)}")
+    print(f"  Inserted: {inserted}")
     print(f"  Skipped (duplicates): {skipped}")
     print(f"  Source event: {SOURCE_EVENT_LABEL}")
     print("Done.")
