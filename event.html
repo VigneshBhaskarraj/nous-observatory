@@ -33,8 +33,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
+/* ── EVENT SELECTOR BAR (top-level: picks the event the whole page is scoped to) ── */
+.event-selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; position: sticky; top: 0; z-index: 101; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.esb-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); flex-shrink: 0; padding-right: 10px; border-right: 1px solid var(--border); margin-right: 4px; }
+.esb-pills { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+.esb-meta { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.esb-meta b { color: var(--text); font-weight: 700; }
+[data-theme="dark"] .event-selector-bar { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .esb-label { border-color:#30363d; }
+
 /* ── NAV ── */
-.subnav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.subnav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 53px; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 .snav { padding: 12px 16px; border: none; background: none; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s; }
 .snav:hover { color: var(--text); }
 .snav.on { color: var(--google-blue); border-bottom-color: var(--google-blue); }
@@ -293,7 +302,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 [data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); }
 
 /* ── LIVE BANNER ── */
-.live-banner { background: linear-gradient(90deg,#b91c1c,#991b1b); color:#fff; padding:9px 28px; display:none; align-items:center; gap:12px; font-size:13px; font-weight:700; position:sticky; top:0; z-index:200; }
+.live-banner { background: linear-gradient(90deg,#b91c1c,#991b1b); color:#fff; padding:9px 28px; display:none; align-items:center; gap:12px; font-size:13px; font-weight:700; position:relative; z-index:200; }
 .live-banner.visible { display:flex; }
 .live-banner-pulse { width:8px; height:8px; border-radius:50%; background:#fff; flex-shrink:0; animation:pulse 1.5s ease-in-out infinite; }
 .live-banner-text { flex:1; }
@@ -334,7 +343,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
   <div class="hero-meta">
-    <div class="hero-stat"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Google milestones tracked</div></div>
+    <div class="hero-stat"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Event milestones tracked</div></div>
     <div class="hero-stat"><div class="hero-stat-n" id="stat-events">—</div><div class="hero-stat-l">Conferences covered</div></div>
     <div class="hero-stat"><div class="hero-stat-n" id="stat-ev-total">—</div><div class="hero-stat-l">Event milestones total</div></div>
     <div class="hero-stat"><div class="hero-stat-n" id="stat-new">—</div><div class="hero-stat-l">Live updates (all events)</div></div>
@@ -343,6 +352,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="status-dot"></div>
     <span id="status-text">Loading event data…</span>
   </div>
+</div>
+
+<div class="event-selector-bar" id="event-selector-bar">
+  <span class="esb-label">📅 Event</span>
+  <div class="esb-pills" id="event-pills"><div class="loading-msg"><span class="spinner"></span>Loading events…</div></div>
+  <div class="esb-meta" id="esb-meta"></div>
 </div>
 
 <div class="subnav">
@@ -357,8 +372,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="content">
 
   <div class="section on" id="going-in">
-    <div class="sh">📊 Going In — Google DeepMind's Trajectory</div>
-    <div class="sh-sub">What the longitudinal record shows about Google's AI arc — the context behind every announcement.</div>
+    <div class="sh" id="going-in-title">📊 Going In</div>
+    <div class="sh-sub" id="going-in-sub">What the longitudinal record shows about the organizer's AI arc — the context behind every announcement.</div>
     <div class="chips" id="google-chips"><div class="loading-msg"><span class="spinner"></span>Loading…</div></div>
     <div class="grid2" style="margin-bottom:24px">
       <div>
@@ -368,15 +383,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Key Metrics</div>
         <div id="google-metrics"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
-        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px">Gemini Model Line</div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px" id="model-line-title">Model Line</div>
         <div id="gemini-models"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
       </div>
     </div>
   </div>
 
   <div class="section" id="watch">
-    <div class="sh">🔭 What To Watch</div>
-    <div class="sh-sub">Predicted focus areas for upcoming Google events — based on trajectory, competitor moves, and market gaps.</div>
+    <div class="sh" id="watch-title">🔭 What To Watch</div>
+    <div class="sh-sub" id="watch-sub">Predicted focus areas for the selected event — based on trajectory, competitor moves, and market gaps.</div>
     <div class="grid2" id="watch-cards"></div>
   </div>
 
@@ -397,8 +412,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <span id="live-active-label" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px"></span>
       <span class="freshness-ts" id="freshness-ts" style="display:none">Updated just now</span>
     </div>
-    <div class="sh-sub">Select a conference to see its milestones grouped by category and impact. Data is seeded via the <code>source_event</code> field on milestones.</div>
-    <div class="event-pills" id="event-pills"><div class="loading-msg"><span class="spinner"></span>Loading events…</div></div>
+    <div class="sh-sub">Milestones for the selected event, grouped by category and impact. Pick a different event in the bar above to switch.</div>
     <div id="live-updates"><div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div></div>
   </div>
 
@@ -407,15 +421,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       📋 Synthesis Brief
       <span id="brief-active-label" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px"></span>
     </div>
-    <div class="sh-sub">Analyst-style synthesis generated deterministically from the milestone corpus — themes, hardware→software chains, displacement rollup, citation index. Validates that the same pipeline will work on I/O 2026 data as it lands.</div>
-    <div class="event-pills" id="brief-event-pills"></div>
+    <div class="sh-sub">Analyst-style synthesis generated deterministically from the milestone corpus for the selected event — themes, hardware→software chains, displacement rollup, citation index.</div>
     <div class="brief-status" id="brief-status"></div>
     <div id="brief-body"><div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Loading…</div></div></div>
   </div>
 
   <div class="section" id="impact">
-    <div class="sh">🌊 Impact Map — Who Google Is Threatening</div>
-    <div class="sh-sub">Milestones where Google DeepMind appears in <code>displacement_entities</code> across all tracked companies.</div>
+    <div class="sh" id="impact-title">🌊 Impact Map</div>
+    <div class="sh-sub" id="impact-sub">Who the selected event's organizer is threatening — and who is threatening them — in the <code>displacement_entities</code> field across all tracked companies.</div>
     <div id="impact-map"><div class="loading-msg"><span class="spinner"></span>Loading displacement data…</div></div>
   </div>
 
@@ -465,15 +478,15 @@ function scoreBar(val, max, color){
 /* ── LIVE TAB ENGINE ───────────────────────────────────────────────── */
 
 const EVENTS = [
-  { key:'google-io',  label:'Google I/O 2026',  pattern:'I/O',        color:'#4285f4', icon:'🔵', date:'May 19–20, 2026',  liveDates:['2026-05-19','2026-05-20'] },
-  { key:'cloud-next', label:'Cloud Next 2026',   pattern:'Cloud Next', color:'#34a853', icon:'☁️', date:'Apr 22–24, 2026',  liveDates:['2026-04-22','2026-04-23','2026-04-24'] },
-  { key:'nvidia-gtc', label:'NVIDIA GTC',        pattern:'GTC',        color:'#76b900', icon:'🟢', date:'Mar 2025',          liveDates:[] },
-  { key:'ms-build',   label:'Microsoft Build',   pattern:'Build',      color:'#00adef', icon:'🪟', date:'May 2025',          liveDates:[] },
-  { key:'openai-dev', label:'OpenAI Dev Day',    pattern:'Dev Day',    color:'#10a37f', icon:'🤖', date:'Nov 2024',          liveDates:[] },
-  { key:'apple-wwdc', label:'Apple WWDC',        pattern:'WWDC',       color:'#555555', icon:'🍎', date:'Jun 2025',          liveDates:[] },
+  { key:'google-io',  label:'Google I/O 2026',  pattern:'I/O',        color:'#4285f4', icon:'🔵', date:'May 19–20, 2026',  liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
+  { key:'cloud-next', label:'Cloud Next 2026',   pattern:'Cloud Next', color:'#34a853', icon:'☁️', date:'Apr 22–24, 2026',  liveDates:['2026-04-22','2026-04-23','2026-04-24'], organizer:'Google DeepMind' },
+  { key:'nvidia-gtc', label:'NVIDIA GTC',        pattern:'GTC',        color:'#76b900', icon:'🟢', date:'Mar 2025',          liveDates:[], organizer:'NVIDIA' },
+  { key:'ms-build',   label:'Microsoft Build',   pattern:'Build',      color:'#00adef', icon:'🪟', date:'May 2025',          liveDates:[], organizer:'Microsoft' },
+  { key:'openai-dev', label:'OpenAI Dev Day',    pattern:'Dev Day',    color:'#10a37f', icon:'🤖', date:'Nov 2024',          liveDates:[], organizer:'OpenAI' },
+  { key:'apple-wwdc', label:'Apple WWDC',        pattern:'WWDC',       color:'#555555', icon:'🍎', date:'Jun 2025',          liveDates:[], organizer:'Apple' },
 ];
 // I/O 2025 retrospective — same Google entity, distinct source_event label
-EVENTS.push({ key:'google-io-2025', label:'Google I/O 2025', pattern:'I/O 2025', color:'#7c3aed', icon:'🟣', date:'May 20–21, 2025', liveDates:[] });
+EVENTS.push({ key:'google-io-2025', label:'Google I/O 2025', pattern:'I/O 2025', color:'#7c3aed', icon:'🟣', date:'May 20–21, 2025', liveDates:[], organizer:'Google DeepMind' });
 
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 function isLiveNow(ev){ return (ev.liveDates||[]).includes(todayISO()); }
@@ -505,6 +518,7 @@ const PREDS = [
 ];
 
 let _allEvMs = [], _activeEv = null, _cardSeq = 0;
+let _allModels = [], _allMsDis = [];
 
 function inferCat(m){
   const tags=(m.tags||[]).map(t=>String(t).toLowerCase()); const ev=(m.event||'').toLowerCase();
@@ -540,37 +554,41 @@ function pickDefaultEvent(){
 }
 
 function buildEventPills(){
-  const render = (prefix) => EVENTS.map(ev=>{
+  const html = EVENTS.map(ev=>{
     const n = msForEvent(ev).length;
     const isOn = ev.key===_activeEv;
-    return `<button class="event-pill${isOn?' on':''}" id="${prefix}${ev.key}" onclick="setEvent('${ev.key}')"
+    return `<button class="event-pill${isOn?' on':''}" id="ep-${ev.key}" onclick="setEvent('${ev.key}')"
       style="${isOn?`background:${ev.color};border-color:${ev.color};`:`color:${ev.color};border-color:${ev.color}30;`}">
       ${ev.icon} ${ev.label}<span class="ep-count">${n}</span>
     </button>`;
   }).join('');
-  document.getElementById('event-pills').innerHTML = render('ep-');
-  const bp = document.getElementById('brief-event-pills');
-  if(bp) bp.innerHTML = render('ep2-');
+  document.getElementById('event-pills').innerHTML = html;
 }
 
 function setEvent(key){
   _activeEv = key;
   const ev = EVENTS.find(e=>e.key===key);
-  // Sync both Live tab pills and Brief tab pills
-  ['ep-','ep2-'].forEach(prefix=>{
-    EVENTS.forEach(e=>{
-      const btn=document.getElementById(prefix+e.key); if(!btn) return;
-      if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
-      else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
-    });
+  // Sync the single top-level event pill row
+  EVENTS.forEach(e=>{
+    const btn=document.getElementById('ep-'+e.key); if(!btn) return;
+    if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
+    else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
   });
+  // Update the selector-bar meta line (date · organizer)
+  const meta=document.getElementById('esb-meta');
+  if(meta && ev) meta.innerHTML = `<b>${esc(ev.date)}</b> · ${esc(ev.organizer||'—')}`;
+  // Sub-tab labels
   const lbl=document.getElementById('live-active-label');
   if(lbl) lbl.textContent = ev ? `· ${ev.label} · ${ev.date}` : '';
   const lbl2=document.getElementById('brief-active-label');
   if(lbl2) lbl2.textContent = ev ? `· ${ev.label}` : '';
+  // Re-render every section that's event-scoped
   const ms = msForEvent(ev);
   renderLive(ms, ev);
   renderBrief(ms, ev);
+  renderWatch(ev);
+  renderGoingIn(ev);
+  renderImpactMap(ev);
 }
 
 function isNewMilestone(m){
@@ -855,10 +873,6 @@ async function init(){
   try {
     const entities=await get('entities','select=id,name,type,current_valuation,trajectory_summary&limit=50');
     _eMap={}; entities.forEach(e=>_eMap[e.id]=e);
-    const gid=entities.find(e=>e.name==='Google DeepMind')?.id; if(!gid) return;
-
-    let gMs=[], off=0;
-    while(true){ const b=await get('milestones',`entity_id=eq.${gid}&select=*&order=date.desc&limit=200&offset=${off}`); gMs=gMs.concat(b); if(b.length<200) break; off+=200; }
 
     // Fetch ALL event milestones for the live tab
     let evMs=[], eOff=0;
@@ -868,8 +882,8 @@ async function init(){
     updateFreshnessTs();
     showLiveBanner();
 
-    // Hero stats — all dynamic
-    document.getElementById('stat-milestones').textContent=gMs.length;
+    // Hero stats — all dynamic, drawn from cross-event totals
+    document.getElementById('stat-milestones').textContent=evMs.length;
     document.getElementById('stat-events').textContent=EVENTS.length;
     document.getElementById('stat-ev-total').textContent=evMs.length;
     document.getElementById('stat-new').textContent=evMs.length;
@@ -887,35 +901,18 @@ async function init(){
       stxt.textContent='No event milestones yet · Select a conference below';
     }
 
-    // Going In chips
-    document.getElementById('google-chips').innerHTML=`
-      <div class="chip"><div class="chip-n" style="color:#4285f4">${gMs.length}</div><div class="chip-l">Total milestones</div></div>
-      <div class="chip"><div class="chip-n" style="color:#34a853">${gMs.filter(m=>m.claim_type==='demonstrated').length}</div><div class="chip-l">Demonstrated</div></div>
-      <div class="chip"><div class="chip-n" style="color:#4285f4">${gMs.filter(m=>m.claim_type==='announced').length}</div><div class="chip-l">Announced</div></div>
-      <div class="chip"><div class="chip-n" style="color:#d97706">${gMs.filter(m=>m.forward_implication_score===5).length}</div><div class="chip-l">Score-5 signals</div></div>`;
-    document.getElementById('recent-milestones').innerHTML=gMs.slice(0,8).map(m=>`<div class="milestone ${m.claim_type||''}"><div class="ms-date">${m.date}</div><div class="ms-event">${esc(m.event)}</div><div class="ms-sig">${esc(m.significance||'')}</div><div class="ms-tags">${m.claim_type?claimTag(m.claim_type):''}${m.forward_implication_score>=4?`<span class="tag tag-new">Signal ${m.forward_implication_score}/5</span>`:''}${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}</div></div>`).join('');
+    // Stash datasets used by event-scoped render functions
+    _allModels = await get('models','select=*&order=release_date&limit=100');
+    _allMsDis = [];
+    let _msOff=0;
+    while(true){ const b=await get('milestones','select=id,entity_id,date,event,displacement_entities&limit=1000&offset='+_msOff+'&displacement_entities=not.is.null'); _allMsDis=_allMsDis.concat(b); if(b.length<1000) break; _msOff+=1000; }
 
-    const metrics=await get('key_metrics',`entity_id=eq.${gid}&select=metric_name,metric_value,as_of_date&order=as_of_date.desc&limit=20`);
-    if(metrics.length) document.getElementById('google-metrics').innerHTML=metrics.map(m=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);font-size:12px">${esc(m.metric_name)}</span><span style="font-weight:700;font-size:13px">${esc(m.metric_value)}</span></div>`).join('');
-
-    const allModels=await get('models','select=*&order=release_date&limit=100');
-    document.getElementById('gemini-models').innerHTML=allModels.filter(m=>m.entity_id===gid).map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><span style="font-weight:700;font-size:13px">${esc(m.display_name)}</span><span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span></div><span style="font-size:11px;background:rgba(66,133,244,.12);color:#4285f4;padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span></div>`).join('');
-
-    const wi=[
-      {area:'🧠 Gemini 3.1 Pro GA + Ultra tier',conf:92,context:'Gemini 3.1 Pro entered preview at Cloud Next (Apr 22) with a new MEDIUM thinking_level parameter. I/O is the canonical GA launch window. Expect full availability plus a 3.1 Ultra SKU to answer Claude Opus 4.7 and GPT-5.5.',signal:'Every Gemini Pro generation previewed at Cloud Next has gone GA at I/O. Gemini 2.5 Ultra was previewed but never shipped — Google is due a fully released Ultra tier this cycle.'},
-      {area:'📱 Android Aluminium (17) — Gemini Intelligence at OS layer',conf:88,context:'Android 16 shipped Gemini Nano on-device. Android 17 (codename "Aluminium") expected to embed Gemini Intelligence at OS level: ambient AI across any app, predictive widgets, real-time camera translation, and Gemini-powered notifications.',signal:'Google announces a major Android version at I/O every year since 2014. Gemini-Intelligence branding has surfaced in Android 17 developer builds.'},
-      {area:'🥽 Android XR smart glasses — consumer hardware push',conf:83,context:'Google confirmed an XR eyewear partnership at Cloud Next 2026. Project Astra demonstrated real-time visual context on prototype glasses. I/O 2026 is the most visible launch window for a consumer reveal alongside form-factor partners.',signal:'LIVE_CATS "Hardware & XR" category tracks glasses, xr, spatial, device. Expect displacement of Meta Ray-Ban in the sub-$500 smart glasses segment.'},
-      {area:'⚡ Gemini 2.5 Flash — inference price floor drop',conf:80,context:'Gemini 2.5 Flash ($0.15/M input) already undercuts Claude Haiku 4.5 ($0.80/M) and GPT-4o mini ($0.60/M). TPU 8i (80% better inference $/perf vs prior gen) gives Google margin to absorb another cut.',signal:'Flash pricing dropped ~70% per generation. A 3.1 Flash at sub-$0.05/M would close the cost gap with self-hosted open models.'},
-      {area:'📚 Googlebooks AI — personalized AI reading assistant',conf:76,context:'A new Googlebooks AI product that ingests personal reading history for Socratic Q&A, summaries, and study guides was signalled in I/O planning leaks. Google Books has 40M+ titles; Gemini 2.0 1M context handles book-length inputs in a single pass.',signal:'"googlebooks" tag appears in LIVE_CATS Hardware & XR alongside Beam and spatial. Competes directly with Perplexity, Kindle AI Summaries, and NotebookLM.'},
-      {area:'🔧 ADK v2 + Agentspace 2.0 — on-device agentic runtime',conf:78,context:'ADK v1.0 GA shipped Apr 22 (Cloud Next). I/O typically delivers a v2 update at lower latency. Agentspace 2.0 likely adds on-device Gemini Nano for edge-first agentic workflows — closing the gap with Anthropic Managed Agents "dreaming" self-improvement.',signal:'A2A Protocol v1.2 has 150 orgs in production. An on-device ADK would be the first agentic framework to run without cloud round-trips, enabling new mobile and automotive use cases.'},
-    ];
-    document.getElementById('watch-cards').innerHTML=wi.map(w=>`<div class="watch-card"><div class="watch-area">${w.area}</div><div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?'#4285f4':w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label" style="margin-bottom:10px">Confidence: ${w.conf}%</div><div class="watch-context">${esc(w.context)}</div><div class="watch-signal">💡 ${esc(w.signal)}</div></div>`).join('');
-
+    // Benchmarks (event-agnostic — comparative landscape)
     const allMF=await getAllMF(); const features=await get('features','select=id,feature_key,display_name&limit=500');
     const fByKey={}; features.forEach(f=>fByKey[f.feature_key]=f.id);
     const mfMap={}; allMF.forEach(r=>{ if(!mfMap[r.model_id]) mfMap[r.model_id]={}; mfMap[r.model_id][r.feature_id]=r.value; });
     const mOrder=['Gemini 2.5 Pro','Gemini 2.5 Flash','Gemini 2.0 Flash','Gemini 1.5 Pro','Claude Opus 4.6','Claude Sonnet 4.6','Claude Haiku 4.5','o3','o4-mini','GPT-4o (May)'];
-    const oMs=[]; mOrder.forEach(n=>{ const m=allModels.find(x=>x.display_name===n); if(m) oMs.push(m); });
+    const oMs=[]; mOrder.forEach(n=>{ const m=_allModels.find(x=>x.display_name===n); if(m) oMs.push(m); });
     const pc=(eid)=>{ const n=_eMap[eid]?.name||''; return n.includes('Google')?'provider-google':n.includes('OpenAI')?'provider-openai':n.includes('Anthropic')?'provider-anthropic':''; };
     const ps=(eid)=>{ const n=_eMap[eid]?.name||''; return n.includes('Google')?'Google':n.includes('OpenAI')?'OpenAI':n.includes('Anthropic')?'Anthropic':n; };
     const fks=['gpqa_score','math_benchmark_score','humaneval_score','swe_bench_score','context_window','output_price_per_million_tokens'];
@@ -924,23 +921,140 @@ async function init(){
     const wins={}; fks.slice(0,4).forEach(fk=>{ let best=-Infinity,bm=''; oMs.forEach(m=>{ const v=parseFloat(mfMap[m.id]?.[fByKey[fk]]||''); if(!isNaN(v)&&v>best){best=v;bm=m.id;} }); wins[fk]=bm; });
     document.getElementById('bench-body').innerHTML=oMs.map(m=>`<tr class="${Object.values(wins).includes(m.id)?'winner':''}"><td style="font-weight:700">${esc(m.display_name)}</td><td class="${pc(m.entity_id)}">${ps(m.entity_id)}</td>${fks.slice(0,4).map(fk=>`<td>${scoreBar(mfMap[m.id]?.[fByKey[fk]]||'—',mxs[fk]||100,wins[fk]===m.id?'#d97706':cols[fk]||'#64748b')}</td>`).join('')}<td style="font-size:12px;color:var(--muted)">${mfMap[m.id]?.[fByKey['context_window']]?Number(mfMap[m.id][fByKey['context_window']]).toLocaleString()+' tok':'—'}</td><td style="font-size:12px">${mfMap[m.id]?.[fByKey['output_price_per_million_tokens']]?'$'+mfMap[m.id][fByKey['output_price_per_million_tokens']]:'—'}</td></tr>`).join('');
 
-    // Live tab: build event pills + select event with most recent milestone
+    // Pick event with the most recent milestone, then let setEvent() drive all sections
     _activeEv = pickDefaultEvent();
     buildEventPills();
     setEvent(_activeEv);
 
-    // Impact map
-    let allMs=[], msOff=0;
-    while(true){ const b=await get('milestones','select=id,entity_id,date,event,displacement_entities&limit=1000&offset='+msOff+'&displacement_entities=not.is.null'); allMs=allMs.concat(b); if(b.length<1000) break; msOff+=1000; }
-    const gDis=allMs.filter(m=>m.entity_id===gid&&(m.displacement_entities||[]).length>0);
-    const thrG=allMs.filter(m=>m.entity_id!==gid&&(m.displacement_entities||[]).includes('Google DeepMind'));
-    let imp='';
-    if(gDis.length){ imp+=`<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Google Threatening Others</div>`; gDis.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow">→</div><div class="dis-targets">${m.displacement_entities.map(d=>`<div class="dis-chip">${esc(d)}</div>`).join('')}</div></div>`; }); }
-    if(thrG.length){ imp+=`<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Others Threatening Google</div>`; thrG.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${_eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow" style="color:#4285f4">←</div><div class="dis-targets"><div class="dis-chip" style="background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8">Google DeepMind</div></div></div>`; }); }
-    if(!imp) imp=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No displacement data yet</div></div>`;
-    document.getElementById('impact-map').innerHTML=imp;
     document.getElementById('last-updated').textContent=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   } catch(e){ console.error(e); }
+}
+
+// ── EVENT-SCOPED RENDERS ─────────────────────────────────────────────────
+// Per-event Watch tab predictions. Falls back to a generic prompt when no
+// prediction set is hand-curated for this event yet.
+const WATCH_PREDS = {
+  'google-io': [
+    {area:'🧠 Gemini 3.1 Pro GA + Ultra tier',conf:92,context:'Gemini 3.1 Pro entered preview at Cloud Next (Apr 22) with a new MEDIUM thinking_level parameter. I/O is the canonical GA launch window. Expect full availability plus a 3.1 Ultra SKU to answer Claude Opus 4.7 and GPT-5.5.',signal:'Every Gemini Pro generation previewed at Cloud Next has gone GA at I/O. Gemini 2.5 Ultra was previewed but never shipped — Google is due a fully released Ultra tier this cycle.'},
+    {area:'📱 Android Aluminium (17) — Gemini Intelligence at OS layer',conf:88,context:'Android 16 shipped Gemini Nano on-device. Android 17 (codename "Aluminium") expected to embed Gemini Intelligence at OS level: ambient AI across any app, predictive widgets, real-time camera translation, Gemini-powered notifications.',signal:'Major Android version announced at I/O every year since 2014. Gemini-Intelligence branding surfaced in Android 17 developer builds.'},
+    {area:'🥽 Android XR smart glasses — consumer hardware push',conf:83,context:'Google confirmed an XR eyewear partnership at Cloud Next 2026. Project Astra demonstrated real-time visual context on prototype glasses. I/O is the most visible launch window for a consumer reveal alongside form-factor partners.',signal:'LIVE_CATS "Hardware & XR" tracks glasses/xr/spatial. Expect displacement of Meta Ray-Ban in the sub-$500 segment.'},
+    {area:'⚡ Gemini 2.5 Flash — inference price floor drop',conf:80,context:'Gemini 2.5 Flash ($0.15/M input) undercuts Claude Haiku 4.5 ($0.80/M) and GPT-4o mini ($0.60/M). TPU 8i (80% better inference $/perf vs prior gen) gives Google margin to absorb another cut.',signal:'Flash pricing dropped ~70% per generation. A 3.1 Flash at sub-$0.05/M would close the cost gap with self-hosted open models.'},
+    {area:'📚 Googlebooks AI — personalized AI reading assistant',conf:76,context:'A Googlebooks AI product that ingests personal reading history for Socratic Q&A, summaries, study guides was signalled in I/O planning leaks. 40M+ titles; Gemini 2.0 1M context handles book-length inputs.',signal:'Tag "googlebooks" already in LIVE_CATS Hardware & XR. Direct threat to Perplexity, Kindle AI Summaries, NotebookLM.'},
+    {area:'🔧 ADK v2 + Agentspace 2.0 — on-device agentic runtime',conf:78,context:'ADK v1.0 GA shipped Apr 22 (Cloud Next). I/O typically delivers a v2 update at lower latency. Agentspace 2.0 likely adds on-device Gemini Nano for edge-first agentic workflows.',signal:'A2A Protocol v1.2 already has 150 orgs in production. An on-device ADK would be the first agentic framework to run without cloud round-trips.'},
+  ],
+  'cloud-next': [
+    {area:'🧠 Gemini 3.x Pro / Ultra release cadence',conf:85,context:'Google announces enterprise-grade Gemini upgrades at Cloud Next with multi-cloud availability. Expect a Gemini 3.x Pro/Ultra preview or GA tied to Vertex AI / Gemini Enterprise Agent Platform updates.',signal:'2026 Cloud Next already shipped Gemini 3.1 Pro preview. Cadence implies a 3.x Ultra preview at the next Cloud Next.'},
+    {area:'⚡ Next-gen TPU silicon',conf:82,context:'Google bifurcated AI silicon into TPU 8t (training) and TPU 8i (inference) at Cloud Next 2026. Next generation expected to push inference $/perf advantage further to support aggressive Gemini Flash pricing.',signal:'TPU 8i delivered 80% better inference $/perf vs prior gen. Google can sustain Flash price cuts as long as silicon advantage holds.'},
+    {area:'🤝 Enterprise agentic platform expansion',conf:80,context:'Gemini Enterprise Agent Platform (rebranded Vertex AI) absorbed Agentspace and added 200+ model garden, no-code Workspace Studio, partner agents from Salesforce/Workday/Box/ServiceNow. Next iteration likely deepens A2A protocol governance and adds vertical-specific agent templates.',signal:'Vertical-integration story is Google\'s strongest enterprise differentiator. Watch for industry-specific Agent Garden offerings.'},
+    {area:'🌐 A2A Protocol expansion under Linux Foundation',conf:75,context:'A2A Protocol v1.2 reached 150 orgs in production. Expect v1.3 or v2 with broader spec coverage, more languages, and tighter MCP interoperability for the agent-to-tool / agent-to-agent split.',signal:'Whoever defines the protocol layer controls multi-agent orchestration network effects. Google + Anthropic are the de facto standards-setters.'},
+  ],
+  'openai-dev': [
+    {area:'🧠 GPT-5.x model family expansion',conf:85,context:'OpenAI cadence (5.1 → 5.3 → 5.5 Instant) signals continuous reliability refinement rather than capability leaps. Dev Day typically introduces a new model tier or specialized variant (Cyber, Code, etc.).',signal:'GPT-5.5 Instant + GPT-5.5 Cyber bifurcated consumer vs vetted defender. Expect further specialization for enterprise verticals.'},
+    {area:'🤖 Agents SDK + Operator advancements',conf:80,context:'OpenAI Operator competes with Anthropic Computer Use and Google Project Mariner. Dev Day is the natural venue for new agent primitives, persistent memory, and multi-agent orchestration.',signal:'Anthropic Managed Agents "dreaming" set a new bar for self-improving runtimes. OpenAI must respond with persistent learning.'},
+    {area:'📦 Tool use + function-calling refinements',conf:75,context:'Structured outputs, JSON mode, and tool use are OpenAI\'s most heavily-used API features. Dev Day typically refines them with new parameters, lower latency, or new tool types.',signal:'Structured output reliability is the #1 enterprise concern. Watch for improved schema validation and tool retries.'},
+  ],
+  'ms-build': [
+    {area:'🪟 Copilot stack deeper integration across Microsoft 365',conf:85,context:'Microsoft Copilot is the most-deployed AI assistant in enterprise. Build typically ships deeper hooks into Excel, Outlook, Teams, and Azure for first-party developers.',signal:'Anthropic Claude for Small Business landed in M365 via connector. Microsoft must reinforce Copilot stickiness.'},
+    {area:'☁️ Azure AI Foundry — multi-model orchestration',conf:80,context:'Microsoft Foundry hosts Claude, GPT-5, Llama, and Mistral side-by-side. Build is where Microsoft pushes multi-model orchestration, routing, and cost optimization tools.',signal:'Multi-model enterprise demand growing. Microsoft is best-positioned as the neutral platform for mixed-model deployments.'},
+    {area:'🔧 GitHub Copilot agent mode + Codespaces evolution',conf:78,context:'GitHub Copilot now competes with Claude Code, Cursor, and Cognition Devin. Build is the canonical venue for Copilot agent-mode and Codespaces upgrades.',signal:'Coding agents are the highest-revenue developer tools category. GitHub leads on distribution; Anthropic leads on quality.'},
+  ],
+  'nvidia-gtc': [
+    {area:'🟢 Next-gen Blackwell / Rubin GPU announcements',conf:90,context:'NVIDIA cadence: Hopper → Blackwell → Rubin. GTC is the canonical announce venue for the next architecture, including memory, interconnect, and rack-scale system upgrades.',signal:'NVIDIA still defines the AI compute roadmap. Every model lab plans capacity around GTC announcements.'},
+    {area:'🔧 CUDA + NIM software stack updates',conf:80,context:'NIM microservices, CUDA libraries, and TensorRT updates underpin the entire AI stack. Expect new optimizations for inference cost reduction and agentic workloads.',signal:'Inference cost is the binding constraint on agentic deployment. NVIDIA software updates have outsized impact on unit economics.'},
+  ],
+  'apple-wwdc': [
+    {area:'🍎 On-device Apple Intelligence expansion',conf:80,context:'Apple Intelligence (announced WWDC 2024) needs material capability improvements to compete with Gemini Nano on Android and Microsoft Copilot in Windows. Watch for larger on-device models and broader app integrations.',signal:'Apple\'s on-device privacy story is a strong differentiator if capability gap closes vs cloud-based alternatives.'},
+    {area:'🥽 Vision Pro v2 + spatial AI',conf:75,context:'Vision Pro v1 launched 2024 with limited adoption. WWDC is the canonical venue for a v2 announcement with spatial AI features, lower price, and broader developer tools.',signal:'Vision Pro v2 + spatial AI would directly compete with Google Android XR smart glasses launching at I/O 2026.'},
+  ],
+  'google-io-2025': [
+    {area:'📊 Retrospective view',conf:0,context:'This is the I/O 2025 retrospective. Use the Live Updates tab to browse milestones that landed at this event, and the Brief tab for analyst synthesis.',signal:'Predictions tab is forward-looking; for past events the Live and Brief tabs carry the analytical weight.'},
+  ],
+};
+
+function renderWatch(ev){
+  const el=document.getElementById('watch-cards');
+  const title=document.getElementById('watch-title');
+  const sub=document.getElementById('watch-sub');
+  if(title) title.innerHTML = `🔭 What To Watch <span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px">· ${esc(ev?.label||'')}</span>`;
+  if(sub) sub.textContent = ev?.organizer ? `Predicted focus areas for ${ev.label} — drawn from ${ev.organizer}'s trajectory, competitor moves, and market gaps.` : 'Pick an event above to see predictions.';
+  const preds = (ev && WATCH_PREDS[ev.key]) || null;
+  if(!preds || !preds.length){
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔭</div><div class="empty-title">No curated predictions for ${esc(ev?.label||'this event')} yet</div><div class="empty-body">The Live Updates and Brief tabs show what actually landed at this event.</div></div>`;
+    return;
+  }
+  el.innerHTML = preds.map(w=>`<div class="watch-card"><div class="watch-area">${w.area}</div>${w.conf?`<div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?ev.color:w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label" style="margin-bottom:10px">Confidence: ${w.conf}%</div>`:''}<div class="watch-context">${esc(w.context)}</div><div class="watch-signal" style="background:${ev.color}10;border-color:${ev.color}40;color:${ev.color}">💡 ${esc(w.signal)}</div></div>`).join('');
+}
+
+function entityIdForOrganizer(name){
+  if(!name) return null;
+  const ent = Object.values(_eMap).find(e=>e.name===name);
+  return ent?.id || null;
+}
+
+function renderGoingIn(ev){
+  const orgName = ev?.organizer || '—';
+  const orgColor = ev?.color || '#4285f4';
+  const title=document.getElementById('going-in-title');
+  const sub=document.getElementById('going-in-sub');
+  if(title) title.innerHTML = `📊 Going In — ${esc(orgName)}'s Trajectory`;
+  if(sub) sub.textContent = `What the longitudinal record shows about ${orgName}'s AI arc — the context behind every ${ev?.label||'event'} announcement.`;
+
+  const eid = entityIdForOrganizer(orgName);
+  if(!eid){
+    document.getElementById('google-chips').innerHTML = `<div class="empty" style="padding:20px"><div class="empty-body">No tracked entity for <b>${esc(orgName)}</b> in the knowledge graph yet.</div></div>`;
+    document.getElementById('recent-milestones').innerHTML='';
+    document.getElementById('google-metrics').innerHTML='';
+    document.getElementById('gemini-models').innerHTML='';
+    return;
+  }
+  // Async fetch organizer milestones, metrics, models
+  (async ()=>{
+    let orgMs=[], off=0;
+    while(true){ const b=await get('milestones',`entity_id=eq.${eid}&select=*&order=date.desc&limit=200&offset=${off}`); orgMs=orgMs.concat(b); if(b.length<200) break; off+=200; }
+    document.getElementById('google-chips').innerHTML=`
+      <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.length}</div><div class="chip-l">Total milestones</div></div>
+      <div class="chip"><div class="chip-n" style="color:#34a853">${orgMs.filter(m=>m.claim_type==='demonstrated').length}</div><div class="chip-l">Demonstrated</div></div>
+      <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.filter(m=>m.claim_type==='announced').length}</div><div class="chip-l">Announced</div></div>
+      <div class="chip"><div class="chip-n" style="color:#d97706">${orgMs.filter(m=>m.forward_implication_score===5).length}</div><div class="chip-l">Score-5 signals</div></div>`;
+    document.getElementById('recent-milestones').innerHTML = orgMs.length
+      ? orgMs.slice(0,8).map(m=>`<div class="milestone ${m.claim_type||''}"><div class="ms-date">${m.date}</div><div class="ms-event">${esc(m.event)}</div><div class="ms-sig">${esc(m.significance||'')}</div><div class="ms-tags">${m.claim_type?claimTag(m.claim_type):''}${m.forward_implication_score>=4?`<span class="tag tag-new">Signal ${m.forward_implication_score}/5</span>`:''}${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}</div></div>`).join('')
+      : `<div class="empty"><div class="empty-body">No milestones for ${esc(orgName)} yet.</div></div>`;
+    const metrics=await get('key_metrics',`entity_id=eq.${eid}&select=metric_name,metric_value,as_of_date&order=as_of_date.desc&limit=20`);
+    document.getElementById('google-metrics').innerHTML = metrics.length
+      ? metrics.map(m=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);font-size:12px">${esc(m.metric_name)}</span><span style="font-weight:700;font-size:13px">${esc(m.metric_value)}</span></div>`).join('')
+      : `<div class="loading-msg" style="padding:8px 0">No metrics tracked for ${esc(orgName)} yet.</div>`;
+    const orgModels = _allModels.filter(m=>m.entity_id===eid);
+    const mlTitle=document.getElementById('model-line-title');
+    if(mlTitle) mlTitle.textContent = `${orgName} Model Line`;
+    document.getElementById('gemini-models').innerHTML = orgModels.length
+      ? orgModels.map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><span style="font-weight:700;font-size:13px">${esc(m.display_name)}</span><span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span></div><span style="font-size:11px;background:${orgColor}1f;color:${orgColor};padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span></div>`).join('')
+      : `<div class="loading-msg" style="padding:8px 0">No models tracked for ${esc(orgName)} yet.</div>`;
+  })().catch(e=>console.error('renderGoingIn:',e));
+}
+
+function renderImpactMap(ev){
+  const orgName = ev?.organizer || '—';
+  const orgColor = ev?.color || '#4285f4';
+  const title=document.getElementById('impact-title');
+  const sub=document.getElementById('impact-sub');
+  if(title) title.innerHTML = `🌊 Impact Map — Who ${esc(orgName)} Is Threatening`;
+  if(sub) sub.textContent = `Milestones where ${orgName} threatens others, and where others threaten ${orgName} — drawn from displacement_entities across all tracked companies.`;
+  const eid = entityIdForOrganizer(orgName);
+  const el=document.getElementById('impact-map');
+  if(!eid){ el.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No tracked entity for ${esc(orgName)}</div></div>`; return; }
+  const gDis=_allMsDis.filter(m=>m.entity_id===eid&&(m.displacement_entities||[]).length>0);
+  const thrG=_allMsDis.filter(m=>m.entity_id!==eid&&(m.displacement_entities||[]).includes(orgName));
+  let imp='';
+  if(gDis.length){
+    imp+=`<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">${esc(orgName)} Threatening Others</div>`;
+    gDis.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow">→</div><div class="dis-targets">${m.displacement_entities.map(d=>`<div class="dis-chip">${esc(d)}</div>`).join('')}</div></div>`; });
+  }
+  if(thrG.length){
+    imp+=`<div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Others Threatening ${esc(orgName)}</div>`;
+    thrG.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${_eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow" style="color:${orgColor}">←</div><div class="dis-targets"><div class="dis-chip" style="background:${orgColor}1f;border-color:${orgColor}66;color:${orgColor}">${esc(orgName)}</div></div></div>`; });
+  }
+  if(!imp) imp=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No displacement data for ${esc(orgName)} yet</div></div>`;
+  el.innerHTML=imp;
 }
 
 let _lastReloadTime = null;
