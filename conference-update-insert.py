@@ -139,7 +139,7 @@ MILESTONES_TEMPLATE = [
     {
         "entity_name": "OpenAI",
         "date": "2026-05-05",
-        "event": "GPT-5.5 Instant replaces GPT-5.3 as default ChatGPT model with 52.5% fewer hallucinations",
+        "event": "GPT-5.5 Instant replaces GPT-5.3 Instant as default ChatGPT model — reduced hallucinations and improved conciseness",
         "significance": "New default model for all ChatGPT users. Internal evals show 52.5% fewer hallucinated claims vs GPT-5.3 on high-stakes prompts (medicine, law, finance). Responses are 30.2% more concise. Real-time self-correction: the model can identify mid-stream logic errors and fix them before output completes. Enhanced personalization draws on past conversations, uploaded files, and connected Gmail.",
         "strategic_signal": "OpenAI's focus on hallucination reduction and conciseness directly addresses the two most-cited enterprise adoption blockers. The rapid cadence (5.1 → 5.3 → 5.5 Instant in months) signals a shift from capability leaps to continuous reliability refinement — a maturation that favors OpenAI's incumbent ChatGPT distribution over challenger models.",
         "ripple_effects": "Raises baseline hallucination-rate expectations across all AI providers. Forces Anthropic and Google to publish comparable accuracy metrics. Gmail integration sets cross-app memory as a consumer battleground. GPT-5.3 Instant retired in 90 days, creating upgrade pressure for API users.",
@@ -185,7 +185,7 @@ MILESTONES_TEMPLATE = [
     {
         "entity_name": "Anthropic",
         "date": "2026-05-13",
-        "event": "Claude for Small Business launches with toggle-install connectors for QuickBooks, HubSpot, PayPal, Google Workspace, and Microsoft 365",
+        "event": "Claude for Small Business launched — pre-built AI workflows in QuickBooks, PayPal, HubSpot, Canva, DocuSign, Google Workspace, and Microsoft 365",
         "significance": "No-API product that embeds Claude directly into the tools small businesses already use: Intuit QuickBooks, PayPal, HubSpot, Canva, DocuSign, Google Workspace, and Microsoft 365. Single-toggle install. First Anthropic product explicitly targeting non-technical users and the SMB segment, where ChatGPT and Microsoft Copilot currently dominate.",
         "strategic_signal": "After dominating enterprise/developer mindshare, Anthropic opens a second front in SMB via connector-first distribution. This contrasts with OpenAI's ChatGPT-centric strategy and Google's Workspace-first approach — Anthropic meets customers in their existing tools rather than asking them to switch interfaces.",
         "ripple_effects": "Direct competition with Microsoft Copilot and ChatGPT Plus in SMB. Forces Zapier/Make to prioritize Claude connectors. QuickBooks and HubSpot partnerships signal Anthropic is ready to revenue-share for distribution — a business model shift from pure API licensing.",
