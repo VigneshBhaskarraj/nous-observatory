@@ -34,7 +34,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
 /* ── EVENT SELECTOR BAR (top-level: picks the event the whole page is scoped to) ── */
-.event-selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; position: sticky; top: 0; z-index: 101; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.event-selector-bar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; position: sticky; top: 52px; z-index: 101; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
 .esb-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); flex-shrink: 0; padding-right: 10px; border-right: 1px solid var(--border); margin-right: 4px; }
 .esb-pills { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
 .esb-meta { font-size: 12px; color: var(--muted); white-space: nowrap; }
@@ -43,7 +43,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 [data-theme="dark"] .esb-label { border-color:#30363d; }
 
 /* ── NAV ── */
-.subnav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 53px; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.subnav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; position: sticky; top: 105px; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 .snav { padding: 12px 16px; border: none; background: none; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s; }
 .snav:hover { color: var(--text); }
 .snav.on { color: var(--google-blue); border-bottom-color: var(--google-blue); }
@@ -301,6 +301,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 [data-theme="dark"] .theme-toggle { border-color:rgba(148,163,184,.25); color:#c9d1d9; }
 [data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); }
 
+/* ── GLOBAL HEADER ── */
+.g-hdr{background:#0f172a;display:flex;align-items:center;padding:0 24px;height:52px;position:sticky;top:0;z-index:300;box-shadow:0 1px 6px rgba(0,0,0,.4);flex-shrink:0;gap:8px;}
+.g-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;margin-right:12px;}
+.g-brand-name{font-size:15px;font-weight:700;letter-spacing:-.3px;color:#e2e8f0;line-height:1.2;}
+.g-brand-tag{font-size:10px;color:#475569;letter-spacing:.3px;}
+.g-nav{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto;}
+.g-nav::-webkit-scrollbar{display:none;}
+.g-link{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s;white-space:nowrap;border:none;background:none;cursor:pointer;}
+.g-link:hover{background:rgba(255,255,255,.08);color:#e2e8f0;}
+.g-link.on{background:rgba(255,255,255,.13);color:#fff;font-weight:600;}
+.g-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.g-btn{background:none;border:1px solid rgba(255,255,255,.15);border-radius:6px;font-size:13px;cursor:pointer;padding:4px 8px;color:#94a3b8;transition:all .15s;line-height:1;}
+.g-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3);}
+/* ── PAGE IDENTITY ── */
+.pg-id{background:#fff;border-bottom:1px solid var(--border);padding:22px 28px 18px;}
+.pg-id-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px;}
+.pg-id-title{font-size:22px;font-weight:800;color:var(--text);line-height:1.25;margin-bottom:6px;}
+.pg-id-title span{color:var(--accent);}
+.pg-id-desc{font-size:13px;color:var(--muted);max-width:640px;line-height:1.65;}
+/* dark variant for model-tree and power-map */
+.pg-id-dark{background:rgba(6,10,22,.97);border-bottom:1px solid rgba(40,80,180,.2);padding:16px 24px 14px;}
+.pg-id-dark .pg-id-label{color:#3a6090;}
+.pg-id-dark .pg-id-title{color:#c8deff;font-size:18px;}
+.pg-id-dark .pg-id-title span{color:#6ab0ff;}
+.pg-id-dark .pg-id-desc{color:#3a6090;font-size:12px;}
+
 /* ── LIVE BANNER ── */
 .live-banner { background: linear-gradient(90deg,#b91c1c,#991b1b); color:#fff; padding:9px 28px; display:none; align-items:center; gap:12px; font-size:13px; font-weight:700; position:relative; z-index:200; }
 .live-banner.visible { display:flex; }
@@ -323,6 +349,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </head>
 <body>
 
+<div class="g-hdr">
+  <a href="index.html" class="g-brand">
+    <span style="font-size:20px;line-height:1">🔭</span>
+    <div><div class="g-brand-name">Nous Observatory</div><div class="g-brand-tag">AI Intelligence Graph</div></div>
+  </a>
+  <nav class="g-nav">
+    <a href="index.html" class="g-link">Overview</a>
+    <a href="event.html" class="g-link on">📡 Live Intel</a>
+    <a href="model-tree.html" class="g-link">⬡ Model Tree</a>
+    <a href="model-advisor.html" class="g-link">🤖 Advisor</a>
+    <a href="power-map.html" class="g-link">🔥 Power Map</a>
+  </nav>
+  <div class="g-actions">
+    <button class="g-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+    <button class="g-btn" id="reload-btn" onclick="reload()">↺ Refresh</button>
+  </div>
+</div>
+
 <div class="live-banner" id="live-banner">
   <div class="live-banner-pulse"></div>
   <div class="live-banner-text" id="live-banner-text"></div>
@@ -333,13 +377,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="hero">
   <div class="hero-top">
     <div style="flex:1;min-width:280px">
-      <div class="hero-eyebrow">Nous Observatory · Event Intelligence</div>
+      <div class="hero-eyebrow">Event Intelligence</div>
       <div class="hero-title"><span>AI Conference</span> Intelligence Brief</div>
       <div class="hero-sub">Longitudinal milestone context across major AI conferences — Google I/O, Cloud Next, GTC, Microsoft Build, and more. Switch between events to explore what was announced, what it signals, and who it threatens.</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
-      <button class="reload-btn" id="reload-btn" onclick="reload()">↺ Refresh</button>
     </div>
   </div>
   <div class="hero-meta">
