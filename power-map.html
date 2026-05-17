@@ -114,6 +114,31 @@ body{background-image:radial-gradient(ellipse at 70% 10%,rgba(40,20,100,.2) 0%,t
   padding:6px 12px;text-align:center;}
 .stat-chip-val{font-size:16px;font-weight:800;color:#60b0f0;}
 .stat-chip-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+
+/* ── LIGHT MODE OVERRIDE (page is dark by default) ── */
+[data-theme="light"] body { background:#f1f5f9; color:#0f172a; }
+[data-theme="light"] .hdr { background:rgba(255,255,255,.97); border-color:#e2e8f0; box-shadow:0 1px 8px rgba(0,0,0,.08); }
+[data-theme="light"] .hdr-title { color:#0f172a; }
+[data-theme="light"] .hdr-sub { color:#64748b; }
+[data-theme="light"] .hdr-link { color:#4f46e5; }
+[data-theme="light"] .sidebar { background:#fff; border-color:#e2e8f0; }
+[data-theme="light"] .sb-section-title { color:#64748b; }
+[data-theme="light"] .ent-row { border-color:#e2e8f0; }
+[data-theme="light"] .ent-row:hover { background:#f8fafc; }
+[data-theme="light"] .ent-name { color:#0f172a; }
+[data-theme="light"] .main-panel { background:#f8fafc; }
+[data-theme="light"] .panel-title { color:#0f172a; border-color:#e2e8f0; }
+[data-theme="light"] .stats-row { border-color:#e2e8f0; }
+[data-theme="light"] .stat-chip { background:#fff; border-color:#e2e8f0; }
+[data-theme="light"] .stat-chip-val { color:#4f46e5; }
+[data-theme="light"] .heat-table th { background:#f8fafc; color:#64748b; border-color:#e2e8f0; }
+[data-theme="light"] .heat-row-hdr { background:#fff; color:#0f172a; border-color:#e2e8f0; }
+
+/* ── THEME TOGGLE ── */
+.theme-toggle { background:none; border:1px solid rgba(168,208,255,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; color:#a8d0ff; flex-shrink:0; }
+.theme-toggle:hover { background:rgba(168,208,255,.1); }
+[data-theme="light"] .theme-toggle { border-color:rgba(100,116,139,.3); color:#64748b; }
+[data-theme="light"] .theme-toggle:hover { background:rgba(100,116,139,.1); }
 </style>
 </head>
 <body>
@@ -129,6 +154,7 @@ body{background-image:radial-gradient(ellipse at 70% 10%,rgba(40,20,100,.2) 0%,t
     <a href="index.html" class="hdr-link">← Observatory</a>
     <a href="model-advisor.html" class="hdr-link">🤖 Advisor</a>
     <a href="model-tree.html" class="hdr-link">⬡ Tree</a>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">☀️</button>
   </div>
 </div>
 
@@ -693,6 +719,27 @@ function setView(v){
 //  INIT
 // ═══════════════════════════════════════════════════════════
 load();
+
+// ── THEME TOGGLE (dark-default page) ──────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('nous_theme');
+  if(saved) document.documentElement.setAttribute('data-theme',saved);
+  function syncBtn(){
+    const btn=document.getElementById('theme-toggle'); if(!btn) return;
+    const t=document.documentElement.getAttribute('data-theme')||'dark';
+    btn.textContent=t==='light'?'🌙':'☀️';
+    btn.title=t==='light'?'Switch to dark mode':'Switch to light mode';
+  }
+  window.toggleTheme=function(){
+    const current=document.documentElement.getAttribute('data-theme')||'dark';
+    const next=current==='light'?'dark':'light';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('nous_theme',next);
+    syncBtn();
+  };
+  if(document.readyState!=='loading') syncBtn();
+  else document.addEventListener('DOMContentLoaded',syncBtn);
+})();
 </script>
 </body>
 </html>

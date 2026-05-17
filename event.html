@@ -247,9 +247,79 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .cite-item-date { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 6px; }
 .live-indicator { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; font-size: 11px; font-weight: 700; }
 .live-indicator .live-pulse { width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.5s ease-in-out infinite; }
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e; color-scheme:dark;
+}
+[data-theme="dark"] body { background:var(--bg); }
+[data-theme="dark"] .hero { background:linear-gradient(135deg,#0d1117,#1a2233); border-color:#30363d; }
+[data-theme="dark"] .hero::before { background:radial-gradient(ellipse at 70% 50%,rgba(79,70,229,.12) 0%,transparent 60%); }
+[data-theme="dark"] .hero-title { color:#c9d1d9; }
+[data-theme="dark"] .subnav { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .footer { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .chip { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .status-badge { background:#1c2128; border-color:#30363d; color:#c9d1d9; }
+[data-theme="dark"] .status-badge.live { background:rgba(153,27,27,.25); border-color:#fca5a5; }
+[data-theme="dark"] .milestone { border-left-color:#30363d; }
+[data-theme="dark"] .bench th { background:#1c2128; }
+[data-theme="dark"] .bench tr:hover td { background:#1c2128; }
+[data-theme="dark"] .bench td { border-color:#30363d; }
+[data-theme="dark"] .watch-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .watch-signal { background:rgba(29,42,90,.7); border-color:#1d4ed8; color:#93c5fd; }
+[data-theme="dark"] .live-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .live-card:hover { border-color:#388bfd40; }
+[data-theme="dark"] .lc-detail { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .lc-signal { background:rgba(29,42,90,.7); }
+[data-theme="dark"] .lc-ripple { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .live-cat-group { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .live-cat-hdr { background:#1c2128; border-color:#30363d; }
+[data-theme="dark"] .live-cat-hdr:hover { background:#21262d; }
+[data-theme="dark"] .live-spotlight { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .signal-box { background:rgba(29,42,90,.6); border-color:#1d4ed8; }
+[data-theme="dark"] .ripple-box { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .lf-pill { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .brief-block { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .brief-stat { background:#1c2128; }
+[data-theme="dark"] .chain-cell { background:#1c2128; }
+[data-theme="dark"] .freshness-ts { background:rgba(255,255,255,.04); border-color:#30363d; }
+[data-theme="dark"] code { background:rgba(255,255,255,.08); color:#a5f3fc; border-radius:3px; padding:0 3px; }
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-toggle { background:none; border:1px solid rgba(100,116,139,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; flex-shrink:0; }
+.theme-toggle:hover { border-color:rgba(100,116,139,.6); background:rgba(100,116,139,.08); }
+[data-theme="dark"] .theme-toggle { border-color:rgba(148,163,184,.25); color:#c9d1d9; }
+[data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); }
+
+/* ── LIVE BANNER ── */
+.live-banner { background: linear-gradient(90deg,#b91c1c,#991b1b); color:#fff; padding:9px 28px; display:none; align-items:center; gap:12px; font-size:13px; font-weight:700; position:sticky; top:0; z-index:200; }
+.live-banner.visible { display:flex; }
+.live-banner-pulse { width:8px; height:8px; border-radius:50%; background:#fff; flex-shrink:0; animation:pulse 1.5s ease-in-out infinite; }
+.live-banner-text { flex:1; }
+.live-banner-dismiss { background:none; border:none; color:#fff; font-size:18px; cursor:pointer; opacity:.7; line-height:1; padding:0 4px; }
+.live-banner-dismiss:hover { opacity:1; }
+
+/* ── FRESHNESS INDICATOR ── */
+.freshness-ts { font-size:11px; color:var(--muted); display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; background:rgba(100,116,139,.08); border:1px solid var(--border); }
+
+/* ── NEW BADGE (recently inserted milestone) ── */
+.new-badge { display:inline-block; font-size:9px; font-weight:800; background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:1px 7px; border-radius:10px; margin-right:4px; vertical-align:middle; text-transform:uppercase; letter-spacing:.3px; animation:pulse 2s ease-in-out infinite; }
+
+/* ── TOAST ── */
+.toast { position:fixed; bottom:24px; right:24px; z-index:9999; background:#1e293b; color:#f1f5f9; border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; box-shadow:0 4px 24px rgba(0,0,0,.22); transform:translateY(80px); opacity:0; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s; pointer-events:none; max-width:320px; }
+.toast.show { transform:translateY(0); opacity:1; }
+.toast-icon { margin-right:6px; }
 </style>
 </head>
 <body>
+
+<div class="live-banner" id="live-banner">
+  <div class="live-banner-pulse"></div>
+  <div class="live-banner-text" id="live-banner-text"></div>
+  <button class="live-banner-dismiss" onclick="document.getElementById('live-banner').classList.remove('visible')" title="Dismiss">×</button>
+</div>
+<div class="toast" id="toast"></div>
 
 <div class="hero">
   <div class="hero-top">
@@ -258,7 +328,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="hero-title"><span>AI Conference</span> Intelligence Brief</div>
       <div class="hero-sub">Longitudinal milestone context across major AI conferences — Google I/O, Cloud Next, GTC, Microsoft Build, and more. Switch between events to explore what was announced, what it signals, and who it threatens.</div>
     </div>
-    <button class="reload-btn" onclick="reload()">↺ Refresh</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+      <button class="reload-btn" id="reload-btn" onclick="reload()">↺ Refresh</button>
+    </div>
   </div>
   <div class="hero-meta">
     <div class="hero-stat"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Google milestones tracked</div></div>
@@ -322,6 +395,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="sh">
       🔴 Live Event Updates
       <span id="live-active-label" style="font-size:12px;font-weight:500;color:var(--muted);margin-left:4px"></span>
+      <span class="freshness-ts" id="freshness-ts" style="display:none">Updated just now</span>
     </div>
     <div class="sh-sub">Select a conference to see its milestones grouped by category and impact. Data is seeded via the <code>source_event</code> field on milestones.</div>
     <div class="event-pills" id="event-pills"><div class="loading-msg"><span class="spinner"></span>Loading events…</div></div>
@@ -499,16 +573,22 @@ function setEvent(key){
   renderBrief(ms, ev);
 }
 
+function isNewMilestone(m){
+  if(!m.created_at) return false;
+  return (Date.now()-new Date(m.created_at).getTime()) < 60*60*1000;
+}
+
 function buildCard(m, evColor){
   const id='lc'+(++_cardSeq);
   const cat=inferCat(m); const cfg=LIVE_CATS[cat]||{icon:'●',color:'#64748b'};
   const pred=getPred(m); const ent=_eMap[m.entity_id]?.name||'';
   const hasDetail=!!(m.significance||m.strategic_signal||m.ripple_effects||(m.displacement_entities||[]).length);
-  return `<div class="live-card" id="${id}" ${hasDetail?`onclick="toggleCard('${id}')"`:'style="cursor:default"'}>
+  const isNew=isNewMilestone(m);
+  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`onclick="toggleCard('${id}')"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
     <div class="lc-row">
       <div class="lc-stripe" style="background:${cfg.color}"></div>
       <span class="lc-date">${(m.date||'').slice(5,10)}</span>
-      <span class="lc-title">${esc(m.event)}</span>
+      <span class="lc-title">${isNew?'<span class="new-badge">new</span>':''}${esc(m.event)}</span>
       <div class="lc-meta">
         ${pred?`<span class="pred-tag">✓ ${pred.short}</span>`:''}
         <span class="tag" style="background:${cfg.color}15;color:${cfg.color};font-size:9px">${cfg.icon} ${cat}</span>
@@ -784,6 +864,9 @@ async function init(){
     let evMs=[], eOff=0;
     while(true){ const b=await get('milestones',`select=*&source_event=not.is.null&order=date.desc&limit=500&offset=${eOff}`); evMs=evMs.concat(b); if(b.length<500) break; eOff+=500; }
     _allEvMs=evMs;
+    _lastReloadTime=Date.now();
+    updateFreshnessTs();
+    showLiveBanner();
 
     // Hero stats — all dynamic
     document.getElementById('stat-milestones').textContent=gMs.length;
@@ -819,12 +902,12 @@ async function init(){
     document.getElementById('gemini-models').innerHTML=allModels.filter(m=>m.entity_id===gid).map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><span style="font-weight:700;font-size:13px">${esc(m.display_name)}</span><span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span></div><span style="font-size:11px;background:rgba(66,133,244,.12);color:#4285f4;padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span></div>`).join('');
 
     const wi=[
-      {area:'🧠 Gemini 2.5 Ultra — Flagship push',conf:90,context:'Gemini 2.5 Pro scored 84% GPQA and 97.1% MATH. Google consistently announces a higher-tier Ultra at I/O. Claude Opus 4.6 leads at 87.7% GPQA. The gap is closeable.',signal:'Longitudinal: Ultra announced at every major I/O since 2023. Gemini 2.0 Ultra was previewed but never widely released — expect a fully shipped version.'},
-      {area:'🔧 Agentic / Project Mariner expansion',conf:85,context:'Google launched Project Mariner and Jules in late 2024. The AI agent arms race with OpenAI Operator and Anthropic Computer Use is intensifying. Expect Mariner GA and deeper workspace integration.',signal:'Our displacement map: Anthropic and OpenAI both appear in Google\'s recent displacement targets around agentic milestones.'},
-      {area:'⚡ Gemini 2.5 Flash pricing pressure',conf:80,context:'Gemini 2.5 Flash (78% GPQA) competes directly with Claude Haiku 4.5 and GPT-4o mini. Flash is at $0.15/M input vs Haiku 4.5 at $0.80/M — further compression expected.',signal:'Track record: Flash pricing dropped ~70% between 1.5 and 2.5 generations.'},
-      {area:'🌐 Context & long-document leadership',conf:75,context:'Gemini 1.5 Pro established the 2M token context record. No other model has matched it publicly. Expect an announcement around practical long-context deployment at scale.',signal:'No displacement milestone for context window — Google still leads uncontested.'},
-      {area:'🎨 Multimodal: native video + audio I/O',conf:70,context:'GPT-4o leads on native multimodality in perception. Google has the underlying capability (Gemini was native multimodal from v1) but hasn\'t won the narrative.',signal:'Gemini Live and Imagen 3 shipped post-I/O 2024. The 2025 cycle surfaces deeper integration.'},
-      {area:'🔬 Research drops: AlphaFold successors / Veo 2+',conf:65,context:'DeepMind research announcements are a consistent I/O feature. AlphaFold 3 and Veo 2 were major 2024 drops. Expect at least one research-to-product bridge announcement.',signal:'Google\'s research pipeline has the highest FIS average across all entities in our DB.'},
+      {area:'🧠 Gemini 3.1 Pro GA + Ultra tier',conf:92,context:'Gemini 3.1 Pro entered preview at Cloud Next (Apr 22) with a new MEDIUM thinking_level parameter. I/O is the canonical GA launch window. Expect full availability plus a 3.1 Ultra SKU to answer Claude Opus 4.7 and GPT-5.5.',signal:'Every Gemini Pro generation previewed at Cloud Next has gone GA at I/O. Gemini 2.5 Ultra was previewed but never shipped — Google is due a fully released Ultra tier this cycle.'},
+      {area:'📱 Android Aluminium (17) — Gemini Intelligence at OS layer',conf:88,context:'Android 16 shipped Gemini Nano on-device. Android 17 (codename "Aluminium") expected to embed Gemini Intelligence at OS level: ambient AI across any app, predictive widgets, real-time camera translation, and Gemini-powered notifications.',signal:'Google announces a major Android version at I/O every year since 2014. Gemini-Intelligence branding has surfaced in Android 17 developer builds.'},
+      {area:'🥽 Android XR smart glasses — consumer hardware push',conf:83,context:'Google confirmed an XR eyewear partnership at Cloud Next 2026. Project Astra demonstrated real-time visual context on prototype glasses. I/O 2026 is the most visible launch window for a consumer reveal alongside form-factor partners.',signal:'LIVE_CATS "Hardware & XR" category tracks glasses, xr, spatial, device. Expect displacement of Meta Ray-Ban in the sub-$500 smart glasses segment.'},
+      {area:'⚡ Gemini 2.5 Flash — inference price floor drop',conf:80,context:'Gemini 2.5 Flash ($0.15/M input) already undercuts Claude Haiku 4.5 ($0.80/M) and GPT-4o mini ($0.60/M). TPU 8i (80% better inference $/perf vs prior gen) gives Google margin to absorb another cut.',signal:'Flash pricing dropped ~70% per generation. A 3.1 Flash at sub-$0.05/M would close the cost gap with self-hosted open models.'},
+      {area:'📚 Googlebooks AI — personalized AI reading assistant',conf:76,context:'A new Googlebooks AI product that ingests personal reading history for Socratic Q&A, summaries, and study guides was signalled in I/O planning leaks. Google Books has 40M+ titles; Gemini 2.0 1M context handles book-length inputs in a single pass.',signal:'"googlebooks" tag appears in LIVE_CATS Hardware & XR alongside Beam and spatial. Competes directly with Perplexity, Kindle AI Summaries, and NotebookLM.'},
+      {area:'🔧 ADK v2 + Agentspace 2.0 — on-device agentic runtime',conf:78,context:'ADK v1.0 GA shipped Apr 22 (Cloud Next). I/O typically delivers a v2 update at lower latency. Agentspace 2.0 likely adds on-device Gemini Nano for edge-first agentic workflows — closing the gap with Anthropic Managed Agents "dreaming" self-improvement.',signal:'A2A Protocol v1.2 has 150 orgs in production. An on-device ADK would be the first agentic framework to run without cloud round-trips, enabling new mobile and automotive use cases.'},
     ];
     document.getElementById('watch-cards').innerHTML=wi.map(w=>`<div class="watch-card"><div class="watch-area">${w.area}</div><div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?'#4285f4':w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label" style="margin-bottom:10px">Confidence: ${w.conf}%</div><div class="watch-context">${esc(w.context)}</div><div class="watch-signal">💡 ${esc(w.signal)}</div></div>`).join('');
 
@@ -860,13 +943,52 @@ async function init(){
   } catch(e){ console.error(e); }
 }
 
+let _lastReloadTime = null;
+let _prevEvMsCount = 0;
+
+function showToast(msg, ms=3500){
+  const t=document.getElementById('toast'); if(!t) return;
+  t.innerHTML=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+function updateFreshnessTs(){
+  const el=document.getElementById('freshness-ts'); if(!el||!_lastReloadTime) return;
+  const diff=Math.round((Date.now()-_lastReloadTime)/1000);
+  let label;
+  if(diff<10) label='Updated just now';
+  else if(diff<60) label=`Updated ${diff}s ago`;
+  else label=`Updated ${Math.round(diff/60)}m ago`;
+  el.textContent=label; el.style.display='inline-flex';
+}
+
+function showLiveBanner(){
+  const liveEvs=EVENTS.filter(isLiveNow);
+  const banner=document.getElementById('live-banner');
+  const btxt=document.getElementById('live-banner-text');
+  if(!banner||!btxt) return;
+  if(!liveEvs.length){ banner.classList.remove('visible'); return; }
+  const day1=liveEvs[0]; const today=todayISO();
+  const dayNum=(day1.liveDates||[]).indexOf(today)+1;
+  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · Auto-refreshing every 5 min`;
+  banner.classList.add('visible');
+}
+
 async function reload(){
-  // Reset stat counters and key panels to a loading state, then re-init.
+  const btn=document.getElementById('reload-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Refreshing…'; }
+  const prevCount=_prevEvMsCount;
   ['stat-milestones','stat-events','stat-ev-total','stat-new'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
   document.getElementById('status-text').textContent='Reloading event data…';
   document.getElementById('event-pills').innerHTML=`<div class="loading-msg"><span class="spinner"></span>Loading events…</div>`;
   document.getElementById('live-updates').innerHTML=`<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div>`;
   await init();
+  if(btn){ btn.disabled=false; btn.textContent='↺ Refresh'; }
+  const newCount=_allEvMs.length;
+  const diff=newCount-prevCount;
+  if(diff>0) showToast(`<span class="toast-icon">✦</span>${diff} new milestone${diff!==1?'s':''} loaded`);
+  else showToast('<span class="toast-icon">✓</span>Up to date');
+  _prevEvMsCount=newCount;
 }
 
 /* ── CONFERENCE-DAY AUTO-REFRESH ──────────────────────────────────────
@@ -888,6 +1010,30 @@ function setupAutoRefresh(){
     stxt.innerHTML = `<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} in progress · auto-refresh every 5 min`;
   }
 }
+
+// Tick freshness indicator every 30 seconds
+setInterval(updateFreshnessTs, 30000);
+
+// ── THEME TOGGLE ──────────────────────────────────────────────────────────
+(function(){
+  const saved=localStorage.getItem('nous_theme');
+  if(saved) document.documentElement.setAttribute('data-theme',saved);
+  function syncBtn(){
+    const btn=document.getElementById('theme-toggle'); if(!btn) return;
+    const t=document.documentElement.getAttribute('data-theme')||'light';
+    btn.textContent=t==='dark'?'☀️':'🌙';
+    btn.title=t==='dark'?'Switch to light mode':'Switch to dark mode';
+  }
+  window.toggleTheme=function(){
+    const current=document.documentElement.getAttribute('data-theme')||'light';
+    const next=current==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('nous_theme',next);
+    syncBtn();
+  };
+  if(document.readyState!=='loading') syncBtn();
+  else document.addEventListener('DOMContentLoaded',syncBtn);
+})();
 
 init().then(setupAutoRefresh);
 </script>
