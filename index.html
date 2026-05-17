@@ -286,31 +286,8 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 </div>
 
 <!-- ── LIVE INTEL ── -->
-<div class="tab" id="t-intel">
-  <div class="loader" id="intel-load"><div class="spin"></div>Loading intelligence feed…</div>
-  <div id="intel-c" style="display:none">
-    <!-- Event selector -->
-    <div style="margin-bottom:24px">
-      <div class="sh" style="margin-bottom:8px">📡 Live Event Intelligence</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Real-time milestones tagged by conference event — select an event to explore what happened, what was announced, and what it means.</div>
-      <div class="cat-pills" id="event-pills"></div>
-    </div>
-
-    <!-- Event overview cards -->
-    <div id="intel-overview" style="margin-bottom:28px"></div>
-
-    <!-- Milestone feed -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div>
-        <div class="panel-t" style="font-size:14px;font-weight:600;margin-bottom:14px">🗓 Event Milestones</div>
-        <div id="intel-feed"></div>
-      </div>
-      <div>
-        <div class="panel-t" style="font-size:14px;font-weight:600;margin-bottom:14px">💥 Displacement Signals</div>
-        <div id="intel-displace"></div>
-      </div>
-    </div>
-  </div>
+<div class="tab" id="t-intel" style="padding:0;height:calc(100vh - 97px);overflow:hidden">
+  <iframe id="intel-frame" src="" style="width:100%;height:100%;border:none;display:block" allow="fullscreen"></iframe>
 </div>
 
 <!-- ── TREE ── -->
@@ -405,24 +382,12 @@ async function sw(ev, id) {
     const fr = document.getElementById('tree-frame');
     if (!fr.src || !fr.src.includes('model-tree.html')) fr.src = 'model-tree.html';
   }
+  if (id === 'intel') {
+    const fr = document.getElementById('intel-frame');
+    if (!fr.src || !fr.src.includes('event.html')) fr.src = 'event.html';
+  }
   if (id === 'search') {
     if (D.milestones.length) search();
-  }
-  if (id === 'intel' && !INTEL.loaded) {
-    try {
-      await loadIntel();
-      INTEL.loaded = true;
-      buildEventPills();
-      renderIntel();
-      document.getElementById('intel-load').style.display = 'none';
-      document.getElementById('intel-c').style.display = 'block';
-    } catch(e) {
-      document.getElementById('intel-load').innerHTML =
-        `<div style="color:var(--red);padding:40px;text-align:center">Failed to load intel: ${e.message}</div>`;
-    }
-  } else if (id === 'intel' && INTEL.loaded) {
-    document.getElementById('intel-load').style.display = 'none';
-    document.getElementById('intel-c').style.display = 'block';
   }
   if (id === 'models' && !MF.loaded) {
     try {
@@ -1192,8 +1157,9 @@ function renderMatrix() {
   document.getElementById('matrix-wrap').innerHTML = html;
 }
 
-// ── Live Intel ────────────────────────────────────────────────────────────
-const EVENTS = [
+// ── Live Intel tab: delegates to event.html via iframe (see t-intel in HTML) ──
+
+const EVENTS = [ // kept for hash-nav compatibility
   { key:'google-io',   label:'Google I/O',       pattern:'I/O',         color:'#4285f4', icon:'🔵', lastDate:'2026-05' },
   { key:'nvidia-gtc',  label:'NVIDIA GTC',        pattern:'GTC',         color:'#76b900', icon:'🟢', lastDate:'2025-03' },
   { key:'openai-dev',  label:'OpenAI Dev Day',    pattern:'Dev Day',     color:'#10a37f', icon:'🤖', lastDate:'2024-11' },
