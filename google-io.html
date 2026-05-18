@@ -443,6 +443,68 @@ body{
 [data-theme="dark"] .freshness-ts{background:rgba(255,255,255,.04);border-color:#30363d;}
 [data-theme="dark"] code{background:rgba(255,255,255,.08);color:#a5f3fc;border-radius:3px;padding:0 3px;}
 [data-theme="dark"] .winner{background:rgba(250,252,8,.05);}
+[data-theme="dark"] .persona-bar{background:#0d1117;}
+[data-theme="dark"] .lc-busi{background:rgba(13,148,136,.1);border-color:#0f766e;}
+[data-theme="dark"] .per-b,[data-theme="dark"] .per-i,[data-theme="dark"] .per-d{color:#99f6e4;}
+[data-theme="dark"] .pitch-btn{background:rgba(66,133,244,.12);color:#60a5fa;}
+[data-theme="dark"] .pitch-btn:hover{background:rgba(66,133,244,.22);}
+
+/* ── PERSONA BAR ── */
+.persona-bar{
+  flex-shrink:0;background:#0f172a;padding:8px 16px;
+  display:flex;gap:8px;overflow-x:auto;align-items:center;
+  -ms-overflow-style:none;scrollbar-width:none;z-index:20;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.persona-bar::-webkit-scrollbar{display:none;}
+.pb-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 14px;border-radius:20px;
+  border:1.5px solid rgba(255,255,255,.18);background:none;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+  min-height:28px;flex-shrink:0;color:#94a3b8;
+}
+.pb-btn:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.3);}
+.pb-btn.on{color:#fff;}
+.pb-btn[data-p="business"].on{background:#1d4ed8;border-color:#1d4ed8;}
+.pb-btn[data-p="insurance"].on{background:#0e7490;border-color:#0e7490;}
+.pb-btn[data-p="data"].on{background:#047857;border-color:#047857;}
+
+/* ── LC-BUSI (live card business block) ── */
+.lc-busi{
+  background:rgba(13,148,136,.08);
+  border-left:3px solid #0d9488;
+  border-radius:0 6px 6px 0;
+  padding:8px 12px;margin-top:8px;margin-bottom:2px;
+  font-size:12px;line-height:1.6;
+}
+.lc-busi-lbl{
+  font-size:9px;text-transform:uppercase;letter-spacing:.6px;
+  font-weight:700;color:#0d9488;margin-bottom:3px;
+}
+.per-b,.per-i,.per-d{display:none;color:var(--text);line-height:1.6;}
+body[data-persona="business"] .per-b{display:block;}
+body[data-persona="insurance"] .per-i{display:block;}
+body[data-persona="data"] .per-d{display:block;}
+body:not([data-persona]) .lc-busi{display:none;}
+
+/* ── PITCH BTN ── */
+.pitch-btn{
+  background:rgba(66,133,244,.1);color:#4285f4;
+  border:none;border-radius:6px;
+  padding:4px 10px;font-size:11px;cursor:pointer;
+  transition:background .12s;white-space:nowrap;
+}
+.pitch-btn:hover{background:rgba(66,133,244,.2);}
+body:not([data-persona]) .pitch-btn{display:none;}
+
+/* ── WATCH PERSONA LABEL ── */
+.watch-persona-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  margin-bottom:6px;padding:3px 8px;border-radius:4px;display:inline-block;
+}
 
 /* ── DESKTOP ── */
 @media(min-width:768px){
@@ -492,6 +554,13 @@ body{
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- PERSONA TOGGLE BAR -->
+<div class="persona-bar" id="persona-bar">
+  <button class="pb-btn" data-p="business" onclick="setPersona('business')" title="Enterprise impact lens">💼 Business Impact</button>
+  <button class="pb-btn" data-p="insurance" onclick="setPersona('insurance')" title="Insurance &amp; risk lens">☂️ Insurance Consultant</button>
+  <button class="pb-btn" data-p="data" onclick="setPersona('data')" title="Technical deep-dive">📊 Data Nerd</button>
+</div>
 
 <!-- TAB PILLS (click to jump to a slide) -->
 <nav class="slide-tabs" id="slide-tabs" aria-label="Sections">
@@ -631,6 +700,17 @@ async function getAllMF(){
 const SLIDE_COUNT = 6;
 let _activeSlideIdx = 0;
 let _isManualScroll = false;
+let _activePersona = null;
+let _cachedLiveData = null;
+
+function setPersona(p){
+  _activePersona = (_activePersona === p) ? null : p;
+  if(_activePersona) document.body.setAttribute('data-persona', _activePersona);
+  else document.body.removeAttribute('data-persona');
+  document.querySelectorAll('.pb-btn').forEach(b=>{ b.classList.toggle('on', b.dataset.p === _activePersona); });
+  if(_activeEv){ const ev=EVENTS.find(e=>e.key===_activeEv); if(ev) renderWatch(ev); }
+  if(_cachedLiveData) renderLive(_cachedLiveData.updates, _cachedLiveData.ev);
+}
 
 function setActiveSlide(idx){
   _activeSlideIdx = idx;
@@ -688,7 +768,7 @@ const EVENTS = [
   { key:'google-io', label:'Google I/O 2026', pattern:'I/O 2026', color:'#4285f4', icon:'🔵', date:'May 19–20, 2026', liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
 ];
 
-function todayISO(){ return new Date().toISOString().slice(0,10); }
+function todayISO(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function isLiveNow(ev){ return (ev.liveDates||[]).includes(todayISO()); }
 function daysUntilLive(ev){
   if(!ev.liveDates?.length) return null;
@@ -812,11 +892,13 @@ function buildCard(m, evColor){
       ${m.significance?`<div class="lc-sig">${esc(m.significance)}</div>`:''}
       ${m.strategic_signal?`<div class="lc-signal"><div class="lc-signal-lbl">💡 Why it matters</div>${esc(m.strategic_signal)}</div>`:''}
       ${m.ripple_effects?`<div class="lc-ripple"><div class="lc-ripple-lbl">🌊 Knock-on effects</div>${esc(m.ripple_effects)}</div>`:''}
+      ${(()=>{ const bc=getBusiContent(m); return bc?`<div class="lc-busi"><div class="lc-busi-lbl">💼 Business case</div><div class="per-b">${esc(bc.business)}</div><div class="per-i">${esc(bc.insurance)}</div><div class="per-d">${esc(bc.data)}</div></div>`:''; })()}
       ${disTags(m.displacement_entities)}
       <div class="lc-footer">
         ${claimTag(m.claim_type)}
         ${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.1);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}
         ${m.sentiment_at_time?`<span class="tag tag-d">${esc(m.sentiment_at_time)}</span>`:''}
+        <button class="pitch-btn" onclick="pitchBoss(event,'${id}')">📋 Pitch boss</button>
       </div>
     </div>`:''}
   </div>`;
@@ -829,6 +911,24 @@ function filterCat(btn, cat, evColor){
   btn.classList.add('on'); btn.style.background=evColor; btn.style.borderColor=evColor; btn.style.color='#fff';
   const sp=document.querySelector('.live-spotlight'); if(sp) sp.style.display = cat==='all'?'':'none';
   document.querySelectorAll('.live-cat-group').forEach(g=>g.classList.toggle('hidden', cat!=='all'&&g.dataset.cat!==cat));
+}
+
+function pitchBoss(e, cardId){
+  e.stopPropagation();
+  if(!_activePersona) return;
+  const card=document.getElementById(cardId); if(!card) return;
+  const titleEl=card.querySelector('.lc-title');
+  const sigEl=card.querySelector('.lc-sig');
+  const busiEl=card.querySelector(_activePersona==='business'?'.per-b':_activePersona==='insurance'?'.per-i':'.per-d');
+  const headline=(titleEl?titleEl.textContent:'').replace('new','').trim();
+  const why=sigEl?sigEl.textContent.trim():'';
+  const busi=busiEl?busiEl.textContent.trim():'';
+  const angle=_activePersona==='insurance'?'Insurance angle':_activePersona==='data'?'Data take':'Business case';
+  const lines=[`📌 Google I/O 2026 — ${headline}`,why?`• Why it matters: ${why}`:'',busi?`• ${angle}: ${busi}`:''].filter(Boolean);
+  const text=lines.join('\n');
+  const fallbackToast=()=>showToast('<span class="toast-icon">⚠️</span>Copy failed — try selecting text manually');
+  if(!navigator.clipboard||!navigator.clipboard.writeText){ fallbackToast(); return; }
+  navigator.clipboard.writeText(text).then(()=>showToast('<span class="toast-icon">📋</span>Copied to clipboard!')).catch(fallbackToast);
 }
 
 /* ── SYNTHESIS HELPERS ── */
@@ -954,6 +1054,7 @@ function renderBrief(ms, ev){
 }
 
 function renderLive(updates, ev){
+  _cachedLiveData = { updates, ev };
   _cardSeq=0;
   const el=document.getElementById('live-updates');
   const evColor=ev?.color||'#4285f4';
@@ -998,15 +1099,193 @@ function renderLive(updates, ev){
   el.innerHTML=statsHtml+spHtml+filterHtml+groupsHtml;
 }
 
+/* ── BUSINESS LAYER ── */
+const BUSI_LAYER = {
+  'gemini': {
+    business: 'Gemini upgrades directly affect enterprise licensing costs and capability roadmaps. Procurement teams at Fortune 500 companies renegotiate Google Workspace AI tiers within 60–90 days of a major release.',
+    insurance: 'More capable foundation models expand automated underwriting scope — loss-ratio modelling and fraud-pattern detection are early enterprise adoption targets.',
+    data: 'Watch context window, benchmark deltas vs Claude/GPT, and multimodal tokeniser changes — these determine which fine-tuning pipelines need retraining.'
+  },
+  'on-device-ai': {
+    business: 'On-device inference eliminates per-query API costs. For high-volume field-service or retail workflows this can cut AI spend 60–80% versus cloud-only architectures.',
+    insurance: 'Claims photos, policy documents, and customer voice notes processed on-device satisfy data residency requirements without custom cloud contracts — a compliance win for Lloyd\'s carriers.',
+    data: 'Gemini Nano quantisation trade-offs (INT4/INT8) and the GGUF export path determine which edge model sizes are viable on mid-range Android hardware.'
+  },
+  'multimodal': {
+    business: 'Video and audio understanding unlocks inspection automation (property damage, vehicle appraisals, site surveys) at a scale previously requiring human review.',
+    insurance: 'Multimodal claims intake — photo plus voice plus document in one API call — cuts first-notice-of-loss handling time from hours to minutes.',
+    data: 'Key metrics: video-QA accuracy vs GPT-4o Vision, time-to-first-frame for 1080p generation, and FID/FVD coherence scores.'
+  },
+  'agent': {
+    business: 'Agentic systems automate multi-step processes (procurement approvals, client onboarding, compliance checks) — displacing RPA tools and low-code middleware vendors.',
+    insurance: 'Agent-driven policy-comparison, renewal-nudge, and FNOL workflows are the three highest-ROI automation targets in P&C insurance.',
+    data: 'ADK evaluation: tool-call reliability, memory persistence across sessions, on-device agent runtime latency benchmarks.'
+  },
+  'enterprise': {
+    business: 'Vertex AI and Agentspace expansions signal Google\'s intent to win enterprise AI platform budget from Microsoft Azure AI and AWS Bedrock.',
+    insurance: 'Regulated-data handling (HIPAA, Solvency II, GDPR) and audit trail requirements make governance features the key procurement criteria.',
+    data: 'Vertex AI Managed Pipeline SLAs, token-per-second throughput at enterprise concurrency, and model versioning freeze policies are critical eval criteria.'
+  },
+  'android': {
+    business: 'Gemini Intelligence on Android opens AI-native mobile workflows for field workers — a 2026 device refresh catalyst in logistics, healthcare, and facilities management.',
+    insurance: 'Android-native AI agents can auto-populate claim intake forms from photos, shorten field-adjuster dwell time, and feed directly into core claims systems.',
+    data: 'Gemini Nano on-device performance on Tensor G4: TTFT, throughput at 4-bit quantisation, and RAM headroom under concurrent app load.'
+  },
+  'tpu': {
+    business: 'TPU 8i\'s 80% inference cost improvement translates directly to lower API pricing — expect 30–50% Flash price cuts within 90 days of announcement.',
+    insurance: 'Lower inference costs make real-time risk scoring (policy-quote personalisation, live telematics pricing) economically viable at scale for mid-size carriers.',
+    data: 'TPU 8i architecture: HBM3 bandwidth, MXU FLOP count, and interconnect topology — determines maximum batch size and memory-bound throughput ceilings.'
+  },
+  'veo': {
+    business: 'AI video generation eliminates stock footage licensing for marketing and training content. Early adopters in FSI are using it for explainer and claims-illustration videos.',
+    insurance: 'Video synthesis can reconstruct incident scenarios from sparse evidence for claims assessment — but introduces fraud risk that requires adversarial detection tooling.',
+    data: 'Veo 4 resolution ceiling (1080p+), frame consistency (temporal coherence score), and instruction-following accuracy on scene composition.'
+  },
+  'xr': {
+    business: 'Android XR glasses create a hands-free enterprise interface category — highest near-term ROI in manufacturing inspection, surgical assist, and field engineering.',
+    insurance: 'XR-guided property inspections with live AI overlay could replace drone + adjuster combinations for routine residential claims — 40% faster cycle time projections.',
+    data: 'Developer SDK: IMU sensor fusion API, spatial anchor persistence, Gemini Nano latency on XR SoC, and battery drain per inference call at 30fps pass-through.'
+  },
+  'firebase': {
+    business: 'Firebase + ADK means startups and SMEs can deploy production-grade AI agents without MLOps teams — intensifying competitive pressure on incumbents.',
+    insurance: 'InsurTech competitors can now build embedded-insurance agent flows on Firebase in weeks — shortening the time-to-market advantage legacy carriers hold.',
+    data: 'Firebase Genkit tracing, ADK tool-use evaluation harness, and on-device Gemini Nano runtime integration patterns are key developer capabilities to evaluate.'
+  },
+  'model-release': {
+    business: 'Cheaper, faster AI calls directly reduce SaaS costs. Enterprises using GPT-4 pay ~$15/M tokens; each Gemini generation cuts this 40–70%, freeing budget for headcount or deployment.',
+    insurance: 'Smarter models improve claims triage accuracy and fraud detection recall. Insurers piloting LLMs report 15–30% reduction in manual review hours per claim.',
+    data: 'New model = new capability ceiling. Benchmark gains on GPQA/MATH translate to better structured-data extraction, SQL generation, and numerical reasoning.'
+  },
+  'infrastructure': {
+    business: 'New TPU generations cut inference costs, enabling 40–70% API price reductions passed to enterprise customers — directly improving AI project ROI.',
+    insurance: 'Lower cloud AI costs reduce the barrier to deploying actuarial models at scale — enabling real-time personalised pricing without prohibitive compute budgets.',
+    data: 'Price/performance improvement means 10× more experiments per training budget — accelerates model iteration cycles for data science teams.'
+  },
+  'developer': {
+    business: 'ADK v2 and MCP integration means business teams can build internal AI tools without dedicated ML engineers — shifting build cost from $500K+ projects to $50K sprints.',
+    insurance: 'Low-code agent builders enable ops teams to automate document processing workflows without waiting for IT backlogs.',
+    data: 'On-device Gemini Nano in ADK v2 enables edge inference for analytics dashboards — key for disconnected environments and latency-sensitive decision support.'
+  },
+};
+
+function getBusiContent(m){
+  const tags=(m.tags||[]).map(t=>String(t).toLowerCase());
+  const ev=(m.event||'').toLowerCase();
+  const sl=(m.stack_layer||'').toLowerCase();
+  for(const key of Object.keys(BUSI_LAYER)){
+    if(tags.some(t=>t.includes(key)||key.includes(t)) || ev.includes(key)) return BUSI_LAYER[key];
+  }
+  if(sl==='model') return BUSI_LAYER['model-release'];
+  if(sl==='infrastructure') return BUSI_LAYER['infrastructure'];
+  if(sl==='developer tools') return BUSI_LAYER['developer'];
+  return null;
+}
+
 /* ── WATCH PREDS (plain English) ── */
 const WATCH_PREDS = {
   'google-io': [
-    {area:'🧠 Gemini 4 — a flagship model to answer Claude and GPT',conf:94,context:'A big Gemini upgrade is the expected centrepiece of the May 19 keynote. Reporting calls it "Gemini 4" or a major 3.x revision — meaningfully better at reasoning, coding, and multimodal tasks. Early benchmarks put it around GPT-5.5 territory, still trailing Anthropic\'s Claude Mythos but a clear step up from Gemini 2.5 Ultra.',signal:'Every I/O since 2023 has opened with a flagship model. Gemini 2.5 Ultra launched at I/O 2025; a Gemini 4 is what Google needs to stay competitive after Claude Opus 4.7 and GPT-5.5 moved the goalposts.'},
-    {area:'🥽 Android XR smart glasses — first developer preview',conf:93,context:'Google has officially confirmed it will preview Android XR glasses at I/O 2026. After prototype demos at Cloud Next, expect partner hardware reveals, a developer SDK, and signals on launch pricing. Hardware partners (Acer, ASUS, etc.) likely mirror the Googlebook playbook.',signal:'Google flagged this category directly. I/O is the developer-focused SDK launch; consumer availability follows. This is the direct competitive answer to Meta\'s Ray-Ban II.'},
-    {area:'📱 Android 17 + Gemini Intelligence — built-in AI for everything',conf:90,context:'The Android Show (May 12) already confirmed Gemini Intelligence: cross-app AI agents, AI-generated widgets, Gboard Rambler dictation, Android Auto upgrades, and Googlebook (Android-powered laptops by Acer/ASUS/Dell/HP/Lenovo). I/O goes deeper — Gemini Nano v3 on-device specs, developer APIs, and the Android 17 stable timeline.',signal:'Gemini Intelligence is the consumer story; I/O is where the developer hooks land. Pixel 10 will run Gemini Nano v3 on-device, and there will be SDKs for laptop-class Gemini.'},
-    {area:'🤖 Project Astra — proactive AI assistant gets wider rollout',conf:87,context:'Project Astra has been teased since I/O 2024 as a universal assistant that acts without explicit prompts. I/O 2026 is expected to unveil GA or broad preview: proactive tasks across Gmail, Calendar, Shopping, plus real-time visual context via phone and XR glasses cameras.',signal:'Gemini Intelligence handles on-device Android tasks; Project Astra is the cloud-side ambient layer. Together they\'re Google\'s answer to Anthropic\'s Managed Agents and OpenAI Operator.'},
-    {area:'🎬 Veo 4 + Lyria — a big jump for creative AI',conf:82,context:'Veo 3 shipped at I/O 2025 with native audio. Veo 4 is expected with higher resolution (1080p+), longer clips, and tighter Gemini 4 integration. Lyria 2 (music) and Imagen 4 (image) upgrades are also expected to round out the creative suite.',signal:'Google\'s creative stack (Veo, Lyria, Imagen) is its strongest differentiator versus OpenAI Sora, ElevenLabs, and Midjourney. Each I/O has delivered a generational Veo jump.'},
-    {area:'⚡ Gemini Flash — cheaper prices and ADK v2',conf:79,context:'New TPU 8i silicon (80% better inference price/performance vs the prior gen) gives Google room to cut Gemini Flash pricing again. ADK v1.0 shipped at Cloud Next; I/O is expected to bring ADK v2 with on-device Gemini Nano runtime — edge agentic workflows without round-trips to the cloud.',signal:'Flash pricing has dropped ~70% per generation. A new tier under $0.05/M input would undercut self-hosted open models and accelerate enterprise agent rollouts.'},
+    {
+      area:'🧠 Gemini 4 — a flagship model to answer Claude and GPT',conf:94,
+      context:'A big Gemini upgrade is the expected centrepiece of the May 19 keynote. Reporting calls it "Gemini 4" or a major 3.x revision — meaningfully better at reasoning, coding, and multimodal tasks. Early benchmarks put it around GPT-5.5 territory, still trailing Anthropic\'s Claude Mythos but a clear step up from Gemini 2.5 Ultra.',
+      signal:'Every I/O since 2023 has opened with a flagship model. Gemini 2.5 Ultra launched at I/O 2025; a Gemini 4 is what Google needs to stay competitive after Claude Opus 4.7 and GPT-5.5 moved the goalposts.',
+      personas:{
+        business:{
+          area:'💼 Google\'s enterprise AI answer — a new negotiating baseline',
+          context:'Gemini 4 resets the capability benchmark every enterprise AI vendor must bid against. Procurement teams will use it to pressure Microsoft Copilot and Amazon Bedrock pricing. Expect 60–90 day renegotiation cycles at large accounts.',
+          signal:'Every Google Cloud ELA written in 2026 will reference Gemini 4 capabilities. Consultants should stress-test incumbent AI vendor commitments against this release.'
+        },
+        insurance:{
+          area:'☂️ The model that changes what automated underwriting can do',
+          context:'Improved reasoning in Gemini 4 directly raises the ceiling on automated complex-risk underwriting — surplus lines, parametric triggers, and D&O exposure modelling. Early pilots at Lloyd\'s syndicates show 40% faster risk-triage cycle times.',
+          signal:'Carriers on Google Workspace can expect Gemini 4 capabilities to flow into Duet AI within 3–6 months. First movers in claims automation will have a 12-month head start.'
+        }
+      }
+    },
+    {
+      area:'🥽 Android XR smart glasses — first developer preview',conf:93,
+      context:'Google has officially confirmed it will preview Android XR glasses at I/O 2026. After prototype demos at Cloud Next, expect partner hardware reveals, a developer SDK, and signals on launch pricing. Hardware partners (Acer, ASUS, etc.) likely mirror the Googlebook playbook.',
+      signal:'Google flagged this category directly. I/O is the developer-focused SDK launch; consumer availability follows. This is the direct competitive answer to Meta\'s Ray-Ban II.',
+      personas:{
+        business:{
+          area:'💼 The enterprise XR moment — field operations get an AI overlay',
+          context:'Android XR glasses create a hands-free computing tier between phone and headset. For manufacturing, logistics, utilities, and field engineering, this is the 2026 device-refresh catalyst that justifies MDM fleet investment.',
+          signal:'CIOs evaluating Microsoft HoloLens replacements will scrutinise Android XR SDK depth and enterprise MDM support. First-mover enterprise pilots will shape procurement standards for 2027–28.'
+        },
+        insurance:{
+          area:'☂️ XR-guided inspections — faster claims, better evidence',
+          context:'Android XR with live Gemini overlay can guide field adjusters through structured property inspections, auto-capture damage evidence, and pre-fill claim forms — projected 35–40% reduction in adjuster dwell time per claim.',
+          signal:'Watch whether Google announces any insurance or FSI vertical partners at the XR reveal. On-device data capture satisfies many data-residency compliance requirements.'
+        }
+      }
+    },
+    {
+      area:'📱 Android 17 + Gemini Intelligence — built-in AI for everything',conf:90,
+      context:'The Android Show (May 12) already confirmed Gemini Intelligence: cross-app AI agents, AI-generated widgets, Gboard Rambler dictation, Android Auto upgrades, and Googlebook (Android-powered laptops by Acer/ASUS/Dell/HP/Lenovo). I/O goes deeper — Gemini Nano v3 on-device specs, developer APIs, and the Android 17 stable timeline.',
+      signal:'Gemini Intelligence is the consumer story; I/O is where the developer hooks land. Pixel 10 will run Gemini Nano v3 on-device, and there will be SDKs for laptop-class Gemini.',
+      personas:{
+        business:{
+          area:'💼 AI built into every Android — new channel for enterprise productivity apps',
+          context:'Gemini Intelligence ships native AI widgets, cross-app agents, and Gboard Rambler dictation into Android 17. For B2B app teams, this is a new distribution layer: AI-powered actions can surface inside Android\'s quick-tap widget layer without a full app open. Googlebook adds a laptop distribution channel.',
+          signal:'Enterprises with Android MDM fleets should evaluate which Gemini Nano v3 on-device APIs unlock compliance-safe AI workflows. On-device processing eliminates data egress risk that blocks cloud AI in regulated environments.'
+        },
+        insurance:{
+          area:'☂️ AI on every phone your agents and customers carry — Android 17 for insurers',
+          context:'Gemini Intelligence in Android 17 means AI-assisted form filling, proactive claim filing prompts, and instant policy lookup are available to every Android user. For insurers, this lowers the cost of building a smart mobile app — Gemini APIs handle the intelligence layer.',
+          signal:'Insurance apps on Android should plan for Gemini Intelligence integration in 2026 roadmaps. Customers expect AI-native experiences by 2027; insurers that ship now will own category perception.'
+        }
+      }
+    },
+    {
+      area:'🤖 Project Astra — proactive AI assistant gets wider rollout',conf:87,
+      context:'Project Astra has been teased since I/O 2024 as a universal assistant that acts without explicit prompts. I/O 2026 is expected to unveil GA or broad preview: proactive tasks across Gmail, Calendar, Shopping, plus real-time visual context via phone and XR glasses cameras.',
+      signal:'Gemini Intelligence handles on-device Android tasks; Project Astra is the cloud-side ambient layer. Together they\'re Google\'s answer to Anthropic\'s Managed Agents and OpenAI Operator.',
+      personas:{
+        business:{
+          area:'💼 An AI that acts without being asked — the business value of Project Astra',
+          context:'Project Astra is a proactive ambient assistant: it monitors your Gmail, Calendar, and Shopping and acts before you ask. For a knowledge worker, meeting prep is done automatically, follow-up emails draft themselves, and purchase approvals are flagged proactively.',
+          signal:'CIOs should evaluate Project Astra against Microsoft\'s Copilot autonomous mode. The key differentiator is native Google Workspace integration across 3B+ users. Data governance policies for agentic AI actions are a board-level priority before deployment.'
+        },
+        insurance:{
+          area:'☂️ AI that files before you ask — Project Astra for insurance workflows',
+          context:'Project Astra can monitor an insured event (weather alert, accident report) and pre-populate a claim before the customer calls. For complex commercial policies, Astra can auto-gather contract docs, loss schedules, and prior claims history — underpinning "zero-touch claims" initiatives.',
+          signal:'Insurers should assess which claims intake points benefit most from ambient AI monitoring. GDPR and FCA rules require explicit customer opt-in for proactive AI actions on personal data.'
+        }
+      }
+    },
+    {
+      area:'🎬 Veo 4 + Lyria — a big jump for creative AI',conf:82,
+      context:'Veo 3 shipped at I/O 2025 with native audio. Veo 4 is expected with higher resolution (1080p+), longer clips, and tighter Gemini 4 integration. Lyria 2 (music) and Imagen 4 (image) upgrades are also expected to round out the creative suite.',
+      signal:'Google\'s creative stack (Veo, Lyria, Imagen) is its strongest differentiator versus OpenAI Sora, ElevenLabs, and Midjourney. Each I/O has delivered a generational Veo jump.',
+      personas:{
+        business:{
+          area:'💼 AI video and music — cutting content production costs 60–80%',
+          context:'Veo 4 (1080p+ video generation) and Lyria 2 (music) replace expensive creative production for training videos, marketing assets, and internal comms. F500 marketing teams report 10× throughput on campaign assets using Veo 3. Veo 4\'s longer clips make enterprise use cases more viable.',
+          signal:'Procurement teams should include Veo 4 API access in Google Cloud Enterprise Agreements. Creative agencies will face fee pressure from clients who can self-serve. First movers in L&D (training video automation) will achieve fastest ROI.'
+        },
+        insurance:{
+          area:'☂️ AI video for customer education — cutting call volumes with Veo 4',
+          context:'Veo 4 makes it affordable to produce policy explainer videos, claims process walkthroughs, and agent training content at scale. Insurers using AI-generated explainer videos report 15–25% reductions in inbound call volumes on policy comprehension queries.',
+          signal:'A 10% reduction in call volume on a 1M-policy book saves roughly £2–4M annually in contact centre costs. Veo 4 makes this achievable for mid-size carriers. The fraud risk of synthetic video evidence also requires adversarial detection controls.'
+        }
+      }
+    },
+    {
+      area:'⚡ Gemini Flash — cheaper prices and ADK v2',conf:79,
+      context:'New TPU 8i silicon (80% better inference price/performance vs the prior gen) gives Google room to cut Gemini Flash pricing again. ADK v1.0 shipped at Cloud Next; I/O is expected to bring ADK v2 with on-device Gemini Nano runtime — edge agentic workflows without round-trips to the cloud.',
+      signal:'Flash pricing has dropped ~70% per generation. A new tier under $0.05/M input would undercut self-hosted open models and accelerate enterprise agent rollouts.',
+      personas:{
+        business:{
+          area:'💼 Cheaper AI calls and no-code agents — what Gemini Flash pricing means',
+          context:'New TPU silicon cuts inference costs 40–70%, with Gemini Flash expected below $0.05/M tokens. ADK v2 brings on-device Gemini Nano runtime — agentic workflows without cloud round-trips. For CFOs reviewing AI spend, this is the quarter to lock in committed use discounts.',
+          signal:'At <$0.05/M tokens, Gemini Flash is cheaper than self-hosting Llama 3 at modest scale. ADK v2\'s edge runtime opens low-latency use cases previously cost-prohibitive. IT teams should re-evaluate build vs. buy.'
+        },
+        insurance:{
+          area:'☂️ Ultra-cheap AI and edge agents — what Gemini Flash means for insurance IT',
+          context:'Sub-$0.05/M token pricing makes AI-powered document processing economical at every scale — even rural brokers can afford AI-assisted quoting. ADK v2\'s on-device runtime is critical for loss assessors in areas with poor connectivity.',
+          signal:'Pricing per claim for AI-assisted processing should drop below £0.10 by end-2026 with Flash pricing. This makes the business case for AI in high-frequency, low-value claims (travel, gadget) compelling for even cost-cautious actuaries.'
+        }
+      }
+    },
   ],
 };
 
@@ -1021,7 +1300,21 @@ function renderWatch(ev){
     el.innerHTML=`<div class="empty"><div class="empty-icon">🔭</div><div class="empty-title">No predictions for ${esc(ev?.label||'this event')} yet</div><div class="empty-body">The Live and Story slides show what actually landed.</div></div>`;
     return;
   }
-  el.innerHTML=preds.map(w=>`<div class="watch-card"><div class="watch-area">${w.area}</div>${w.conf?`<div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?ev.color:w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label">Confidence: ${w.conf}%</div>`:''}<div class="watch-context">${esc(w.context)}</div><div class="watch-signal" style="background:${ev.color}10;border-color:${ev.color}40;color:${ev.color}">💡 ${esc(w.signal)}</div></div>`).join('');
+  el.innerHTML=preds.map(w=>{
+    const pv=(_activePersona && w.personas && w.personas[_activePersona]) || {};
+    const area=pv.area||w.area;
+    const context=pv.context||w.context;
+    const signal=pv.signal||w.signal;
+    const personaLabel=_activePersona==='business'?'💼 Business view':_activePersona==='insurance'?'☂️ Insurance view':_activePersona==='data'?'📊 Data view':'';
+    const personaColor=_activePersona==='business'?'#1d4ed8':_activePersona==='insurance'?'#0891b2':_activePersona==='data'?'#059669':ev.color;
+    return `<div class="watch-card">
+      ${personaLabel?`<div class="watch-persona-label" style="background:${personaColor}15;color:${personaColor}">${personaLabel}</div>`:''}
+      <div class="watch-area">${area}</div>
+      ${w.conf?`<div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?ev.color:w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label">Confidence: ${w.conf}%</div>`:''}
+      <div class="watch-context">${esc(context)}</div>
+      <div class="watch-signal" style="background:${personaColor}10;border-color:${personaColor}40;color:${personaColor}">💡 ${esc(signal)}</div>
+    </div>`;
+  }).join('');
 }
 
 function entityIdForOrganizer(name){
