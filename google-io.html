@@ -141,13 +141,14 @@ body{
   margin-bottom:20px;
 }
 
-/* ── DOTS INDICATOR ── */
+/* ── DOTS INDICATOR + SIGNATURE ── */
 .slide-dots{
-  display:flex;justify-content:center;align-items:center;gap:8px;
-  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));
   background:var(--card);border-top:1px solid var(--border);
   flex-shrink:0;z-index:20;
 }
+.dots-row{display:flex;align-items:center;gap:8px;}
 .dot{
   width:8px;height:8px;border-radius:50%;
   background:var(--border);cursor:pointer;
@@ -155,10 +156,12 @@ body{
   border:none;padding:0;
 }
 .dot.active{background:var(--google-blue);transform:scale(1.4);}
-.dots-hint{
-  font-size:10px;color:var(--muted);margin-left:10px;
-  letter-spacing:.5px;
+.dots-signature{
+  font-size:10px;color:var(--muted);
+  letter-spacing:.4px;font-weight:500;
+  text-align:center;
 }
+.dots-signature b{color:var(--text);font-weight:600;}
 
 /* ── HERO STATS (inside slide 0) ── */
 .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
@@ -451,7 +454,6 @@ body{
   .chain-arrow{text-align:center;padding-left:0;}
   .cite-list{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
   .live-chips{grid-template-columns:repeat(4,1fr);}
-  .dots-hint{display:inline;}
 }
 </style>
 </head>
@@ -590,15 +592,17 @@ body{
 
 </div><!-- /slides -->
 
-<!-- DOTS INDICATOR -->
+<!-- DOTS INDICATOR + SIGNATURE -->
 <div class="slide-dots" id="slide-dots">
-  <button class="dot active" onclick="goToSlide(0)" aria-label="Today"></button>
-  <button class="dot" onclick="goToSlide(1)" aria-label="To Watch"></button>
-  <button class="dot" onclick="goToSlide(2)" aria-label="Rankings"></button>
-  <button class="dot" onclick="goToSlide(3)" aria-label="Live"></button>
-  <button class="dot" onclick="goToSlide(4)" aria-label="Story"></button>
-  <button class="dot" onclick="goToSlide(5)" aria-label="Pressure"></button>
-  <span class="dots-hint">swipe or tap to navigate</span>
+  <div class="dots-row">
+    <button class="dot active" onclick="goToSlide(0)" aria-label="Today"></button>
+    <button class="dot" onclick="goToSlide(1)" aria-label="To Watch"></button>
+    <button class="dot" onclick="goToSlide(2)" aria-label="Rankings"></button>
+    <button class="dot" onclick="goToSlide(3)" aria-label="Live"></button>
+    <button class="dot" onclick="goToSlide(4)" aria-label="Story"></button>
+    <button class="dot" onclick="goToSlide(5)" aria-label="Pressure"></button>
+  </div>
+  <div class="dots-signature">Curated by <b>Vignesh Bhaskarraj</b></div>
 </div>
 
 <script>
