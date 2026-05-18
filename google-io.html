@@ -454,6 +454,8 @@ body{
   flex-shrink:0;background:#0f172a;padding:8px 16px;
   display:flex;gap:8px;overflow-x:auto;align-items:center;
   -ms-overflow-style:none;scrollbar-width:none;z-index:20;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
 }
 .persona-bar::-webkit-scrollbar{display:none;}
 .pb-btn{
@@ -467,8 +469,8 @@ body{
 .pb-btn:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.3);}
 .pb-btn.on{color:#fff;}
 .pb-btn[data-p="business"].on{background:#1d4ed8;border-color:#1d4ed8;}
-.pb-btn[data-p="insurance"].on{background:#0891b2;border-color:#0891b2;}
-.pb-btn[data-p="data"].on{background:#059669;border-color:#059669;}
+.pb-btn[data-p="insurance"].on{background:#0e7490;border-color:#0e7490;}
+.pb-btn[data-p="data"].on{background:#047857;border-color:#047857;}
 
 /* ── LC-BUSI (live card business block) ── */
 .lc-busi{
@@ -913,6 +915,7 @@ function filterCat(btn, cat, evColor){
 
 function pitchBoss(e, cardId){
   e.stopPropagation();
+  if(!_activePersona) return;
   const card=document.getElementById(cardId); if(!card) return;
   const titleEl=card.querySelector('.lc-title');
   const sigEl=card.querySelector('.lc-sig');
