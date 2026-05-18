@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Google I/O 2026 Tracker — What to expect, what's landing, and how it stacks up. A swipeable read for analysts and consultants.">
+<title>Google I/O 2026 Tracker</title>
+<style>
+/* ── VARIABLES ── */
+:root {
+  --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
+  --text:#0f172a; --muted:#64748b; --accent:#4285f4;
+  --warn:#d97706; --red:#dc2626; --indigo:#4f46e5;
+  --google-blue:#4285f4; --google-green:#34a853;
+  --google-yellow:#d97706; --google-red:#dc2626;
+}
+
+/* ── RESET + BASE ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--text);
+  font-size:16px;line-height:1.6;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  overscroll-behavior:none;
+}
+
+/* ── HEADER ── */
+.hdr{
+  height:56px;background:#0f172a;
+  display:flex;align-items:center;
+  padding:0 16px;gap:12px;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.4);
+  z-index:30;
+}
+.hdr-brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-decoration:none;}
+.hdr-icon{font-size:20px;flex-shrink:0;}
+.hdr-name{font-size:16px;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-tag{font-size:10px;color:#8b949e;white-space:nowrap;}
+.hdr-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.hdr-btn{
+  background:none;border:1px solid rgba(255,255,255,.15);border-radius:8px;
+  color:#94a3b8;font-size:13px;cursor:pointer;padding:6px 10px;
+  min-height:36px;transition:all .15s;line-height:1;white-space:nowrap;
+}
+.hdr-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3);}
+
+/* ── EDITION BAR ── */
+.edition-bar{
+  background:var(--card);border-bottom:1px solid var(--border);
+  padding:10px 16px;display:flex;align-items:center;gap:10px;
+  flex-shrink:0;min-height:52px;z-index:25;
+}
+.esb-label{
+  font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);white-space:nowrap;flex-shrink:0;
+  padding-right:10px;border-right:1px solid var(--border);margin-right:4px;
+}
+.esb-pills{display:flex;gap:8px;flex:1;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.esb-pills::-webkit-scrollbar{display:none;}
+.event-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 16px;border-radius:24px;border:1.5px solid;background:none;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;
+  white-space:nowrap;min-height:36px;flex-shrink:0;
+}
+.event-pill.on{color:#fff !important;}
+.ep-count{font-size:10px;font-weight:700;background:rgba(255,255,255,.25);padding:0 5px;border-radius:10px;}
+.esb-meta{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;display:none;}
+
+/* ── LIVE BANNER ── */
+.live-banner{
+  background:linear-gradient(90deg,#b91c1c,#991b1b);color:#fff;
+  padding:10px 16px;display:none;align-items:center;gap:12px;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
+.live-banner.visible{display:flex;}
+.live-banner-pulse{width:8px;height:8px;border-radius:50%;background:#fff;flex-shrink:0;animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-banner-text{flex:1;}
+.live-banner-dismiss{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.7;line-height:1;padding:0 4px;}
+
+/* ── SLIDE TABS ── */
+.slide-tabs{
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;flex-shrink:0;padding:0 4px;
+  overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
+  z-index:20;
+}
+.slide-tabs::-webkit-scrollbar{display:none;}
+.slide-tab{
+  padding:11px 14px;background:none;border:none;
+  border-bottom:2px solid transparent;
+  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
+  white-space:nowrap;margin-bottom:-1px;min-height:44px;
+  transition:all .15s;display:inline-flex;align-items:center;gap:5px;
+}
+.slide-tab:hover{color:var(--text);}
+.slide-tab.active{color:var(--google-blue);border-bottom-color:var(--google-blue);}
+.slide-tab .tab-badge{
+  background:#ea4335;color:#fff;font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:10px;line-height:1.4;
+}
+
+/* ── SLIDES (horizontal swipe deck) ── */
+.slides{
+  flex:1 1 auto;display:flex;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  scroll-behavior:smooth;min-height:0;
+}
+.slides::-webkit-scrollbar{display:none;}
+.slide{
+  flex:0 0 100%;width:100%;height:100%;
+  scroll-snap-align:start;scroll-snap-stop:always;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  background:var(--bg);
+  overscroll-behavior:contain;
+}
+.slide-inner{
+  padding:20px 16px 28px;
+  max-width:100%;
+}
+.slide-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.slide-title{
+  font-size:24px;font-weight:800;line-height:1.2;
+  color:var(--text);margin-bottom:8px;
+}
+.slide-sub{
+  font-size:14px;color:var(--muted);line-height:1.6;
+  margin-bottom:20px;
+}
+
+/* ── DOTS INDICATOR + SIGNATURE ── */
+.slide-dots{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));
+  background:var(--card);border-top:1px solid var(--border);
+  flex-shrink:0;z-index:20;
+}
+.dots-row{display:flex;align-items:center;gap:8px;}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--border);cursor:pointer;
+  transition:background .2s,transform .2s;
+  border:none;padding:0;
+}
+.dot.active{background:var(--google-blue);transform:scale(1.4);}
+.dots-signature{
+  font-size:10px;color:var(--muted);
+  letter-spacing:.4px;font-weight:500;
+  text-align:center;line-height:1.4;
+}
+.dots-signature b{color:var(--text);font-weight:700;letter-spacing:.6px;}
+.dots-signature .sig-name{
+  display:block;font-size:9px;font-weight:400;
+  opacity:.75;letter-spacing:.3px;margin-top:1px;
+}
+
+/* ── HERO STATS (inside slide 0) ── */
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.hero-stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px;
+}
+.hero-stat-n{font-size:24px;font-weight:800;line-height:1;}
+.hero-stat-l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
+.status-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:#dcfce7;border:1px solid #86efac;color:#166534;
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;
+  margin-bottom:24px;
+}
+.status-badge.live{background:#fee2e2;border-color:#fca5a5;color:#991b1b;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+
+/* ── SECTION HEADERS WITHIN SLIDE ── */
+.sec-h{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:24px 0 12px;}
+
+/* ── CHIPS ── */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.chip{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;flex:1;min-width:130px;
+}
+.chip-n{font-size:22px;font-weight:800;}
+.chip-l{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* ── TAGS ── */
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:5px;}
+.tag-d{background:#dcfce7;color:#166534;}
+.tag-a{background:#dbeafe;color:#1d4ed8;}
+.tag-i{background:#f3e8ff;color:#6b21a8;}
+.tag-new{background:#fef3c7;color:#92400e;}
+
+/* ── MILESTONES ── */
+.milestone{border-left:3px solid var(--border);padding:12px 0 12px 16px;margin-bottom:10px;}
+.milestone.demonstrated{border-left-color:#34a853;}
+.milestone.announced{border-left-color:#4285f4;}
+.milestone.inferred{border-left-color:#9b59b6;}
+.ms-date{font-size:11px;color:var(--muted);font-weight:600;}
+.ms-event{font-size:14px;font-weight:600;margin:3px 0;line-height:1.4;}
+.ms-sig{font-size:12px;color:var(--muted);line-height:1.55;}
+.ms-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+
+/* ── BENCH TABLE ── */
+.bench-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px;}
+.bench{width:100%;border-collapse:collapse;min-width:520px;}
+.bench th{background:#f8fafc;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.bench td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.bench tr:hover td{background:#f8fafc;}
+.bench .provider-google{color:#4285f4;font-weight:700;}
+.bench .provider-openai{color:#10a37f;font-weight:700;}
+.bench .provider-anthropic{color:#cf6679;font-weight:700;}
+.score-bar-wrap{display:flex;align-items:center;gap:6px;}
+.score-bar{height:6px;border-radius:3px;min-width:4px;}
+.score-val{font-size:12px;font-weight:600;white-space:nowrap;}
+.winner{background:#fefce8;}
+
+/* ── WATCH CARDS ── */
+.watch-grid{display:flex;flex-direction:column;gap:12px;}
+.watch-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.watch-area{font-size:15px;font-weight:700;margin-bottom:8px;line-height:1.4;}
+.watch-context{font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6;}
+.watch-signal{font-size:12px;padding:8px 12px;border-radius:8px;margin-top:8px;line-height:1.55;}
+.conf-bar{height:4px;border-radius:2px;background:var(--border);margin-bottom:6px;}
+.conf-fill{height:4px;border-radius:2px;}
+.conf-label{font-size:11px;color:var(--muted);margin-bottom:10px;}
+
+/* ── DISPLACEMENT ── */
+.displacement-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.dis-source{font-weight:700;font-size:13px;flex:1;min-width:180px;}
+.dis-arrow{color:var(--red);font-size:16px;margin-top:2px;}
+.dis-targets{display:flex;gap:6px;flex-wrap:wrap;}
+.dis-chip{font-size:11px;background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:3px 10px;border-radius:5px;}
+
+/* ── LIVE STATS ── */
+.live-chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.live-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.live-chip.threat{border-color:#fca5a5;}
+.live-chip.threat .lc-val{color:var(--red);}
+.lc-icon{font-size:20px;flex-shrink:0;}
+.lc-val{font-size:20px;font-weight:800;line-height:1;}
+.lc-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+
+/* ── SPOTLIGHT ── */
+.live-spotlight{border-left:4px solid var(--google-blue);background:var(--card);border:1px solid var(--border);border-left-width:4px;border-radius:0 14px 14px 0;padding:16px;margin-bottom:16px;}
+.sp-eyebrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+.sp-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 10px;border-radius:10px;color:#fff;}
+.sp-entity{font-size:11px;font-weight:600;padding:3px 9px;border-radius:8px;}
+.sp-date{font-size:11px;color:var(--muted);background:rgba(100,116,139,.1);padding:3px 9px;border-radius:8px;}
+.sp-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:8px;}
+.sp-sig{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+
+/* ── SIGNAL / RIPPLE ── */
+.signal-box{background:#eff6ff;border:1px solid #bfdbfe;border-left:3px solid var(--google-blue);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:10px;}
+.signal-box-label{font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:#1d4ed8;margin-bottom:4px;}
+.signal-box-text{font-size:12px;color:#1e40af;line-height:1.6;}
+.ripple-box{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:10px;}
+.ripple-box-label{font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:700;color:var(--muted);margin-bottom:4px;}
+.ripple-box-text{font-size:12px;color:#64748b;line-height:1.6;}
+.live-dis-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.live-dis-tag{font-size:11px;font-weight:600;background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;padding:3px 10px;border-radius:20px;}
+
+/* ── CAT FILTER ── */
+.live-cat-filter{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.live-filter-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.lf-pill{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;color:var(--muted);min-height:32px;}
+.lf-pill.on{color:#fff;}
+
+/* ── CAT GROUPS ── */
+.live-cat-group{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.live-cat-group.hidden{display:none;}
+.live-cat-hdr{display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;background:#f8fafc;border-bottom:1px solid var(--border);user-select:none;transition:background .12s;min-height:48px;}
+.live-cat-hdr:hover{background:#f1f5f9;}
+.live-cat-group.collapsed .live-cat-hdr{border-bottom-color:transparent;}
+.live-cat-group.collapsed .live-cat-cards{display:none;}
+.cat-hdr-icon{font-size:16px;}
+.cat-hdr-name{font-size:14px;font-weight:700;flex:1;}
+.cat-hdr-count{font-size:11px;font-weight:700;color:#fff;padding:2px 9px;border-radius:10px;}
+.cat-hdr-chev{font-size:11px;color:var(--muted);transition:transform .2s;}
+.live-cat-group.collapsed .cat-hdr-chev{transform:rotate(-90deg);}
+.live-cat-cards{padding:8px;display:flex;flex-direction:column;gap:6px;}
+
+/* ── LIVE CARDS ── */
+.live-card{border:1px solid #edf1f7;border-radius:10px;overflow:hidden;background:#fff;cursor:pointer;transition:border-color .12s,box-shadow .12s;}
+.live-card:hover{border-color:#bfdbfe;box-shadow:0 1px 6px rgba(66,133,244,.08);}
+.live-card.expanded{border-color:#93c5fd;}
+.lc-row{display:flex;align-items:center;gap:9px;padding:12px;min-height:52px;}
+.lc-stripe{width:3px;align-self:stretch;border-radius:2px;flex-shrink:0;min-height:20px;}
+.lc-date{font-size:11px;color:var(--muted);white-space:nowrap;min-width:42px;font-variant-numeric:tabular-nums;}
+.lc-title{font-size:14px;font-weight:600;color:var(--text);flex:1;line-height:1.4;}
+.lc-meta{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.pips{display:flex;gap:2px;}
+.pip{width:5px;height:5px;border-radius:50%;background:var(--border);}
+.pip.on{background:var(--warn);}
+.pred-tag{font-size:10px;font-weight:700;background:#dcfce7;color:#166534;border:1px solid #86efac;padding:2px 8px;border-radius:6px;white-space:nowrap;}
+.live-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 2s ease-in-out infinite;}
+.chev{font-size:10px;color:#94a3b8;transition:transform .2s;flex-shrink:0;}
+.live-card.expanded .chev{transform:rotate(180deg);}
+.lc-detail{display:none;padding:14px 16px 16px;background:#fafbfd;border-top:1px dashed var(--border);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.live-card.expanded .lc-detail{display:block;animation:fadeIn .15s ease-out;}
+.lc-sig{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+.lc-signal{background:#eff6ff;border-left:3px solid var(--google-blue);border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:9px;font-size:12px;color:#1e40af;line-height:1.6;}
+.lc-signal-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:#1d4ed8;margin-bottom:3px;}
+.lc-ripple{background:#f8fafc;border:1px solid var(--border);border-radius:6px;padding:8px 11px;margin-bottom:9px;font-size:12px;color:#64748b;line-height:1.6;}
+.lc-ripple-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.6px;font-weight:700;color:var(--muted);margin-bottom:3px;}
+.lc-footer{display:flex;gap:5px;flex-wrap:wrap;align-items:center;padding-top:8px;border-top:1px solid #edf1f7;margin-top:8px;}
+
+/* ── BRIEF ── */
+.brief-status{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.brief-status .live-now{color:#991b1b;font-weight:700;background:#fee2e2;border:1px solid #fca5a5;padding:2px 9px;border-radius:10px;margin-right:6px;}
+.brief-status .upcoming{color:#92400e;font-weight:700;background:#fef3c7;border:1px solid #fde68a;padding:2px 9px;border-radius:10px;margin-right:6px;}
+.brief-block{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;}
+.brief-h{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.brief-h-count{font-size:10px;font-weight:600;color:#fff;padding:1px 7px;border-radius:8px;background:var(--muted);}
+.brief-headline{font-size:17px;font-weight:700;line-height:1.4;color:var(--text);margin-bottom:10px;}
+.brief-prose{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+.brief-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.brief-stat{background:#f8fafc;border-radius:8px;padding:10px 12px;}
+.brief-stat-n{font-size:18px;font-weight:700;color:var(--text);line-height:1;}
+.brief-stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:3px;}
+.theme-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.theme-row:last-child{border-bottom:none;}
+.theme-bullet{width:8px;height:8px;border-radius:50%;margin-top:7px;flex-shrink:0;}
+.theme-body{flex:1;}
+.theme-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;text-transform:capitalize;}
+.theme-evidence{font-size:12px;color:var(--muted);line-height:1.55;}
+.theme-pop{font-size:10px;font-weight:600;color:#fff;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:middle;}
+.chain-row{display:grid;grid-template-columns:1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);}
+.chain-row:last-child{border-bottom:none;}
+.chain-cell{background:#f8fafc;border-radius:6px;padding:8px 10px;}
+.chain-cell-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.chain-cell-title{font-size:12px;font-weight:600;color:var(--text);}
+.chain-cell-tags{font-size:10px;color:var(--muted);margin-top:3px;}
+.chain-arrow{color:var(--indigo);font-size:16px;font-weight:700;text-align:left;padding-left:12px;}
+.dis-rollup{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.dis-rollup:last-child{border-bottom:none;}
+.dis-rollup-name{font-weight:700;font-size:13px;min-width:130px;color:#991b1b;}
+.dis-rollup-bar{flex:1;height:6px;background:#fee2e2;border-radius:3px;overflow:hidden;}
+.dis-rollup-fill{height:100%;background:var(--red);border-radius:3px;}
+.dis-rollup-count{font-size:11px;color:var(--muted);white-space:nowrap;}
+.cite-list{display:flex;flex-direction:column;}
+.cite-item{font-size:12px;line-height:1.65;color:var(--muted);padding:6px 0;border-bottom:1px dotted var(--border);}
+.cite-item-date{font-variant-numeric:tabular-nums;margin-right:8px;font-weight:600;}
+
+/* ── INDICATORS ── */
+.live-indicator{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;background:#fee2e2;border:1px solid #fca5a5;color:#991b1b;font-size:11px;font-weight:700;}
+.live-indicator .live-pulse{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 1.5s ease-in-out infinite;}
+.new-badge{display:inline-block;font-size:9px;font-weight:800;background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:1px 7px;border-radius:10px;margin-right:4px;vertical-align:middle;text-transform:uppercase;letter-spacing:.3px;animation:pulse 2s ease-in-out infinite;}
+.freshness-ts{font-size:10px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;background:rgba(100,116,139,.08);border:1px solid var(--border);}
+
+/* ── EMPTY / LOADING ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.empty-body{font-size:13px;max-width:360px;margin:0 auto;line-height:1.6;}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #e2e8f0;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{color:var(--muted);font-size:13px;padding:20px 0;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(60px + env(safe-area-inset-bottom,0px));
+  right:16px;left:16px;z-index:9999;
+  background:#1e293b;color:#f1f5f9;border-radius:12px;
+  padding:14px 18px;font-size:14px;font-weight:600;
+  box-shadow:0 4px 24px rgba(0,0,0,.22);
+  transform:translateY(80px);opacity:0;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;
+  pointer-events:none;text-align:center;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-icon{margin-right:6px;}
+
+/* ── DARK MODE ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--card:#161b22;--border:#30363d;
+  --text:#c9d1d9;--muted:#8b949e;color-scheme:dark;
+  --indigo:#a5b4fc;--accent:#60a5fa;--google-blue:#60a5fa;
+}
+[data-theme="dark"] body{background:var(--bg);}
+[data-theme="dark"] .slide{background:var(--bg);}
+[data-theme="dark"] .edition-bar{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .esb-label{border-color:#30363d;}
+[data-theme="dark"] .slide-tabs{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .slide-tab:hover{color:#c9d1d9;}
+[data-theme="dark"] .slide-dots{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .dot{background:#30363d;}
+[data-theme="dark"] .hero-stat-card{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .chip{background:#1c2128;border-color:#30363d;}
+[data-theme="dark"] .status-badge{background:#1c2128;border-color:#30363d;color:#c9d1d9;}
+[data-theme="dark"] .status-badge.live{background:rgba(153,27,27,.25);border-color:#fca5a5;}
+[data-theme="dark"] .bench th{background:#1c2128;}
+[data-theme="dark"] .bench tr:hover td{background:#1c2128;}
+[data-theme="dark"] .bench td{border-color:#30363d;}
+[data-theme="dark"] .bench .provider-google{color:#79c0ff;}
+[data-theme="dark"] .bench .provider-openai{color:#56d364;}
+[data-theme="dark"] .bench .provider-anthropic{color:#f0a8d0;}
+[data-theme="dark"] .watch-card{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .watch-context{color:#8b949e;}
+[data-theme="dark"] .watch-signal{background:rgba(29,42,90,.7);border-color:#1d4ed8;color:#93c5fd;}
+[data-theme="dark"] .live-card{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .live-card:hover{border-color:#388bfd40;}
+[data-theme="dark"] .lc-detail{background:#0d1117;border-color:#30363d;}
+[data-theme="dark"] .lc-sig{color:#8b949e;}
+[data-theme="dark"] .lc-signal{background:rgba(29,42,90,.7);}
+[data-theme="dark"] .lc-signal-lbl{color:#93c5fd;}
+[data-theme="dark"] .lc-ripple{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .live-cat-group{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .live-cat-hdr{background:#1c2128;border-color:#30363d;}
+[data-theme="dark"] .live-cat-hdr:hover{background:#21262d;}
+[data-theme="dark"] .live-spotlight{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .signal-box{background:rgba(29,42,90,.6);border-color:#1d4ed8;}
+[data-theme="dark"] .signal-box-label{color:#93c5fd;}
+[data-theme="dark"] .signal-box-text{color:#93c5fd;}
+[data-theme="dark"] .ripple-box{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .ripple-box-text{color:#8b949e;}
+[data-theme="dark"] .lf-pill{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .brief-block{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .brief-stat{background:#1c2128;}
+[data-theme="dark"] .brief-prose{color:#8b949e;}
+[data-theme="dark"] .chain-cell{background:#1c2128;}
+[data-theme="dark"] .ms-sig{color:#8b949e;}
+[data-theme="dark"] .dis-rollup-name{color:#ff7b72;}
+[data-theme="dark"] .dis-chip{background:rgba(248,81,73,.15);border-color:#ff7b7260;color:#ff7b72;}
+[data-theme="dark"] .live-dis-tag{background:rgba(248,81,73,.15);border-color:#ff7b7260;color:#ff7b72;}
+[data-theme="dark"] .tag-d{background:rgba(52,168,83,.2);color:#56d364;border-color:transparent;}
+[data-theme="dark"] .tag-a{background:rgba(66,133,244,.2);color:#79c0ff;border-color:transparent;}
+[data-theme="dark"] .tag-i{background:rgba(188,100,255,.2);color:#d2a8ff;border-color:transparent;}
+[data-theme="dark"] .tag-new{background:rgba(220,160,10,.2);color:#e3b341;border-color:transparent;}
+[data-theme="dark"] .freshness-ts{background:rgba(255,255,255,.04);border-color:#30363d;}
+[data-theme="dark"] code{background:rgba(255,255,255,.08);color:#a5f3fc;border-radius:3px;padding:0 3px;}
+[data-theme="dark"] .winner{background:rgba(250,252,8,.05);}
+[data-theme="dark"] .persona-bar{background:#0d1117;}
+[data-theme="dark"] .lc-busi{background:rgba(13,148,136,.1);border-color:#0f766e;}
+[data-theme="dark"] .per-b,[data-theme="dark"] .per-i,[data-theme="dark"] .per-d{color:#99f6e4;}
+[data-theme="dark"] .pitch-btn{background:rgba(66,133,244,.12);color:#60a5fa;}
+[data-theme="dark"] .pitch-btn:hover{background:rgba(66,133,244,.22);}
+
+/* ── PERSONA BAR ── */
+.persona-bar{
+  flex-shrink:0;background:#0f172a;padding:8px 16px;
+  display:flex;gap:8px;overflow-x:auto;align-items:center;
+  -ms-overflow-style:none;scrollbar-width:none;z-index:20;
+}
+.persona-bar::-webkit-scrollbar{display:none;}
+.pb-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 14px;border-radius:20px;
+  border:1.5px solid rgba(255,255,255,.18);background:none;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .15s;white-space:nowrap;
+  min-height:28px;flex-shrink:0;color:#94a3b8;
+}
+.pb-btn:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.3);}
+.pb-btn.on{color:#fff;}
+.pb-btn[data-p="business"].on{background:#1d4ed8;border-color:#1d4ed8;}
+.pb-btn[data-p="insurance"].on{background:#0891b2;border-color:#0891b2;}
+.pb-btn[data-p="data"].on{background:#059669;border-color:#059669;}
+
+/* ── LC-BUSI (live card business block) ── */
+.lc-busi{
+  background:rgba(13,148,136,.08);
+  border-left:3px solid #0d9488;
+  border-radius:0 6px 6px 0;
+  padding:8px 12px;margin-top:8px;margin-bottom:2px;
+  font-size:12px;line-height:1.6;
+}
+.lc-busi-lbl{
+  font-size:9px;text-transform:uppercase;letter-spacing:.6px;
+  font-weight:700;color:#0d9488;margin-bottom:3px;
+}
+.per-b,.per-i,.per-d{display:none;color:var(--text);line-height:1.6;}
+body[data-persona="business"] .per-b{display:block;}
+body[data-persona="insurance"] .per-i{display:block;}
+body[data-persona="data"] .per-d{display:block;}
+body:not([data-persona]) .lc-busi{display:none;}
+
+/* ── PITCH BTN ── */
+.pitch-btn{
+  background:rgba(66,133,244,.1);color:#4285f4;
+  border:none;border-radius:6px;
+  padding:4px 10px;font-size:11px;cursor:pointer;
+  transition:background .12s;white-space:nowrap;
+}
+.pitch-btn:hover{background:rgba(66,133,244,.2);}
+body:not([data-persona]) .pitch-btn{display:none;}
+
+/* ── WATCH PERSONA LABEL ── */
+.watch-persona-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  margin-bottom:6px;padding:3px 8px;border-radius:4px;display:inline-block;
+}
+
+/* ── DESKTOP ── */
+@media(min-width:768px){
+  body{font-size:14px;}
+  .slide-inner{padding:32px;max-width:1000px;margin:0 auto;}
+  .slide-title{font-size:32px;}
+  .slide-sub{font-size:15px;}
+  .hero-stats{grid-template-columns:repeat(4,1fr);}
+  .esb-meta{display:block;}
+  .watch-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .brief-stats{grid-template-columns:repeat(4,1fr);}
+  .chain-row{grid-template-columns:1fr auto 1fr;}
+  .chain-arrow{text-align:center;padding-left:0;}
+  .cite-list{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
+  .live-chips{grid-template-columns:repeat(4,1fr);}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html" class="hdr-brand">
+    <span class="hdr-icon">🔵</span>
+    <div>
+      <div class="hdr-name">Google I/O Tracker</div>
+      <div class="hdr-tag">2026 · Live Intel</div>
+    </div>
+  </a>
+  <div class="hdr-actions">
+    <button class="hdr-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+    <button class="hdr-btn" id="reload-btn" onclick="reload()">↺ Refresh</button>
+  </div>
+</header>
+
+<div class="edition-bar">
+  <span class="esb-label">🔵 Edition</span>
+  <div class="esb-pills" id="event-pills">
+    <div class="loading-msg"><span class="spinner"></span>Loading…</div>
+  </div>
+  <div class="esb-meta" id="esb-meta"></div>
+</div>
+
+<div class="live-banner" id="live-banner">
+  <div class="live-banner-pulse"></div>
+  <div class="live-banner-text" id="live-banner-text"></div>
+  <button class="live-banner-dismiss" onclick="document.getElementById('live-banner').classList.remove('visible')" title="Dismiss">×</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- PERSONA TOGGLE BAR -->
+<div class="persona-bar" id="persona-bar">
+  <button class="pb-btn" data-p="business" onclick="setPersona('business')" title="Enterprise impact lens">💼 Business Impact</button>
+  <button class="pb-btn" data-p="insurance" onclick="setPersona('insurance')" title="Insurance &amp; risk lens">☂️ Insurance Consultant</button>
+  <button class="pb-btn" data-p="data" onclick="setPersona('data')" title="Technical deep-dive">📊 Data Nerd</button>
+</div>
+
+<!-- TAB PILLS (click to jump to a slide) -->
+<nav class="slide-tabs" id="slide-tabs" aria-label="Sections">
+  <button class="slide-tab active" data-idx="0" onclick="goToSlide(0,this)">📊 Today</button>
+  <button class="slide-tab" data-idx="1" onclick="goToSlide(1,this)">🔭 To Watch</button>
+  <button class="slide-tab" data-idx="2" onclick="goToSlide(2,this)">⚡ Rankings</button>
+  <button class="slide-tab" data-idx="3" onclick="goToSlide(3,this)">🔴 Live <span id="live-count" class="tab-badge" style="display:none"></span></button>
+  <button class="slide-tab" data-idx="4" onclick="goToSlide(4,this)">📋 Story</button>
+  <button class="slide-tab" data-idx="5" onclick="goToSlide(5,this)">🌊 Pressure</button>
+</nav>
+
+<!-- SWIPE DECK -->
+<div class="slides" id="slides">
+
+  <!-- Slide 0: Today (Where Google Stands) -->
+  <section class="slide" id="slide-0" aria-labelledby="slide-0-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Pre-event context</div>
+      <h1 class="slide-title" id="slide-0-title">Where Google Stands</h1>
+      <p class="slide-sub" id="going-in-sub">A quick read on Google's recent moves — the backdrop for everything coming at I/O 2026.</p>
+
+      <div class="hero-stats">
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Announcements tracked</div></div>
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-events">—</div><div class="hero-stat-l">Editions covered</div></div>
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-ev-total">—</div><div class="hero-stat-l">Total items</div></div>
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-new">—</div><div class="hero-stat-l">New in 24 h</div></div>
+      </div>
+      <div class="status-badge" id="status-badge">
+        <div class="status-dot"></div>
+        <span id="status-text">Loading event data…</span>
+      </div>
+
+      <h2 class="sec-h" id="going-in-title">Google's Recent Moves</h2>
+      <div class="chips" id="google-chips"><div class="loading-msg"><span class="spinner"></span>Loading…</div></div>
+
+      <h2 class="sec-h">Latest announcements</h2>
+      <div id="recent-milestones"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
+
+      <h2 class="sec-h" id="model-line-title">Model line</h2>
+      <div id="gemini-models"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
+
+      <h2 class="sec-h">Key metrics</h2>
+      <div id="google-metrics"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
+    </div>
+  </section>
+
+  <!-- Slide 1: To Watch (Predictions) -->
+  <section class="slide" id="slide-1" aria-labelledby="slide-1-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Predictions</div>
+      <h1 class="slide-title" id="slide-1-title"><span id="watch-title">What To Watch For</span></h1>
+      <p class="slide-sub" id="watch-sub">What's likely on the stage — based on past patterns, competitor pressure, and gaps in Google's lineup.</p>
+      <div class="watch-grid" id="watch-cards"></div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Rankings (Benchmarks) -->
+  <section class="slide" id="slide-2" aria-labelledby="slide-2-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Competitive landscape</div>
+      <h1 class="slide-title" id="slide-2-title">How Models Stack Up</h1>
+      <p class="slide-sub">Where Gemini sits versus Claude and GPT today — the field Google has to beat. Scroll the table sideways to see all columns.</p>
+      <div class="bench-wrap">
+        <table class="bench">
+          <thead><tr><th>Model</th><th>Provider</th><th>GPQA</th><th>MATH</th><th>HumanEval</th><th>SWE-bench</th><th>Context</th><th>$/M out</th></tr></thead>
+          <tbody id="bench-body"><tr><td colspan="8" class="loading-msg"><span class="spinner"></span>Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Live (real-time tracker) -->
+  <section class="slide" id="slide-3" aria-labelledby="slide-3-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Live tracker <span class="freshness-ts" id="freshness-ts" style="display:none">Updated just now</span></div>
+      <h1 class="slide-title" id="slide-3-title">Live Updates <span id="live-active-label" style="font-size:14px;font-weight:500;color:var(--muted)"></span></h1>
+      <p class="slide-sub">Announcements landing in real time, grouped by area. Tap any item to read why it matters.</p>
+      <div id="live-updates"><div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div></div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Story (Synthesis Brief) -->
+  <section class="slide" id="slide-4" aria-labelledby="slide-4-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Synthesis <span id="brief-active-label" style="font-size:11px;color:var(--muted)"></span></div>
+      <h1 class="slide-title" id="slide-4-title">The Story So Far</h1>
+      <p class="slide-sub">An analyst read — what's big, what's a pattern, who's under pressure. Generated from the same announcements you see on the Live slide.</p>
+      <div class="brief-status" id="brief-status"></div>
+      <div id="brief-body"><div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Loading…</div></div></div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Pressure (Impact Map) -->
+  <section class="slide" id="slide-5" aria-labelledby="slide-5-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Competitive pressure</div>
+      <h1 class="slide-title" id="slide-5-title"><span id="impact-title">Who's Pressuring Whom</span></h1>
+      <p class="slide-sub" id="impact-sub">Where Google is putting competitors on the back foot — and where rivals are pushing back. Pulled from competitive callouts across every tracked company.</p>
+      <div id="impact-map"><div class="loading-msg"><span class="spinner"></span>Loading…</div></div>
+    </div>
+  </section>
+
+</div><!-- /slides -->
+
+<!-- DOTS INDICATOR + SIGNATURE -->
+<div class="slide-dots" id="slide-dots">
+  <div class="dots-row">
+    <button class="dot active" onclick="goToSlide(0)" aria-label="Today"></button>
+    <button class="dot" onclick="goToSlide(1)" aria-label="To Watch"></button>
+    <button class="dot" onclick="goToSlide(2)" aria-label="Rankings"></button>
+    <button class="dot" onclick="goToSlide(3)" aria-label="Live"></button>
+    <button class="dot" onclick="goToSlide(4)" aria-label="Story"></button>
+    <button class="dot" onclick="goToSlide(5)" aria-label="Pressure"></button>
+  </div>
+  <div class="dots-signature">Curated by <b>Nous AI</b><span class="sig-name">Vignesh Bhaskarraj</span></div>
+</div>
+
+<script>
+const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
+const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
+const HDR = { apikey: KEY, Authorization: 'Bearer ' + KEY };
+let _eMap = {};
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+async function get(t, q=''){
+  const r = await fetch(`${SB}/rest/v1/${t}?${q}`,{headers:HDR});
+  if(!r.ok) throw new Error(`${t} ${r.status}`);
+  return r.json();
+}
+async function getAllMF(){
+  let rows=[], off=0;
+  while(true){ const b=await get('model_features',`select=*&limit=1000&offset=${off}`); rows=rows.concat(b); if(b.length<1000) break; off+=1000; }
+  return rows;
+}
+
+/* ── SLIDE NAVIGATION ── */
+const SLIDE_COUNT = 6;
+let _activeSlideIdx = 0;
+let _isManualScroll = false;
+let _activePersona = null;
+let _cachedLiveData = null;
+
+function setPersona(p){
+  _activePersona = (_activePersona === p) ? null : p;
+  if(_activePersona) document.body.setAttribute('data-persona', _activePersona);
+  else document.body.removeAttribute('data-persona');
+  document.querySelectorAll('.pb-btn').forEach(b=>{ b.classList.toggle('on', b.dataset.p === _activePersona); });
+  if(_activeEv){ const ev=EVENTS.find(e=>e.key===_activeEv); if(ev) renderWatch(ev); }
+  if(_cachedLiveData) renderLive(_cachedLiveData.updates, _cachedLiveData.ev);
+}
+
+function setActiveSlide(idx){
+  _activeSlideIdx = idx;
+  document.querySelectorAll('.slide-tab').forEach((b,i)=>b.classList.toggle('active', i===idx));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+  // Scroll the active tab pill into view in case it's offscreen
+  const activeTab = document.querySelector('.slide-tab.active');
+  if(activeTab) activeTab.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+}
+
+function goToSlide(idx, btn){
+  const slides = document.getElementById('slides');
+  const slide = document.getElementById('slide-'+idx);
+  if(!slides || !slide) return;
+  _isManualScroll = true;
+  // scrollIntoView with inline:start scrolls horizontally to that slide
+  slide.scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+  setActiveSlide(idx);
+  setTimeout(()=>{ _isManualScroll = false; }, 600);
+}
+
+// Track active slide as user swipes
+function setupSlideObserver(){
+  const slides = document.getElementById('slides');
+  if(!slides) return;
+  // Use scroll event with throttle — IntersectionObserver with horizontal scroll
+  // root has some quirks across browsers, this is more reliable
+  let scrollTimer = null;
+  slides.addEventListener('scroll', ()=>{
+    if(_isManualScroll) return;
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{
+      const idx = Math.round(slides.scrollLeft / slides.clientWidth);
+      if(idx !== _activeSlideIdx && idx >= 0 && idx < SLIDE_COUNT){
+        setActiveSlide(idx);
+      }
+    }, 80);
+  }, {passive:true});
+}
+
+function claimTag(ct){
+  if(ct==='demonstrated') return `<span class="tag tag-d">shipped</span>`;
+  if(ct==='announced')    return `<span class="tag tag-a">announced</span>`;
+  if(ct==='inferred')     return `<span class="tag tag-i">expected</span>`;
+  return '';
+}
+function scoreBar(val, max, color){
+  if(!val||val==='N/A') return '<span style="color:var(--muted)">—</span>';
+  const n=parseFloat(val); if(isNaN(n)) return `<span style="font-size:12px">${esc(val)}</span>`;
+  return `<div class="score-bar-wrap"><div class="score-bar" style="width:${Math.min(100,(n/max)*100)}px;max-width:80px;background:${color}"></div><span class="score-val" style="color:${color}">${n}%</span></div>`;
+}
+
+/* ── EVENT DATA ── */
+const EVENTS = [
+  { key:'google-io', label:'Google I/O 2026', pattern:'I/O 2026', color:'#4285f4', icon:'🔵', date:'May 19–20, 2026', liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
+];
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function isLiveNow(ev){ return (ev.liveDates||[]).includes(todayISO()); }
+function daysUntilLive(ev){
+  if(!ev.liveDates?.length) return null;
+  const today=new Date(todayISO());
+  const first=new Date(ev.liveDates[0]);
+  const diff=Math.round((first-today)/(86400*1000));
+  return diff>0 ? diff : null;
+}
+
+const LIVE_CATS = {
+  'Models':           {icon:'🧠',color:'#4f46e5',tags:['model-release','frontier-model','reasoning','gemini','thinking','vision','coding','flash','pro','ultra']},
+  'Android & OS':     {icon:'📱',color:'#059669',tags:['android','android-17','gemini-intelligence','mobile','rambler','widget','os','chrome','gemini-nano']},
+  'Infrastructure':   {icon:'⚡',color:'#0891b2',tags:['tpu','hardware','inference','training','custom-silicon','silicon','a2a','protocol','standards','interoperability']},
+  'Enterprise':       {icon:'🏢',color:'#7c3aed',tags:['agent-platform','enterprise','vertex-ai','workspace','cloud','agentspace','governance','no-code','agent-gateway']},
+  'Developer Tools':  {icon:'🔧',color:'#d97706',tags:['firebase','adk','mcp','sdk','api','tools','genkit','developer','studio']},
+  'Hardware & XR':    {icon:'🥽',color:'#dc2626',tags:['xr','glasses','device','googlebooks','beam','pixel','spatial']},
+  'Creative AI':      {icon:'🎨',color:'#be185d',tags:['veo','imagen','lyria','video','audio','generative-media','music']},
+};
+
+const PREDS = [
+  {short:'Ultra',      tags:['gemini','ultra','flagship','frontier-model']},
+  {short:'Agents',     tags:['agent','mariner','agentic','agent-platform','computer-use']},
+  {short:'Cheaper',    tags:['flash','pricing','cost','price-drop']},
+  {short:'Long memory',tags:['long-context','context','million-token']},
+  {short:'Multimodal', tags:['multimodal','video','audio','live-api','native-audio']},
+  {short:'Research',   tags:['research','veo','alphafold','lyria','deepmind-research']},
+];
+
+let _allEvMs = [], _activeEv = null, _cardSeq = 0;
+let _allModels = [], _allMsDis = [];
+
+function inferCat(m){
+  const tags=(m.tags||[]).map(t=>String(t).toLowerCase()); const ev=(m.event||'').toLowerCase();
+  for(const [cat,cfg] of Object.entries(LIVE_CATS)) if(cfg.tags.some(t=>tags.includes(t)||ev.includes(t))) return cat;
+  const sl=(m.stack_layer||'').toLowerCase();
+  return sl==='model'?'Models':sl==='infrastructure'?'Infrastructure':'Enterprise';
+}
+function getPred(m){
+  const tags=(m.tags||[]).map(t=>String(t).toLowerCase()); const ev=(m.event||'').toLowerCase();
+  return PREDS.find(p=>p.tags.some(t=>tags.includes(t)||ev.includes(t)));
+}
+function pips(n){ return `<div class="pips" title="Impact ${n||0} of 5">${Array.from({length:5},(_,i)=>`<div class="pip${i<(n||0)?' on':''}"></div>`).join('')}</div>`; }
+function disTags(arr){ if(!arr||!arr.length) return ''; return `<div class="live-dis-row">${arr.map(e=>`<span class="live-dis-tag">⚠ ${esc(e)}</span>`).join('')}</div>`; }
+
+function msForEvent(ev){
+  return _allEvMs.filter(m=>m.source_event&&m.source_event.toLowerCase().includes(ev.pattern.toLowerCase()));
+}
+
+function pickDefaultEvent(){
+  let best=null, bestDate='', bestCount=-1;
+  EVENTS.forEach(ev=>{
+    const ms=msForEvent(ev);
+    if(!ms.length) return;
+    const maxDate=ms.reduce((a,m)=>(m.date||'')>a?(m.date||''):a,'');
+    if(maxDate>bestDate || (maxDate===bestDate && ms.length>bestCount)){
+      best=ev; bestDate=maxDate; bestCount=ms.length;
+    }
+  });
+  return best ? best.key : EVENTS[0].key;
+}
+
+function buildEventPills(){
+  const html = EVENTS.map(ev=>{
+    const n = msForEvent(ev).length;
+    const isOn = ev.key===_activeEv;
+    return `<button class="event-pill${isOn?' on':''}" id="ep-${ev.key}" onclick="setEvent('${ev.key}')"
+      style="${isOn?`background:${ev.color};border-color:${ev.color};`:`color:${ev.color};border-color:${ev.color}30;`}">
+      ${ev.icon} ${ev.label}<span class="ep-count">${n}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('event-pills').innerHTML = html;
+}
+
+function setEvent(key){
+  _activeEv = key;
+  const ev = EVENTS.find(e=>e.key===key);
+  EVENTS.forEach(e=>{
+    const btn=document.getElementById('ep-'+e.key); if(!btn) return;
+    if(e.key===key){ btn.classList.add('on'); btn.style.background=e.color; btn.style.borderColor=e.color; btn.style.color='#fff'; }
+    else { btn.classList.remove('on'); btn.style.background=''; btn.style.borderColor=e.color+'30'; btn.style.color=e.color; }
+  });
+  const meta=document.getElementById('esb-meta');
+  if(meta && ev) meta.innerHTML = `<b>${esc(ev.date)}</b> · ${esc(ev.organizer||'—')}`;
+  const lbl=document.getElementById('live-active-label');
+  if(lbl) lbl.textContent = ev ? `· ${ev.label}` : '';
+  const lbl2=document.getElementById('brief-active-label');
+  if(lbl2) lbl2.textContent = ev ? `· ${ev.label}` : '';
+  const ms = msForEvent(ev);
+  renderLive(ms, ev);
+  renderBrief(ms, ev);
+  renderWatch(ev);
+  renderGoingIn(ev);
+  renderImpactMap(ev);
+}
+
+function isNewMilestone(m){
+  if(!m.created_at) return false;
+  return (Date.now()-new Date(m.created_at).getTime()) < 60*60*1000;
+}
+
+function buildCard(m, evColor){
+  const id='lc'+(++_cardSeq);
+  const cat=inferCat(m); const cfg=LIVE_CATS[cat]||{icon:'●',color:'#64748b'};
+  const pred=getPred(m); const ent=_eMap[m.entity_id]?.name||'';
+  const hasDetail=!!(m.significance||m.strategic_signal||m.ripple_effects||(m.displacement_entities||[]).length);
+  const isNew=isNewMilestone(m);
+  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`role="button" tabindex="0" onclick="toggleCard('${id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCard('${id}')}"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
+    <div class="lc-row">
+      <div class="lc-stripe" style="background:${cfg.color}"></div>
+      <span class="lc-date">${(m.date||'').slice(5,10)}</span>
+      <span class="lc-title">${isNew?'<span class="new-badge">new</span>':''}${esc(m.event)}</span>
+      <div class="lc-meta">
+        ${pred?`<span class="pred-tag">✓ ${pred.short}</span>`:''}
+        ${pips(m.forward_implication_score)}
+        <div class="live-dot" style="background:${evColor}"></div>
+      </div>
+      ${hasDetail?`<span class="chev">▼</span>`:''}
+    </div>
+    ${hasDetail?`<div class="lc-detail">
+      ${ent?`<div style="font-size:10px;font-weight:700;color:${evColor};text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">${esc(ent)}</div>`:''}
+      ${m.significance?`<div class="lc-sig">${esc(m.significance)}</div>`:''}
+      ${m.strategic_signal?`<div class="lc-signal"><div class="lc-signal-lbl">💡 Why it matters</div>${esc(m.strategic_signal)}</div>`:''}
+      ${m.ripple_effects?`<div class="lc-ripple"><div class="lc-ripple-lbl">🌊 Knock-on effects</div>${esc(m.ripple_effects)}</div>`:''}
+      ${(()=>{ const bc=getBusiContent(m); return bc?`<div class="lc-busi"><div class="lc-busi-lbl">💼 Business case</div><div class="per-b">${esc(bc.business)}</div><div class="per-i">${esc(bc.insurance)}</div><div class="per-d">${esc(bc.data)}</div></div>`:''; })()}
+      ${disTags(m.displacement_entities)}
+      <div class="lc-footer">
+        ${claimTag(m.claim_type)}
+        ${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.1);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}
+        ${m.sentiment_at_time?`<span class="tag tag-d">${esc(m.sentiment_at_time)}</span>`:''}
+        <button class="pitch-btn" onclick="pitchBoss(event,'${id}')">📋 Pitch boss</button>
+      </div>
+    </div>`:''}
+  </div>`;
+}
+
+function toggleCard(id){ document.getElementById(id)?.classList.toggle('expanded'); }
+function toggleCatGroup(el){ el.classList.toggle('collapsed'); }
+function filterCat(btn, cat, evColor){
+  document.querySelectorAll('.lf-pill').forEach(b=>{ b.classList.remove('on'); b.style.background=''; b.style.borderColor=''; b.style.color=''; });
+  btn.classList.add('on'); btn.style.background=evColor; btn.style.borderColor=evColor; btn.style.color='#fff';
+  const sp=document.querySelector('.live-spotlight'); if(sp) sp.style.display = cat==='all'?'':'none';
+  document.querySelectorAll('.live-cat-group').forEach(g=>g.classList.toggle('hidden', cat!=='all'&&g.dataset.cat!==cat));
+}
+
+function pitchBoss(e, cardId){
+  e.stopPropagation();
+  const card=document.getElementById(cardId); if(!card) return;
+  const titleEl=card.querySelector('.lc-title');
+  const sigEl=card.querySelector('.lc-sig');
+  const busiEl=card.querySelector(_activePersona==='business'?'.per-b':_activePersona==='insurance'?'.per-i':'.per-d');
+  const headline=(titleEl?titleEl.textContent:'').replace('new','').trim();
+  const why=sigEl?sigEl.textContent.trim():'';
+  const busi=busiEl?busiEl.textContent.trim():'';
+  const angle=_activePersona==='insurance'?'Insurance angle':_activePersona==='data'?'Data take':'Business case';
+  const lines=[`📌 Google I/O 2026 — ${headline}`,why?`• Why it matters: ${why}`:'',busi?`• ${angle}: ${busi}`:''].filter(Boolean);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>showToast('<span class="toast-icon">📋</span>Copied to clipboard!')).catch(()=>showToast('<span class="toast-icon">⚠️</span>Copy failed — try selecting text manually'));
+}
+
+/* ── SYNTHESIS HELPERS ── */
+const THEME_STOPWORDS = new Set([
+  'gemini','google','model-release','announced','preview','experimental',
+  'developer','sdk','api','tools','cloud-next'
+]);
+
+function humanizeTheme(tag){ return tag.replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
+
+function clusterThemes(ms){
+  const tagCount={}, tagBack={};
+  ms.forEach(m=>(m.tags||[]).forEach(raw=>{
+    const t=String(raw).toLowerCase();
+    if(THEME_STOPWORDS.has(t)) return;
+    tagCount[t]=(tagCount[t]||0)+1;
+    if(!tagBack[t]) tagBack[t]=[];
+    tagBack[t].push(m);
+  }));
+  return Object.entries(tagCount).filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([tag,count])=>({tag,count,milestones:tagBack[tag]}));
+}
+
+function hardwareToSoftwareChains(ms){
+  const infra=ms.filter(m=>(m.stack_layer||'').toLowerCase()==='infrastructure');
+  const downstream=ms.filter(m=>{ const sl=(m.stack_layer||'').toLowerCase(); return sl==='model'||sl==='application'||sl==='developer tools'; });
+  const chains=[];
+  infra.forEach(src=>{
+    const srcTags=new Set((src.tags||[]).map(t=>String(t).toLowerCase()));
+    downstream.forEach(dst=>{
+      const dstTags=(dst.tags||[]).map(t=>String(t).toLowerCase());
+      const overlap=dstTags.filter(t=>srcTags.has(t)&&!THEME_STOPWORDS.has(t));
+      if(overlap.length>=1) chains.push({src,dst,overlap});
+    });
+  });
+  const seen=new Set();
+  return chains.sort((a,b)=>b.overlap.length-a.overlap.length).filter(c=>{ const k=c.src.id+':'+c.dst.id; if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,6);
+}
+
+function displacementRollup(ms){
+  const counts={}, back={};
+  ms.forEach(m=>(m.displacement_entities||[]).forEach(e=>{ counts[e]=(counts[e]||0)+1; if(!back[e]) back[e]=[]; back[e].push(m); }));
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([name,count])=>({name,count,milestones:back[name]}));
+}
+
+function dominantCategory(ms){
+  const cnt={}; ms.forEach(m=>{ const c=inferCat(m); cnt[c]=(cnt[c]||0)+1; });
+  return Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+}
+
+function liveStatusFor(ev){
+  if(isLiveNow(ev)) return `<span class="live-now">● LIVE NOW</span> Auto-refresh every 5 min during ${esc(ev.date)}.`;
+  const d=daysUntilLive(ev);
+  if(d!==null) return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} is scheduled for ${esc(ev.date)}. Auto-refresh kicks in on day one.`;
+  if(ev.liveDates?.length===0) return `Past event · ${esc(ev.date)}. Showing the historical record.`;
+  return '';
+}
+
+function renderBrief(ms, ev){
+  const el=document.getElementById('brief-body');
+  const status=document.getElementById('brief-status');
+  if(status) status.innerHTML = liveStatusFor(ev);
+  if(!ms.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Nothing to summarise yet</div><div class="empty-body">Announcements will populate this view as they land. Check the Live slide for real-time updates.</div></div>`;
+    return;
+  }
+  const evColor=ev?.color||'#4f46e5';
+  const top=[...ms].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0))[0];
+  const highSig=ms.filter(m=>(m.forward_implication_score||0)>=4).length;
+  const claimCounts={demonstrated:ms.filter(m=>m.claim_type==='demonstrated').length,announced:ms.filter(m=>m.claim_type==='announced').length,inferred:ms.filter(m=>m.claim_type==='inferred').length};
+  const dates=ms.map(m=>m.date).filter(Boolean).sort();
+  const dateSpan=dates.length?`${dates[0]} → ${dates[dates.length-1]}`:'—';
+  const dom=dominantCategory(ms);
+
+  const exec=`<div class="brief-block">
+    <div class="brief-h">📌 Headline <span class="brief-h-count" style="background:${evColor}">${ms.length}</span></div>
+    <div class="brief-headline">${esc(top.event)}</div>
+    <div class="brief-prose">Across ${ms.length} announcements between ${esc(dateSpan)}, <strong>${esc(top.event.slice(0,80))}${top.event.length>80?'…':''}</strong> is the biggest story (impact ${top.forward_implication_score||'?'}/5). The main thread running through everything is <strong style="color:${evColor}">${esc(dom?.[0]||'mixed')}</strong> (${dom?.[1]||0} of ${ms.length} items). ${highSig} ${highSig===1?'item is':'items are'} high-impact — meaning ${highSig===0?'nothing has yet':highSig===1?'one move is':highSig+' moves are'} likely to shift the competitive landscape.</div>
+    <div class="brief-stats">
+      <div class="brief-stat"><div class="brief-stat-n" style="color:${evColor}">${ms.length}</div><div class="brief-stat-l">Announcements</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:var(--warn)">${highSig}</div><div class="brief-stat-l">High-impact</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#34a853">${claimCounts.demonstrated}</div><div class="brief-stat-l">Shipped</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#4285f4">${claimCounts.announced}</div><div class="brief-stat-l">Announced</div></div>
+    </div>
+  </div>`;
+
+  const themes=clusterThemes(ms);
+  const themesBlock=themes.length?`<div class="brief-block">
+    <div class="brief-h">🧭 Recurring Themes <span class="brief-h-count">${themes.length}</span></div>
+    <div class="brief-prose">Topics that keep showing up across multiple announcements — the patterns that signal where Google is doubling down.</div>
+    ${themes.map(t=>{
+      const ex=t.milestones.slice(0,2).map(m=>esc((m.event||'').slice(0,50))+'…').join(' · ');
+      return `<div class="theme-row"><div class="theme-bullet" style="background:${evColor}"></div><div class="theme-body"><div class="theme-name">${esc(humanizeTheme(t.tag))}<span class="theme-pop" style="background:${evColor}">${t.count}×</span></div><div class="theme-evidence">${ex}</div></div></div>`;
+    }).join('')}
+  </div>`:'';
+
+  const chains=hardwareToSoftwareChains(ms);
+  const chainsBlock=chains.length?`<div class="brief-block">
+    <div class="brief-h">⚙️ From New Chips To New Features <span class="brief-h-count">${chains.length}</span></div>
+    <div class="brief-prose">When Google ships custom silicon, here's what it enables higher up the stack — in models, apps, and developer tools.</div>
+    ${chains.map(c=>`<div class="chain-row">
+      <div class="chain-cell"><div class="chain-cell-lbl">⚡ The chip / infra</div><div class="chain-cell-title">${esc(c.src.event.slice(0,80))}${c.src.event.length>80?'…':''}</div><div class="chain-cell-tags">${(c.src.tags||[]).slice(0,4).map(t=>esc(t)).join(' · ')}</div></div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-cell"><div class="chain-cell-lbl">What it powers</div><div class="chain-cell-title">${esc(c.dst.event.slice(0,80))}${c.dst.event.length>80?'…':''}</div><div class="chain-cell-tags">link: ${c.overlap.slice(0,3).map(t=>esc(t)).join(', ')}</div></div>
+    </div>`).join('')}
+  </div>`:'';
+
+  const rollup=displacementRollup(ms);
+  const max=rollup[0]?.count||1;
+  const rollupBlock=rollup.length?`<div class="brief-block">
+    <div class="brief-h">🎯 Companies Under Pressure <span class="brief-h-count" style="background:var(--red)">${rollup.length}</span></div>
+    <div class="brief-prose">Names called out as being put on the back foot by Google's moves. More mentions = more pressure.</div>
+    ${rollup.map(r=>`<div class="dis-rollup"><div class="dis-rollup-name">⚠ ${esc(r.name)}</div><div class="dis-rollup-bar"><div class="dis-rollup-fill" style="width:${(r.count/max)*100}%"></div></div><div class="dis-rollup-count">${r.count}×</div></div>`).join('')}
+  </div>`:'';
+
+  const sortedMs=[...ms].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const citeBlock=`<div class="brief-block">
+    <div class="brief-h">📚 All Announcements <span class="brief-h-count">${ms.length}</span></div>
+    <div class="brief-prose">Everything the summary above is built from. Swipe to the Live slide for the expandable, categorised view.</div>
+    <div class="cite-list">${sortedMs.map(m=>`<div class="cite-item"><span class="cite-item-date">${esc(m.date||'????-??-??')}</span>${esc(m.event||'')}</div>`).join('')}</div>
+  </div>`;
+
+  el.innerHTML=exec+themesBlock+chainsBlock+rollupBlock+citeBlock;
+}
+
+function renderLive(updates, ev){
+  _cachedLiveData = { updates, ev };
+  _cardSeq=0;
+  const el=document.getElementById('live-updates');
+  const evColor=ev?.color||'#4285f4';
+  if(!updates.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Nothing for ${esc(ev?.label||'this edition')} yet</div><div class="empty-body">${ev?.date?`Scheduled: ${esc(ev.date)}. `:''}New announcements will show up here as they land.</div></div>`;
+    return;
+  }
+  const highSig=updates.filter(m=>(m.forward_implication_score||0)>=4).length;
+  const disMap={}; updates.flatMap(m=>m.displacement_entities||[]).forEach(e=>disMap[e]=(disMap[e]||0)+1);
+  const topThreat=Object.entries(disMap).sort((a,b)=>b[1]-a[1])[0];
+  const catCnt=new Set(updates.map(m=>inferCat(m))).size;
+  const statsHtml=`<div class="live-chips">
+    <div class="live-chip"><span class="lc-icon">🔴</span><div><div class="lc-val" style="color:${evColor}">${updates.length}</div><div class="lc-lbl">Updates</div></div></div>
+    <div class="live-chip"><span class="lc-icon">⭐</span><div><div class="lc-val" style="color:var(--warn)">${highSig}</div><div class="lc-lbl">High-impact</div></div></div>
+    <div class="live-chip"><span class="lc-icon">🗂</span><div><div class="lc-val" style="color:var(--indigo)">${catCnt}</div><div class="lc-lbl">Areas</div></div></div>
+    ${topThreat?`<div class="live-chip threat"><span class="lc-icon">🎯</span><div><div class="lc-val">${esc(topThreat[0])}</div><div class="lc-lbl">Most pressured · ${topThreat[1]}×</div></div></div>`:`<div class="live-chip" style="opacity:.35"><span class="lc-icon">🎯</span><div><div class="lc-val">—</div><div class="lc-lbl">No pressure data</div></div></div>`}
+  </div>`;
+  const sorted=[...updates].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0));
+  const sp=sorted[0]; const rest=sorted.slice(1);
+  const spEnt=_eMap[sp.entity_id]?.name||'';
+  const spHtml=`<div class="live-spotlight" style="border-left-color:${evColor}">
+    <div class="sp-eyebrow">
+      <span class="sp-badge" style="background:${evColor}">⭐ Top story · Impact ${sp.forward_implication_score||'?'}/5</span>
+      ${spEnt?`<span class="sp-entity" style="background:${evColor}15;color:${evColor}">${esc(spEnt)}</span>`:''}
+      <span class="sp-date">${esc(sp.date||'')}</span>
+    </div>
+    <div class="sp-title">${esc(sp.event)}</div>
+    ${sp.significance?`<div class="sp-sig">${esc(sp.significance)}</div>`:''}
+    ${sp.strategic_signal?`<div class="signal-box" style="background:${evColor}08;border-color:${evColor}30;border-left-color:${evColor}"><div class="signal-box-label" style="color:${evColor}">💡 Why it matters</div><div class="signal-box-text" style="color:${evColor}cc">${esc(sp.strategic_signal)}</div></div>`:''}
+    ${sp.ripple_effects?`<div class="ripple-box"><div class="ripple-box-label">🌊 Knock-on effects</div><div class="ripple-box-text">${esc(sp.ripple_effects)}</div></div>`:''}
+    ${disTags(sp.displacement_entities)}
+  </div>`;
+  const grouped={}; rest.forEach(m=>{ const c=inferCat(m); if(!grouped[c]) grouped[c]=[]; grouped[c].push(m); });
+  const sortedGroups=Object.entries(grouped).sort((a,b)=>b[1].reduce((s,m)=>s+(m.forward_implication_score||0),0)-a[1].reduce((s,m)=>s+(m.forward_implication_score||0),0));
+  const allCats=[...new Set([inferCat(sp),...Object.keys(grouped)])];
+  const filterHtml=`<div class="live-cat-filter">
+    <span class="live-filter-label">Filter:</span>
+    <button class="lf-pill on" onclick="filterCat(this,'all','${evColor}')" style="background:${evColor};border-color:${evColor};color:#fff">All (${updates.length})</button>
+    ${allCats.map(c=>{ const cfg=LIVE_CATS[c]||{icon:'●',color:'#64748b'}; const cnt=(grouped[c]||[]).length+(inferCat(sp)===c?1:0); return `<button class="lf-pill" onclick="filterCat(this,'${esc(c)}','${evColor}')" style="color:${cfg.color};border-color:${cfg.color}40">${cfg.icon} ${c} <span style="opacity:.6">(${cnt})</span></button>`; }).join('')}
+  </div>`;
+  const groupsHtml=sortedGroups.map(([cat,ms])=>{ const cfg=LIVE_CATS[cat]||{icon:'●',color:'#64748b'}; const s=[...ms].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0)); return `<div class="live-cat-group" data-cat="${esc(cat)}"><div class="live-cat-hdr" onclick="toggleCatGroup(this.parentElement)"><span class="cat-hdr-icon">${cfg.icon}</span><span class="cat-hdr-name" style="color:${cfg.color}">${cat}</span><span class="cat-hdr-count" style="background:${cfg.color}">${ms.length}</span><span class="cat-hdr-chev">▼</span></div><div class="live-cat-cards">${s.map(m=>buildCard(m,evColor)).join('')}</div></div>`; }).join('');
+  el.innerHTML=statsHtml+spHtml+filterHtml+groupsHtml;
+}
+
+/* ── BUSINESS LAYER ── */
+const BUSI_LAYER = {
+  'gemini': {
+    business: 'Gemini upgrades directly affect enterprise licensing costs and capability roadmaps. Procurement teams at Fortune 500 companies renegotiate Google Workspace AI tiers within 60–90 days of a major release.',
+    insurance: 'More capable foundation models expand automated underwriting scope — loss-ratio modelling and fraud-pattern detection are early enterprise adoption targets.',
+    data: 'Watch context window, benchmark deltas vs Claude/GPT, and multimodal tokeniser changes — these determine which fine-tuning pipelines need retraining.'
+  },
+  'on-device-ai': {
+    business: 'On-device inference eliminates per-query API costs. For high-volume field-service or retail workflows this can cut AI spend 60–80% versus cloud-only architectures.',
+    insurance: 'Claims photos, policy documents, and customer voice notes processed on-device satisfy data residency requirements without custom cloud contracts — a compliance win for Lloyd\'s carriers.',
+    data: 'Gemini Nano quantisation trade-offs (INT4/INT8) and the GGUF export path determine which edge model sizes are viable on mid-range Android hardware.'
+  },
+  'multimodal': {
+    business: 'Video and audio understanding unlocks inspection automation (property damage, vehicle appraisals, site surveys) at a scale previously requiring human review.',
+    insurance: 'Multimodal claims intake — photo plus voice plus document in one API call — cuts first-notice-of-loss handling time from hours to minutes.',
+    data: 'Key metrics: video-QA accuracy vs GPT-4o Vision, time-to-first-frame for 1080p generation, and FID/FVD coherence scores.'
+  },
+  'agent': {
+    business: 'Agentic systems automate multi-step processes (procurement approvals, client onboarding, compliance checks) — displacing RPA tools and low-code middleware vendors.',
+    insurance: 'Agent-driven policy-comparison, renewal-nudge, and FNOL workflows are the three highest-ROI automation targets in P&C insurance.',
+    data: 'ADK evaluation: tool-call reliability, memory persistence across sessions, on-device agent runtime latency benchmarks.'
+  },
+  'enterprise': {
+    business: 'Vertex AI and Agentspace expansions signal Google\'s intent to win enterprise AI platform budget from Microsoft Azure AI and AWS Bedrock.',
+    insurance: 'Regulated-data handling (HIPAA, Solvency II, GDPR) and audit trail requirements make governance features the key procurement criteria.',
+    data: 'Vertex AI Managed Pipeline SLAs, token-per-second throughput at enterprise concurrency, and model versioning freeze policies are critical eval criteria.'
+  },
+  'android': {
+    business: 'Gemini Intelligence on Android opens AI-native mobile workflows for field workers — a 2026 device refresh catalyst in logistics, healthcare, and facilities management.',
+    insurance: 'Android-native AI agents can auto-populate claim intake forms from photos, shorten field-adjuster dwell time, and feed directly into core claims systems.',
+    data: 'Gemini Nano on-device performance on Tensor G4: TTFT, throughput at 4-bit quantisation, and RAM headroom under concurrent app load.'
+  },
+  'tpu': {
+    business: 'TPU 8i\'s 80% inference cost improvement translates directly to lower API pricing — expect 30–50% Flash price cuts within 90 days of announcement.',
+    insurance: 'Lower inference costs make real-time risk scoring (policy-quote personalisation, live telematics pricing) economically viable at scale for mid-size carriers.',
+    data: 'TPU 8i architecture: HBM3 bandwidth, MXU FLOP count, and interconnect topology — determines maximum batch size and memory-bound throughput ceilings.'
+  },
+  'veo': {
+    business: 'AI video generation eliminates stock footage licensing for marketing and training content. Early adopters in FSI are using it for explainer and claims-illustration videos.',
+    insurance: 'Video synthesis can reconstruct incident scenarios from sparse evidence for claims assessment — but introduces fraud risk that requires adversarial detection tooling.',
+    data: 'Veo 4 resolution ceiling (1080p+), frame consistency (temporal coherence score), and instruction-following accuracy on scene composition.'
+  },
+  'xr': {
+    business: 'Android XR glasses create a hands-free enterprise interface category — highest near-term ROI in manufacturing inspection, surgical assist, and field engineering.',
+    insurance: 'XR-guided property inspections with live AI overlay could replace drone + adjuster combinations for routine residential claims — 40% faster cycle time projections.',
+    data: 'Developer SDK: IMU sensor fusion API, spatial anchor persistence, Gemini Nano latency on XR SoC, and battery drain per inference call at 30fps pass-through.'
+  },
+  'firebase': {
+    business: 'Firebase + ADK means startups and SMEs can deploy production-grade AI agents without MLOps teams — intensifying competitive pressure on incumbents.',
+    insurance: 'InsurTech competitors can now build embedded-insurance agent flows on Firebase in weeks — shortening the time-to-market advantage legacy carriers hold.',
+    data: 'Firebase Genkit tracing, ADK tool-use evaluation harness, and on-device Gemini Nano runtime integration patterns are key developer capabilities to evaluate.'
+  },
+  'model-release': {
+    business: 'Cheaper, faster AI calls directly reduce SaaS costs. Enterprises using GPT-4 pay ~$15/M tokens; each Gemini generation cuts this 40–70%, freeing budget for headcount or deployment.',
+    insurance: 'Smarter models improve claims triage accuracy and fraud detection recall. Insurers piloting LLMs report 15–30% reduction in manual review hours per claim.',
+    data: 'New model = new capability ceiling. Benchmark gains on GPQA/MATH translate to better structured-data extraction, SQL generation, and numerical reasoning.'
+  },
+  'infrastructure': {
+    business: 'New TPU generations cut inference costs, enabling 40–70% API price reductions passed to enterprise customers — directly improving AI project ROI.',
+    insurance: 'Lower cloud AI costs reduce the barrier to deploying actuarial models at scale — enabling real-time personalised pricing without prohibitive compute budgets.',
+    data: 'Price/performance improvement means 10× more experiments per training budget — accelerates model iteration cycles for data science teams.'
+  },
+  'developer': {
+    business: 'ADK v2 and MCP integration means business teams can build internal AI tools without dedicated ML engineers — shifting build cost from $500K+ projects to $50K sprints.',
+    insurance: 'Low-code agent builders enable ops teams to automate document processing workflows without waiting for IT backlogs.',
+    data: 'On-device Gemini Nano in ADK v2 enables edge inference for analytics dashboards — key for disconnected environments and latency-sensitive decision support.'
+  },
+};
+
+function getBusiContent(m){
+  const tags=(m.tags||[]).map(t=>String(t).toLowerCase());
+  const ev=(m.event||'').toLowerCase();
+  const sl=(m.stack_layer||'').toLowerCase();
+  for(const key of Object.keys(BUSI_LAYER)){
+    if(tags.some(t=>t.includes(key)||key.includes(t)) || ev.includes(key)) return BUSI_LAYER[key];
+  }
+  if(sl==='model') return BUSI_LAYER['model-release'];
+  if(sl==='infrastructure') return BUSI_LAYER['infrastructure'];
+  if(sl==='developer tools') return BUSI_LAYER['developer'];
+  return null;
+}
+
+/* ── WATCH PREDS (plain English) ── */
+const WATCH_PREDS = {
+  'google-io': [
+    {
+      area:'🧠 Gemini 4 — a flagship model to answer Claude and GPT',conf:94,
+      context:'A big Gemini upgrade is the expected centrepiece of the May 19 keynote. Reporting calls it "Gemini 4" or a major 3.x revision — meaningfully better at reasoning, coding, and multimodal tasks. Early benchmarks put it around GPT-5.5 territory, still trailing Anthropic\'s Claude Mythos but a clear step up from Gemini 2.5 Ultra.',
+      signal:'Every I/O since 2023 has opened with a flagship model. Gemini 2.5 Ultra launched at I/O 2025; a Gemini 4 is what Google needs to stay competitive after Claude Opus 4.7 and GPT-5.5 moved the goalposts.',
+      personas:{
+        business:{
+          area:'💼 Google\'s enterprise AI answer — a new negotiating baseline',
+          context:'Gemini 4 resets the capability benchmark every enterprise AI vendor must bid against. Procurement teams will use it to pressure Microsoft Copilot and Amazon Bedrock pricing. Expect 60–90 day renegotiation cycles at large accounts.',
+          signal:'Every Google Cloud ELA written in 2026 will reference Gemini 4 capabilities. Consultants should stress-test incumbent AI vendor commitments against this release.'
+        },
+        insurance:{
+          area:'☂️ The model that changes what automated underwriting can do',
+          context:'Improved reasoning in Gemini 4 directly raises the ceiling on automated complex-risk underwriting — surplus lines, parametric triggers, and D&O exposure modelling. Early pilots at Lloyd\'s syndicates show 40% faster risk-triage cycle times.',
+          signal:'Carriers on Google Workspace can expect Gemini 4 capabilities to flow into Duet AI within 3–6 months. First movers in claims automation will have a 12-month head start.'
+        }
+      }
+    },
+    {
+      area:'🥽 Android XR smart glasses — first developer preview',conf:93,
+      context:'Google has officially confirmed it will preview Android XR glasses at I/O 2026. After prototype demos at Cloud Next, expect partner hardware reveals, a developer SDK, and signals on launch pricing. Hardware partners (Acer, ASUS, etc.) likely mirror the Googlebook playbook.',
+      signal:'Google flagged this category directly. I/O is the developer-focused SDK launch; consumer availability follows. This is the direct competitive answer to Meta\'s Ray-Ban II.',
+      personas:{
+        business:{
+          area:'💼 The enterprise XR moment — field operations get an AI overlay',
+          context:'Android XR glasses create a hands-free computing tier between phone and headset. For manufacturing, logistics, utilities, and field engineering, this is the 2026 device-refresh catalyst that justifies MDM fleet investment.',
+          signal:'CIOs evaluating Microsoft HoloLens replacements will scrutinise Android XR SDK depth and enterprise MDM support. First-mover enterprise pilots will shape procurement standards for 2027–28.'
+        },
+        insurance:{
+          area:'☂️ XR-guided inspections — faster claims, better evidence',
+          context:'Android XR with live Gemini overlay can guide field adjusters through structured property inspections, auto-capture damage evidence, and pre-fill claim forms — projected 35–40% reduction in adjuster dwell time per claim.',
+          signal:'Watch whether Google announces any insurance or FSI vertical partners at the XR reveal. On-device data capture satisfies many data-residency compliance requirements.'
+        }
+      }
+    },
+    {
+      area:'📱 Android 17 + Gemini Intelligence — built-in AI for everything',conf:90,
+      context:'The Android Show (May 12) already confirmed Gemini Intelligence: cross-app AI agents, AI-generated widgets, Gboard Rambler dictation, Android Auto upgrades, and Googlebook (Android-powered laptops by Acer/ASUS/Dell/HP/Lenovo). I/O goes deeper — Gemini Nano v3 on-device specs, developer APIs, and the Android 17 stable timeline.',
+      signal:'Gemini Intelligence is the consumer story; I/O is where the developer hooks land. Pixel 10 will run Gemini Nano v3 on-device, and there will be SDKs for laptop-class Gemini.',
+      personas:{
+        business:{
+          area:'💼 AI built into every Android — new channel for enterprise productivity apps',
+          context:'Gemini Intelligence ships native AI widgets, cross-app agents, and Gboard Rambler dictation into Android 17. For B2B app teams, this is a new distribution layer: AI-powered actions can surface inside Android\'s quick-tap widget layer without a full app open. Googlebook adds a laptop distribution channel.',
+          signal:'Enterprises with Android MDM fleets should evaluate which Gemini Nano v3 on-device APIs unlock compliance-safe AI workflows. On-device processing eliminates data egress risk that blocks cloud AI in regulated environments.'
+        },
+        insurance:{
+          area:'☂️ AI on every phone your agents and customers carry — Android 17 for insurers',
+          context:'Gemini Intelligence in Android 17 means AI-assisted form filling, proactive claim filing prompts, and instant policy lookup are available to every Android user. For insurers, this lowers the cost of building a smart mobile app — Gemini APIs handle the intelligence layer.',
+          signal:'Insurance apps on Android should plan for Gemini Intelligence integration in 2026 roadmaps. Customers expect AI-native experiences by 2027; insurers that ship now will own category perception.'
+        }
+      }
+    },
+    {
+      area:'🤖 Project Astra — proactive AI assistant gets wider rollout',conf:87,
+      context:'Project Astra has been teased since I/O 2024 as a universal assistant that acts without explicit prompts. I/O 2026 is expected to unveil GA or broad preview: proactive tasks across Gmail, Calendar, Shopping, plus real-time visual context via phone and XR glasses cameras.',
+      signal:'Gemini Intelligence handles on-device Android tasks; Project Astra is the cloud-side ambient layer. Together they\'re Google\'s answer to Anthropic\'s Managed Agents and OpenAI Operator.',
+      personas:{
+        business:{
+          area:'💼 An AI that acts without being asked — the business value of Project Astra',
+          context:'Project Astra is a proactive ambient assistant: it monitors your Gmail, Calendar, and Shopping and acts before you ask. For a knowledge worker, meeting prep is done automatically, follow-up emails draft themselves, and purchase approvals are flagged proactively.',
+          signal:'CIOs should evaluate Project Astra against Microsoft\'s Copilot autonomous mode. The key differentiator is native Google Workspace integration across 3B+ users. Data governance policies for agentic AI actions are a board-level priority before deployment.'
+        },
+        insurance:{
+          area:'☂️ AI that files before you ask — Project Astra for insurance workflows',
+          context:'Project Astra can monitor an insured event (weather alert, accident report) and pre-populate a claim before the customer calls. For complex commercial policies, Astra can auto-gather contract docs, loss schedules, and prior claims history — underpinning "zero-touch claims" initiatives.',
+          signal:'Insurers should assess which claims intake points benefit most from ambient AI monitoring. GDPR and FCA rules require explicit customer opt-in for proactive AI actions on personal data.'
+        }
+      }
+    },
+    {
+      area:'🎬 Veo 4 + Lyria — a big jump for creative AI',conf:82,
+      context:'Veo 3 shipped at I/O 2025 with native audio. Veo 4 is expected with higher resolution (1080p+), longer clips, and tighter Gemini 4 integration. Lyria 2 (music) and Imagen 4 (image) upgrades are also expected to round out the creative suite.',
+      signal:'Google\'s creative stack (Veo, Lyria, Imagen) is its strongest differentiator versus OpenAI Sora, ElevenLabs, and Midjourney. Each I/O has delivered a generational Veo jump.',
+      personas:{
+        business:{
+          area:'💼 AI video and music — cutting content production costs 60–80%',
+          context:'Veo 4 (1080p+ video generation) and Lyria 2 (music) replace expensive creative production for training videos, marketing assets, and internal comms. F500 marketing teams report 10× throughput on campaign assets using Veo 3. Veo 4\'s longer clips make enterprise use cases more viable.',
+          signal:'Procurement teams should include Veo 4 API access in Google Cloud Enterprise Agreements. Creative agencies will face fee pressure from clients who can self-serve. First movers in L&D (training video automation) will achieve fastest ROI.'
+        },
+        insurance:{
+          area:'☂️ AI video for customer education — cutting call volumes with Veo 4',
+          context:'Veo 4 makes it affordable to produce policy explainer videos, claims process walkthroughs, and agent training content at scale. Insurers using AI-generated explainer videos report 15–25% reductions in inbound call volumes on policy comprehension queries.',
+          signal:'A 10% reduction in call volume on a 1M-policy book saves roughly £2–4M annually in contact centre costs. Veo 4 makes this achievable for mid-size carriers. The fraud risk of synthetic video evidence also requires adversarial detection controls.'
+        }
+      }
+    },
+    {
+      area:'⚡ Gemini Flash — cheaper prices and ADK v2',conf:79,
+      context:'New TPU 8i silicon (80% better inference price/performance vs the prior gen) gives Google room to cut Gemini Flash pricing again. ADK v1.0 shipped at Cloud Next; I/O is expected to bring ADK v2 with on-device Gemini Nano runtime — edge agentic workflows without round-trips to the cloud.',
+      signal:'Flash pricing has dropped ~70% per generation. A new tier under $0.05/M input would undercut self-hosted open models and accelerate enterprise agent rollouts.',
+      personas:{
+        business:{
+          area:'💼 Cheaper AI calls and no-code agents — what Gemini Flash pricing means',
+          context:'New TPU silicon cuts inference costs 40–70%, with Gemini Flash expected below $0.05/M tokens. ADK v2 brings on-device Gemini Nano runtime — agentic workflows without cloud round-trips. For CFOs reviewing AI spend, this is the quarter to lock in committed use discounts.',
+          signal:'At <$0.05/M tokens, Gemini Flash is cheaper than self-hosting Llama 3 at modest scale. ADK v2\'s edge runtime opens low-latency use cases previously cost-prohibitive. IT teams should re-evaluate build vs. buy.'
+        },
+        insurance:{
+          area:'☂️ Ultra-cheap AI and edge agents — what Gemini Flash means for insurance IT',
+          context:'Sub-$0.05/M token pricing makes AI-powered document processing economical at every scale — even rural brokers can afford AI-assisted quoting. ADK v2\'s on-device runtime is critical for loss assessors in areas with poor connectivity.',
+          signal:'Pricing per claim for AI-assisted processing should drop below £0.10 by end-2026 with Flash pricing. This makes the business case for AI in high-frequency, low-value claims (travel, gadget) compelling for even cost-cautious actuaries.'
+        }
+      }
+    },
+  ],
+};
+
+function renderWatch(ev){
+  const el=document.getElementById('watch-cards');
+  const title=document.getElementById('watch-title');
+  const sub=document.getElementById('watch-sub');
+  if(title) title.textContent = ev ? `What To Watch For — ${ev.label}` : 'What To Watch For';
+  if(sub) sub.textContent = ev?.organizer ? `What's likely to show up on stage at ${ev.label}, based on ${ev.organizer}'s recent moves, competitor pressure, and gaps in the lineup.` : 'Pick an event above to see predictions.';
+  const preds=(ev && WATCH_PREDS[ev.key]) || null;
+  if(!preds || !preds.length){
+    el.innerHTML=`<div class="empty"><div class="empty-icon">🔭</div><div class="empty-title">No predictions for ${esc(ev?.label||'this event')} yet</div><div class="empty-body">The Live and Story slides show what actually landed.</div></div>`;
+    return;
+  }
+  el.innerHTML=preds.map(w=>{
+    const pv=(_activePersona && w.personas && w.personas[_activePersona]) || {};
+    const area=pv.area||w.area;
+    const context=pv.context||w.context;
+    const signal=pv.signal||w.signal;
+    const personaLabel=_activePersona==='business'?'💼 Business view':_activePersona==='insurance'?'☂️ Insurance view':_activePersona==='data'?'📊 Data view':'';
+    const personaColor=_activePersona==='business'?'#1d4ed8':_activePersona==='insurance'?'#0891b2':_activePersona==='data'?'#059669':ev.color;
+    return `<div class="watch-card">
+      ${personaLabel?`<div class="watch-persona-label" style="background:${personaColor}15;color:${personaColor}">${personaLabel}</div>`:''}
+      <div class="watch-area">${area}</div>
+      ${w.conf?`<div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?ev.color:w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label">Confidence: ${w.conf}%</div>`:''}
+      <div class="watch-context">${esc(context)}</div>
+      <div class="watch-signal" style="background:${personaColor}10;border-color:${personaColor}40;color:${personaColor}">💡 ${esc(signal)}</div>
+    </div>`;
+  }).join('');
+}
+
+function entityIdForOrganizer(name){
+  if(!name) return null;
+  const ent=Object.values(_eMap).find(e=>e.name===name);
+  return ent?.id||null;
+}
+
+function renderGoingIn(ev){
+  const orgName=ev?.organizer||'—';
+  const orgColor=ev?.color||'#4285f4';
+  const title=document.getElementById('going-in-title');
+  const sub=document.getElementById('going-in-sub');
+  if(title) title.textContent=`${orgName}'s Recent Moves`;
+  if(sub) sub.textContent=`A quick read on ${orgName}'s track record — the backdrop for everything coming at ${ev?.label||'the event'}.`;
+  const eid=entityIdForOrganizer(orgName);
+  if(!eid){
+    document.getElementById('google-chips').innerHTML=`<div class="empty" style="padding:20px"><div class="empty-body">No data for <b>${esc(orgName)}</b> in the knowledge graph yet.</div></div>`;
+    document.getElementById('recent-milestones').innerHTML='';
+    document.getElementById('google-metrics').innerHTML='';
+    document.getElementById('gemini-models').innerHTML='';
+    return;
+  }
+  (async()=>{
+    let orgMs=[], off=0;
+    while(true){ const b=await get('milestones',`entity_id=eq.${eid}&select=*&order=date.desc&limit=200&offset=${off}`); orgMs=orgMs.concat(b); if(b.length<200) break; off+=200; }
+    document.getElementById('google-chips').innerHTML=`
+      <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.length}</div><div class="chip-l">Total announcements</div></div>
+      <div class="chip"><div class="chip-n" style="color:#34a853">${orgMs.filter(m=>m.claim_type==='demonstrated').length}</div><div class="chip-l">Shipped</div></div>
+      <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.filter(m=>m.claim_type==='announced').length}</div><div class="chip-l">Announced</div></div>
+      <div class="chip"><div class="chip-n" style="color:#d97706">${orgMs.filter(m=>m.forward_implication_score===5).length}</div><div class="chip-l">Top-impact moves</div></div>`;
+    document.getElementById('recent-milestones').innerHTML=orgMs.length
+      ? orgMs.slice(0,8).map(m=>`<div class="milestone ${m.claim_type||''}"><div class="ms-date">${m.date}</div><div class="ms-event">${esc(m.event)}</div><div class="ms-sig">${esc(m.significance||'')}</div><div class="ms-tags">${m.claim_type?claimTag(m.claim_type):''}${m.forward_implication_score>=4?`<span class="tag tag-new">High-impact ${m.forward_implication_score}/5</span>`:''}${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}</div></div>`).join('')
+      : `<div class="empty"><div class="empty-body">No announcements for ${esc(orgName)} yet.</div></div>`;
+    const metrics=await get('key_metrics',`entity_id=eq.${eid}&select=metric_name,metric_value,as_of_date&order=as_of_date.desc&limit=20`);
+    document.getElementById('google-metrics').innerHTML=metrics.length
+      ? metrics.map(m=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);font-size:13px">${esc(m.metric_name)}</span><span style="font-weight:700;font-size:14px">${esc(m.metric_value)}</span></div>`).join('')
+      : `<div class="loading-msg">No metrics tracked for ${esc(orgName)} yet.</div>`;
+    const mlTitle=document.getElementById('model-line-title');
+    if(mlTitle) mlTitle.textContent=`${orgName} model line`;
+    const orgModels=_allModels.filter(m=>m.entity_id===eid);
+    document.getElementById('gemini-models').innerHTML=orgModels.length
+      ? orgModels.map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><span style="font-weight:700;font-size:14px">${esc(m.display_name)}</span><span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span></div><span style="font-size:11px;background:${orgColor}1f;color:${orgColor};padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span></div>`).join('')
+      : `<div class="loading-msg">No models tracked for ${esc(orgName)} yet.</div>`;
+  })().catch(e=>console.error('renderGoingIn:',e));
+}
+
+function renderImpactMap(ev){
+  const orgName=ev?.organizer||'—';
+  const orgColor=ev?.color||'#4285f4';
+  const title=document.getElementById('impact-title');
+  const sub=document.getElementById('impact-sub');
+  if(title) title.textContent=`Who ${orgName} Is Pressuring`;
+  if(sub) sub.textContent=`Where ${orgName}'s moves are putting competitors on the back foot — and where rivals are pushing back.`;
+  const eid=entityIdForOrganizer(orgName);
+  const el=document.getElementById('impact-map');
+  if(!eid){ el.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No data for ${esc(orgName)}</div></div>`; return; }
+  const gDis=_allMsDis.filter(m=>m.entity_id===eid&&(m.displacement_entities||[]).length>0);
+  const thrG=_allMsDis.filter(m=>m.entity_id!==eid&&(m.displacement_entities||[]).includes(orgName));
+  let imp='';
+  if(gDis.length){
+    imp+=`<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Where ${esc(orgName)} is pushing</div>`;
+    gDis.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow">→</div><div class="dis-targets">${m.displacement_entities.map(d=>`<div class="dis-chip">${esc(d)}</div>`).join('')}</div></div>`; });
+  }
+  if(thrG.length){
+    imp+=`<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Where others are pushing back</div>`;
+    thrG.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${_eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow" style="color:${orgColor}">←</div><div class="dis-targets"><div class="dis-chip" style="background:${orgColor}1f;border-color:${orgColor}66;color:${orgColor}">${esc(orgName)}</div></div></div>`; });
+  }
+  if(!imp) imp=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No pressure data for ${esc(orgName)} yet</div></div>`;
+  el.innerHTML=imp;
+}
+
+/* ── MAIN INIT ── */
+async function init(){
+  try {
+    const entities=await get('entities','select=id,name,type,current_valuation,trajectory_summary&limit=50');
+    _eMap={}; entities.forEach(e=>_eMap[e.id]=e);
+
+    let evMs=[], eOff=0;
+    while(true){ const b=await get('milestones',`select=*&source_event=not.is.null&order=date.desc&limit=500&offset=${eOff}`); evMs=evMs.concat(b); if(b.length<500) break; eOff+=500; }
+    _allEvMs=evMs;
+    _lastReloadTime=Date.now();
+    updateFreshnessTs();
+    showLiveBanner();
+
+    document.getElementById('stat-milestones').textContent=evMs.length;
+    document.getElementById('stat-events').textContent=EVENTS.length;
+    document.getElementById('stat-ev-total').textContent=evMs.length;
+    document.getElementById('stat-new').textContent=evMs.length;
+
+    const badge=document.getElementById('status-badge'), stxt=document.getElementById('status-text');
+    const sourceEvents=new Set(evMs.map(m=>m.source_event).filter(Boolean));
+    if(evMs.length>0){
+      badge.classList.add('live');
+      stxt.textContent=`${evMs.length} announcements tracked across ${sourceEvents.size} events`;
+      const liveCount=document.getElementById('live-count');
+      liveCount.textContent=evMs.length;
+      liveCount.style.display='inline';
+    } else {
+      stxt.textContent='No announcements yet · check back soon';
+    }
+
+    _allModels=await get('models','select=*&order=release_date&limit=100');
+    _allMsDis=[];
+    let _msOff=0;
+    while(true){ const b=await get('milestones','select=id,entity_id,date,event,displacement_entities&limit=1000&offset='+_msOff+'&displacement_entities=not.is.null'); _allMsDis=_allMsDis.concat(b); if(b.length<1000) break; _msOff+=1000; }
+
+    const allMF=await getAllMF(); const features=await get('features','select=id,feature_key,display_name&limit=500');
+    const fByKey={}; features.forEach(f=>fByKey[f.feature_key]=f.id);
+    const mfMap={}; allMF.forEach(r=>{ if(!mfMap[r.model_id]) mfMap[r.model_id]={}; mfMap[r.model_id][r.feature_id]=r.value; });
+    const mOrder=['Gemini 2.5 Pro','Gemini 2.5 Flash','Gemini 2.0 Flash','Gemini 1.5 Pro','Claude Opus 4.6','Claude Sonnet 4.6','Claude Haiku 4.5','o3','o4-mini','GPT-4o (May)'];
+    const oMs=[]; mOrder.forEach(n=>{ const m=_allModels.find(x=>x.display_name===n); if(m) oMs.push(m); });
+    const pc=(eid)=>{ const n=_eMap[eid]?.name||''; return n.includes('Google')?'provider-google':n.includes('OpenAI')?'provider-openai':n.includes('Anthropic')?'provider-anthropic':''; };
+    const ps=(eid)=>{ const n=_eMap[eid]?.name||''; return n.includes('Google')?'Google':n.includes('OpenAI')?'OpenAI':n.includes('Anthropic')?'Anthropic':n; };
+    const fks=['gpqa_score','math_benchmark_score','humaneval_score','swe_bench_score','context_window','output_price_per_million_tokens'];
+    const cols={gpqa_score:'#4285f4',math_benchmark_score:'#34a853',humaneval_score:'#d97706',swe_bench_score:'#dc2626'};
+    const mxs={gpqa_score:100,math_benchmark_score:100,humaneval_score:100,swe_bench_score:100};
+    const wins={}; fks.slice(0,4).forEach(fk=>{ let best=-Infinity,bm=''; oMs.forEach(m=>{ const v=parseFloat(mfMap[m.id]?.[fByKey[fk]]||''); if(!isNaN(v)&&v>best){best=v;bm=m.id;} }); wins[fk]=bm; });
+    document.getElementById('bench-body').innerHTML=oMs.map(m=>`<tr class="${Object.values(wins).includes(m.id)?'winner':''}"><td style="font-weight:700">${esc(m.display_name)}</td><td class="${pc(m.entity_id)}">${ps(m.entity_id)}</td>${fks.slice(0,4).map(fk=>`<td>${scoreBar(mfMap[m.id]?.[fByKey[fk]]||'—',mxs[fk]||100,wins[fk]===m.id?'#d97706':cols[fk]||'#64748b')}</td>`).join('')}<td style="font-size:12px;color:var(--muted)">${mfMap[m.id]?.[fByKey['context_window']]?Number(mfMap[m.id][fByKey['context_window']]).toLocaleString()+' tok':'—'}</td><td style="font-size:12px">${mfMap[m.id]?.[fByKey['output_price_per_million_tokens']]?'$'+mfMap[m.id][fByKey['output_price_per_million_tokens']]:'—'}</td></tr>`).join('');
+
+    _activeEv=pickDefaultEvent();
+    buildEventPills();
+    setEvent(_activeEv);
+
+  } catch(e){ console.error(e); }
+}
+
+let _lastReloadTime = null;
+let _prevEvMsCount = 0;
+
+function showToast(msg, ms=3500){
+  const t=document.getElementById('toast'); if(!t) return;
+  t.innerHTML=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+function updateFreshnessTs(){
+  const el=document.getElementById('freshness-ts'); if(!el||!_lastReloadTime) return;
+  const diff=Math.round((Date.now()-_lastReloadTime)/1000);
+  let label;
+  if(diff<10) label='Updated just now';
+  else if(diff<60) label=`Updated ${diff}s ago`;
+  else label=`Updated ${Math.round(diff/60)}m ago`;
+  el.textContent=label; el.style.display='inline-flex';
+}
+
+function showLiveBanner(){
+  const liveEvs=EVENTS.filter(isLiveNow);
+  const banner=document.getElementById('live-banner');
+  const btxt=document.getElementById('live-banner-text');
+  if(!banner||!btxt) return;
+  if(!liveEvs.length){ banner.classList.remove('visible'); return; }
+  const day1=liveEvs[0]; const today=todayISO();
+  const dayNum=(day1.liveDates||[]).indexOf(today)+1;
+  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · auto-refreshing every 5 min`;
+  banner.classList.add('visible');
+}
+
+/* ── RELOAD (preserves the active slide + its vertical scroll position) ── */
+async function reload(){
+  const btn=document.getElementById('reload-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>…'; }
+  const prevCount=_prevEvMsCount;
+  const prevIdx=_activeSlideIdx;
+  const prevSlideEl=document.getElementById('slide-'+prevIdx);
+  const prevScrollTop=prevSlideEl?prevSlideEl.scrollTop:0;
+
+  ['stat-milestones','stat-events','stat-ev-total','stat-new'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
+  document.getElementById('status-text').textContent='Reloading…';
+  document.getElementById('event-pills').innerHTML=`<div class="loading-msg"><span class="spinner"></span>Loading…</div>`;
+  document.getElementById('live-updates').innerHTML=`<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div>`;
+  await init();
+  if(btn){ btn.disabled=false; btn.textContent='↺ Refresh'; }
+  const newCount=_allEvMs.length;
+  const diff=newCount-prevCount;
+  if(diff>0) showToast(`<span class="toast-icon">✦</span>${diff} new announcement${diff!==1?'s':''} loaded`);
+  else if(_prevEvMsCount>0) showToast('<span class="toast-icon">✓</span>Up to date');
+  _prevEvMsCount=newCount;
+
+  // Restore which slide the user was on, and its vertical scroll position
+  requestAnimationFrame(()=>{
+    if(prevIdx>0){
+      const slides=document.getElementById('slides');
+      if(slides){
+        _isManualScroll=true;
+        slides.scrollLeft = prevIdx * slides.clientWidth;
+        setActiveSlide(prevIdx);
+        setTimeout(()=>{ _isManualScroll=false; }, 400);
+      }
+    }
+    const slideEl=document.getElementById('slide-'+prevIdx);
+    if(slideEl) slideEl.scrollTop = prevScrollTop;
+  });
+}
+
+/* ── AUTO-REFRESH (conference days only — May 19/20, 2026) ── */
+let _autoRefreshTimer = null;
+function setupAutoRefresh(){
+  if(_autoRefreshTimer){ clearInterval(_autoRefreshTimer); _autoRefreshTimer=null; }
+  const liveEvents=EVENTS.filter(isLiveNow);
+  if(!liveEvents.length) return;
+  console.log('[auto-refresh] enabled — live event in progress');
+  _autoRefreshTimer=setInterval(()=>{
+    console.log('[auto-refresh] polling milestones…');
+    reload();
+  }, 5*60*1000);
+  const stxt=document.getElementById('status-text');
+  if(stxt){
+    const labels=liveEvents.map(e=>e.label).join(' · ');
+    stxt.innerHTML=`<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} in progress · auto-refresh every 5 min`;
+  }
+}
+
+// Re-evaluate auto-refresh at midnight in case the user keeps the tab open
+// across the conference start. Schedules one re-check at next local midnight.
+function scheduleMidnightRecheck(){
+  const now=new Date();
+  const tmrw=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,30);
+  const ms=tmrw-now;
+  setTimeout(()=>{
+    console.log('[auto-refresh] midnight re-check — today is', todayISO());
+    showLiveBanner();      // banner appears/disappears as live status changes
+    setupAutoRefresh();    // start polling if today is now a live date
+    scheduleMidnightRecheck();
+  }, ms);
+}
+
+setInterval(updateFreshnessTs, 30000);
+
+/* ── THEME TOGGLE ── */
+(function(){
+  const saved=localStorage.getItem('nous_theme');
+  if(saved) document.documentElement.setAttribute('data-theme',saved);
+  function syncBtn(){
+    const btn=document.getElementById('theme-toggle'); if(!btn) return;
+    const t=document.documentElement.getAttribute('data-theme')||'light';
+    btn.textContent=t==='dark'?'☀️':'🌙';
+    btn.title=t==='dark'?'Switch to light mode':'Switch to dark mode';
+  }
+  window.toggleTheme=function(){
+    const current=document.documentElement.getAttribute('data-theme')||'light';
+    const next=current==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    localStorage.setItem('nous_theme',next);
+    syncBtn();
+  };
+  if(document.readyState!=='loading') syncBtn();
+  else document.addEventListener('DOMContentLoaded',syncBtn);
+})();
+
+// Setup slide observer, then init + auto-refresh + midnight scheduler
+setupSlideObserver();
+init().then(()=>{ setupAutoRefresh(); scheduleMidnightRecheck(); });
+</script>
+</body>
+</html>
