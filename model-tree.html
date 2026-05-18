@@ -215,6 +215,28 @@ body {
 .pg-id-dark .pg-id-title{color:#c8deff;font-size:18px;}
 .pg-id-dark .pg-id-title span{color:#6ab0ff;}
 .pg-id-dark .pg-id-desc{color:#3a6090;font-size:12px;}
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:768px){
+  /* Header: brand+actions stay on one row, nav wraps to second row */
+  .g-hdr{flex-wrap:wrap;height:auto;padding:10px 16px 0;}
+  .g-brand{flex:1;margin-right:0;padding-bottom:10px;}
+  .g-actions{padding-bottom:10px;}
+  .g-nav{order:3;width:100%;border-top:1px solid rgba(255,255,255,.08);padding:6px 0 8px;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);}
+  .g-link{font-size:11px;padding:5px 10px;}
+  /* Page identity strips */
+  .pg-id{padding:16px 16px 12px;}
+  .pg-id-title{font-size:18px;}
+  .pg-id-desc{font-size:12px;}
+  .pg-id-dark{padding:12px 16px 10px;}
+  .pg-id-dark .pg-id-title{font-size:16px;}
+  .ptabs{gap:4px;padding:6px 10px 4px;justify-content:flex-start;overflow-x:auto;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 4%,#000 96%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 4%,#000 96%,transparent 100%);}
+  .ptab{padding:4px 14px;font-size:10px;flex-shrink:0;}
+  .detail-panel{width:min(360px,90vw) !important;}
+}
+@media(max-width:480px){
+  .detail-panel{width:100vw !important;left:0 !important;right:0 !important;border-radius:0;}
+}
 </style>
 </head>
 <body>
