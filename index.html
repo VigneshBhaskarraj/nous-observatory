@@ -191,7 +191,7 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 /* ── DARK MODE ── */
 [data-theme="dark"] {
   --bg:#0d1117; --card:#161b22; --border:#30363d;
-  --text:#c9d1d9; --muted:#8b949e; --accent-bg:rgba(79,70,229,.15);
+  --text:#c9d1d9; --muted:#8b949e; --accent:#818cf8; --accent-bg:rgba(129,140,248,.15);
   color-scheme:dark;
 }
 [data-theme="dark"] body { background:var(--bg); }
@@ -208,6 +208,26 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 [data-theme="dark"] .mfm .cat-hdr td { background:#1c2128; }
 [data-theme="dark"] .theme-toggle { border-color:rgba(148,163,184,.3); color:#94a3b8; }
 [data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); color:#c9d1d9; }
+[data-theme="dark"] .b-co,[data-theme="dark"] .b-ann,[data-theme="dark"] .b-app { background:rgba(56,139,253,.15); color:#79c0ff; }
+[data-theme="dark"] .b-pe,[data-theme="dark"] .b-dem,[data-theme="dark"] .b-plt { background:rgba(52,168,83,.15); color:#56d364; }
+[data-theme="dark"] .b-inf { background:rgba(187,128,9,.15); color:#e3b341; }
+[data-theme="dark"] .b-con { background:rgba(248,81,73,.15); color:#ff7b72; }
+[data-theme="dark"] .b-inf-l { background:rgba(188,100,255,.15); color:#d2a8ff; }
+[data-theme="dark"] .b-mod { background:rgba(219,97,162,.15); color:#f0a8d0; }
+[data-theme="dark"] .b-biz { background:rgba(220,100,50,.15); color:#ffa657; }
+[data-theme="dark"] .pip.e { background:#30363d; }
+[data-theme="dark"] .rc-sig { color:#8b949e; }
+[data-theme="dark"] .rc-strat { color:#8b949e; background:#161b22; border-left-color:var(--accent); }
+[data-theme="dark"] .mf-num { color:#79c0ff; }
+[data-theme="dark"] .mf-enum { background:rgba(188,100,255,.2); color:#d2a8ff; }
+[data-theme="dark"] .mf-false { color:#484f58; }
+[data-theme="dark"] .mf-true { color:#56d364; }
+[data-theme="dark"] .eq-3 { background:rgba(52,168,83,.2); color:#56d364; }
+[data-theme="dark"] .eq-2 { background:rgba(56,139,253,.2); color:#79c0ff; }
+[data-theme="dark"] .eq-1 { background:rgba(220,160,10,.2); color:#e3b341; }
+[data-theme="dark"] .tp-haiku  { background:rgba(52,168,83,.2); color:#56d364; }
+[data-theme="dark"] .tp-sonnet { background:rgba(56,139,253,.2); color:#79c0ff; }
+[data-theme="dark"] .tp-opus   { background:rgba(188,100,255,.2); color:#d2a8ff; }
 
 /* ── THEME TOGGLE ── */
 .theme-toggle { background:none; border:1px solid rgba(148,163,184,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; color:#94a3b8; flex-shrink:0; }
