@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Model Evolution Tree — Nous Observatory. Trace the lineage of every major AI model across providers — capabilities, context windows, and milestone history.">
 <title>Model Evolution Tree — Nous Observatory</title>
 <style>
 :root {
@@ -194,7 +195,7 @@ body {
 .g-hdr{background:#0f172a;display:flex;align-items:center;padding:0 24px;height:52px;position:sticky;top:0;z-index:300;box-shadow:0 1px 6px rgba(0,0,0,.4);flex-shrink:0;gap:8px;}
 .g-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;margin-right:12px;}
 .g-brand-name{font-size:15px;font-weight:700;letter-spacing:-.3px;color:#e2e8f0;line-height:1.2;}
-.g-brand-tag{font-size:10px;color:#475569;letter-spacing:.3px;}
+.g-brand-tag{font-size:10px;color:#8b949e;letter-spacing:.3px;}
 .g-nav{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto;}
 .g-nav::-webkit-scrollbar{display:none;}
 .g-link{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s;white-space:nowrap;border:none;background:none;cursor:pointer;}
@@ -215,6 +216,28 @@ body {
 .pg-id-dark .pg-id-title{color:#c8deff;font-size:18px;}
 .pg-id-dark .pg-id-title span{color:#6ab0ff;}
 .pg-id-dark .pg-id-desc{color:#3a6090;font-size:12px;}
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:768px){
+  /* Header: brand+actions stay on one row, nav wraps to second row */
+  .g-hdr{flex-wrap:wrap;height:auto;padding:10px 16px 0;}
+  .g-brand{flex:1;margin-right:0;padding-bottom:10px;}
+  .g-actions{padding-bottom:10px;}
+  .g-nav{order:3;width:100%;border-top:1px solid rgba(255,255,255,.08);padding:6px 0 8px;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);}
+  .g-link{font-size:11px;padding:5px 10px;}
+  /* Page identity strips */
+  .pg-id{padding:16px 16px 12px;}
+  .pg-id-title{font-size:18px;}
+  .pg-id-desc{font-size:12px;}
+  .pg-id-dark{padding:12px 16px 10px;}
+  .pg-id-dark .pg-id-title{font-size:16px;}
+  .ptabs{gap:4px;padding:6px 10px 4px;justify-content:flex-start;overflow-x:auto;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 4%,#000 96%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 4%,#000 96%,transparent 100%);}
+  .ptab{padding:4px 14px;font-size:10px;flex-shrink:0;}
+  .detail-panel{width:min(360px,90vw) !important;}
+}
+@media(max-width:480px){
+  .detail-panel{width:100vw !important;left:0 !important;right:0 !important;border-radius:0;}
+}
 </style>
 </head>
 <body>
@@ -226,13 +249,13 @@ body {
   </a>
   <nav class="g-nav">
     <a href="index.html" class="g-link">Overview</a>
+    <a href="index.html#search" class="g-link">🔍 Search</a>
+    <a href="index.html#models" class="g-link">⚗️ Models</a>
     <a href="event.html" class="g-link">📡 Live Intel</a>
     <a href="model-tree.html" class="g-link on">⬡ Model Tree</a>
     <a href="model-advisor.html" class="g-link">🤖 Advisor</a>
-    <a href="power-map.html" class="g-link">🔥 Power Map</a>
   </nav>
   <div class="g-actions">
-    <button class="g-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">☀️</button>
   </div>
 </div>
 <div class="pg-id pg-id-dark">
@@ -253,7 +276,7 @@ body {
 
 <!-- STAGE -->
 <div class="stage" id="stage">
-  <canvas id="particle-canvas"></canvas>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
   <svg id="tree-svg" viewBox="0 0 820 540" preserveAspectRatio="xMidYMid meet"></svg>
   <div class="zoom-hint" id="zoom-hint">Click a model node to zoom in · Click background to zoom out</div>
 </div>
@@ -1353,26 +1376,8 @@ initParticles();
 drawTree('anthropic', true);
 requestAnimationFrame(renderParticles);
 
-// ── THEME TOGGLE (dark-default page) ──────────────────────────────────────
-(function(){
-  const saved=localStorage.getItem('nous_theme');
-  if(saved) document.documentElement.setAttribute('data-theme',saved);
-  function syncBtn(){
-    const btn=document.getElementById('theme-toggle'); if(!btn) return;
-    const t=document.documentElement.getAttribute('data-theme')||'dark';
-    btn.textContent=t==='light'?'🌙':'☀️';
-    btn.title=t==='light'?'Switch to dark mode':'Switch to light mode';
-  }
-  window.toggleTheme=function(){
-    const current=document.documentElement.getAttribute('data-theme')||'dark';
-    const next=current==='light'?'dark':'light';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('nous_theme',next);
-    syncBtn();
-  };
-  if(document.readyState!=='loading') syncBtn();
-  else document.addEventListener('DOMContentLoaded',syncBtn);
-})();
+// Model Tree is always dark — ignores the global theme preference
+document.documentElement.setAttribute('data-theme','dark');
 </script>
 </body>
 </html>

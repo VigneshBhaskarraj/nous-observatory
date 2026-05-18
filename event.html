@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Event Intelligence — Nous Observatory. Live predictions, watch items, and analysis for major AI conferences including Google I/O, WWDC, and more.">
 <title>Event Intelligence — Nous Observatory</title>
 <style>
 :root {
@@ -261,12 +262,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 [data-theme="dark"] {
   --bg:#0d1117; --card:#161b22; --border:#30363d;
   --text:#c9d1d9; --muted:#8b949e; color-scheme:dark;
+  --indigo:#a5b4fc; --accent:#60a5fa;
+  --google-blue:#60a5fa;
 }
 [data-theme="dark"] body { background:var(--bg); }
-[data-theme="dark"] .hero { background:linear-gradient(135deg,#0d1117,#1a2233); border-color:#30363d; }
-[data-theme="dark"] .hero::before { background:radial-gradient(ellipse at 70% 50%,rgba(79,70,229,.12) 0%,transparent 60%); }
-[data-theme="dark"] .hero-title { color:#c9d1d9; }
-[data-theme="dark"] .subnav { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .hero { background:linear-gradient(135deg,#131d2e 0%,#1a2a40 100%); border-top:1px solid #1e3a5f; border-bottom-color:#30363d; }
+[data-theme="dark"] .hero::before { background:radial-gradient(ellipse at 70% 50%,rgba(99,102,241,.18) 0%,transparent 60%); }
+[data-theme="dark"] .hero-title { color:#e2e8f0; }
+[data-theme="dark"] .hero-sub { color:#94a3b8; }
+[data-theme="dark"] .hero-stat-n { color:#e2e8f0; }
+[data-theme="dark"] .subnav { background:#161b22; border-color:#30363d; }
 [data-theme="dark"] .footer { background:#0d1117; border-color:#30363d; }
 [data-theme="dark"] .chip { background:#161b22; border-color:#30363d; }
 [data-theme="dark"] .status-badge { background:#1c2128; border-color:#30363d; color:#c9d1d9; }
@@ -294,6 +299,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 [data-theme="dark"] .chain-cell { background:#1c2128; }
 [data-theme="dark"] .freshness-ts { background:rgba(255,255,255,.04); border-color:#30363d; }
 [data-theme="dark"] code { background:rgba(255,255,255,.08); color:#a5f3fc; border-radius:3px; padding:0 3px; }
+[data-theme="dark"] .ms-sig { color:#8b949e; }
+[data-theme="dark"] .lc-sig { color:#8b949e; }
+[data-theme="dark"] .watch-context { color:#8b949e; }
+[data-theme="dark"] .brief-prose { color:#8b949e; }
+[data-theme="dark"] .signal-box-label { color:#93c5fd; }
+[data-theme="dark"] .signal-box-text { color:#93c5fd; }
+[data-theme="dark"] .lc-signal-lbl { color:#93c5fd; }
+[data-theme="dark"] .ripple-box-text { color:#8b949e; }
+[data-theme="dark"] .dis-rollup-name { color:#ff7b72; }
+[data-theme="dark"] .tag-d { background:rgba(52,168,83,.2); color:#56d364; border-color:transparent; }
+[data-theme="dark"] .tag-a { background:rgba(66,133,244,.2); color:#79c0ff; border-color:transparent; }
+[data-theme="dark"] .tag-i { background:rgba(188,100,255,.2); color:#d2a8ff; border-color:transparent; }
+[data-theme="dark"] .tag-new { background:rgba(220,160,10,.2); color:#e3b341; border-color:transparent; }
+[data-theme="dark"] .dis-chip { background:rgba(248,81,73,.15); border-color:#ff7b7260; color:#ff7b72; }
+[data-theme="dark"] .live-dis-tag { background:rgba(248,81,73,.15); border-color:#ff7b7260; color:#ff7b72; }
+[data-theme="dark"] .bench .provider-google { color:#79c0ff; }
+[data-theme="dark"] .bench .provider-openai { color:#56d364; }
+[data-theme="dark"] .bench .provider-anthropic { color:#f0a8d0; }
 
 /* ── THEME TOGGLE BUTTON ── */
 .theme-toggle { background:none; border:1px solid rgba(100,116,139,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; flex-shrink:0; }
@@ -305,7 +328,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .g-hdr{background:#0f172a;display:flex;align-items:center;padding:0 24px;height:52px;position:sticky;top:0;z-index:300;box-shadow:0 1px 6px rgba(0,0,0,.4);flex-shrink:0;gap:8px;}
 .g-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;margin-right:12px;}
 .g-brand-name{font-size:15px;font-weight:700;letter-spacing:-.3px;color:#e2e8f0;line-height:1.2;}
-.g-brand-tag{font-size:10px;color:#475569;letter-spacing:.3px;}
+.g-brand-tag{font-size:10px;color:#8b949e;letter-spacing:.3px;}
 .g-nav{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto;}
 .g-nav::-webkit-scrollbar{display:none;}
 .g-link{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s;white-space:nowrap;border:none;background:none;cursor:pointer;}
@@ -345,6 +368,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .toast { position:fixed; bottom:24px; right:24px; z-index:9999; background:#1e293b; color:#f1f5f9; border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; box-shadow:0 4px 24px rgba(0,0,0,.22); transform:translateY(80px); opacity:0; transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s; pointer-events:none; max-width:320px; }
 .toast.show { transform:translateY(0); opacity:1; }
 .toast-icon { margin-right:6px; }
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:768px){
+  /* Header: brand+actions stay on one row, nav wraps to second row */
+  .g-hdr{flex-wrap:wrap;height:auto;padding:10px 16px 0;}
+  .g-brand{flex:1;margin-right:0;padding-bottom:10px;}
+  .g-actions{padding-bottom:10px;}
+  .g-nav{order:3;width:100%;border-top:1px solid rgba(255,255,255,.08);padding:6px 0 8px;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);}
+  .g-link{font-size:11px;padding:5px 10px;}
+  /* Page identity strips */
+  .pg-id{padding:16px 16px 12px;}
+  .pg-id-title{font-size:18px;}
+  .pg-id-desc{font-size:12px;}
+  .pg-id-dark{padding:12px 16px 10px;}
+  .pg-id-dark .pg-id-title{font-size:16px;}
+  /* Sticky offset correction when header is 2 rows (~88px) on mobile */
+  .event-selector-bar{top:88px;}
+  .subnav{top:141px;}  /* 88 + 53 */
+  .hero{padding:24px 16px 20px;}
+  .hero-title{font-size:26px;}
+  .hero-sub{font-size:13px;}
+  .hero-meta{gap:12px;margin-top:16px;}
+  .hero-stat-n{font-size:18px;}
+  .content{padding:20px 16px;}
+  .watch-card{padding:14px 16px;}
+  .live-spotlight{padding:14px 16px;}
+  .live-chips{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:480px){
+  .hero-title{font-size:20px;}
+  .esb-pills{gap:4px;}
+  .event-pill{font-size:11px;padding:4px 10px;}
+  .snav{padding:10px 12px;font-size:11px;}
+  .bench-wrap{font-size:11px;}
+  .bench th,.bench td{padding:8px 10px;}
+  .grid2{grid-template-columns:1fr;}
+  .brief-stats{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 </head>
 <body>
@@ -356,10 +417,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </a>
   <nav class="g-nav">
     <a href="index.html" class="g-link">Overview</a>
+    <a href="index.html#search" class="g-link">🔍 Search</a>
+    <a href="index.html#models" class="g-link">⚗️ Models</a>
     <a href="event.html" class="g-link on">📡 Live Intel</a>
     <a href="model-tree.html" class="g-link">⬡ Model Tree</a>
     <a href="model-advisor.html" class="g-link">🤖 Advisor</a>
-    <a href="power-map.html" class="g-link">🔥 Power Map</a>
   </nav>
   <div class="g-actions">
     <button class="g-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
@@ -642,7 +704,7 @@ function buildCard(m, evColor){
   const pred=getPred(m); const ent=_eMap[m.entity_id]?.name||'';
   const hasDetail=!!(m.significance||m.strategic_signal||m.ripple_effects||(m.displacement_entities||[]).length);
   const isNew=isNewMilestone(m);
-  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`onclick="toggleCard('${id}')"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
+  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`role="button" tabindex="0" onclick="toggleCard('${id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCard('${id}')}"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
     <div class="lc-row">
       <div class="lc-stripe" style="background:${cfg.color}"></div>
       <span class="lc-date">${(m.date||'').slice(5,10)}</span>

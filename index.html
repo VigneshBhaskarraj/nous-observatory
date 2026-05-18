@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Nous Observatory — AI Intelligence Graph. Track AI entities, model releases, research milestones, and industry signals across every major lab.">
 <title>Nous Observatory</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <style>
@@ -190,7 +191,7 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 /* ── DARK MODE ── */
 [data-theme="dark"] {
   --bg:#0d1117; --card:#161b22; --border:#30363d;
-  --text:#c9d1d9; --muted:#8b949e; --accent-bg:rgba(79,70,229,.15);
+  --text:#c9d1d9; --muted:#8b949e; --accent:#818cf8; --accent-bg:rgba(129,140,248,.15);
   color-scheme:dark;
 }
 [data-theme="dark"] body { background:var(--bg); }
@@ -204,9 +205,34 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 [data-theme="dark"] .sg-card { background:#161b22; border-color:#30363d; }
 [data-theme="dark"] .rc  { background:#161b22; border-color:#30363d; }
 [data-theme="dark"] .mfm td { background:#161b22; border-color:#30363d; color:#c9d1d9; }
-[data-theme="dark"] .mfm .cat-hdr td { background:#1c2128; }
+[data-theme="dark"] .mfm td:first-child { background:#161b22 !important; border-color:#30363d; }
+[data-theme="dark"] .mfm thead th { background:#1c2128 !important; border-color:#30363d; color:#8b949e; }
+[data-theme="dark"] .mfm thead th:first-child { background:#1c2128 !important; }
+[data-theme="dark"] .mfm tbody tr:hover td { background:#1c2128 !important; }
+[data-theme="dark"] .mfm tbody tr:hover td:first-child { background:#21262d !important; }
+[data-theme="dark"] .mfm .cat-hdr td { background:rgba(129,140,248,.12) !important; }
 [data-theme="dark"] .theme-toggle { border-color:rgba(148,163,184,.3); color:#94a3b8; }
 [data-theme="dark"] .theme-toggle:hover { background:rgba(148,163,184,.1); color:#c9d1d9; }
+[data-theme="dark"] .b-co,[data-theme="dark"] .b-ann,[data-theme="dark"] .b-app { background:rgba(56,139,253,.15); color:#79c0ff; }
+[data-theme="dark"] .b-pe,[data-theme="dark"] .b-dem,[data-theme="dark"] .b-plt { background:rgba(52,168,83,.15); color:#56d364; }
+[data-theme="dark"] .b-inf { background:rgba(187,128,9,.15); color:#e3b341; }
+[data-theme="dark"] .b-con { background:rgba(248,81,73,.15); color:#ff7b72; }
+[data-theme="dark"] .b-inf-l { background:rgba(188,100,255,.15); color:#d2a8ff; }
+[data-theme="dark"] .b-mod { background:rgba(219,97,162,.15); color:#f0a8d0; }
+[data-theme="dark"] .b-biz { background:rgba(220,100,50,.15); color:#ffa657; }
+[data-theme="dark"] .pip.e { background:#30363d; }
+[data-theme="dark"] .rc-sig { color:#8b949e; }
+[data-theme="dark"] .rc-strat { color:#8b949e; background:#161b22; border-left-color:var(--accent); }
+[data-theme="dark"] .mf-num { color:#79c0ff; }
+[data-theme="dark"] .mf-enum { background:rgba(188,100,255,.2); color:#d2a8ff; }
+[data-theme="dark"] .mf-false { color:#484f58; }
+[data-theme="dark"] .mf-true { color:#56d364; }
+[data-theme="dark"] .eq-3 { background:rgba(52,168,83,.2); color:#56d364; }
+[data-theme="dark"] .eq-2 { background:rgba(56,139,253,.2); color:#79c0ff; }
+[data-theme="dark"] .eq-1 { background:rgba(220,160,10,.2); color:#e3b341; }
+[data-theme="dark"] .tp-haiku  { background:rgba(52,168,83,.2); color:#56d364; }
+[data-theme="dark"] .tp-sonnet { background:rgba(56,139,253,.2); color:#79c0ff; }
+[data-theme="dark"] .tp-opus   { background:rgba(188,100,255,.2); color:#d2a8ff; }
 
 /* ── THEME TOGGLE ── */
 .theme-toggle { background:none; border:1px solid rgba(148,163,184,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; color:#94a3b8; flex-shrink:0; }
@@ -216,7 +242,7 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 .g-hdr{background:#0f172a;display:flex;align-items:center;padding:0 24px;height:52px;position:sticky;top:0;z-index:300;box-shadow:0 1px 6px rgba(0,0,0,.4);flex-shrink:0;gap:8px;}
 .g-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;margin-right:12px;}
 .g-brand-name{font-size:15px;font-weight:700;letter-spacing:-.3px;color:#e2e8f0;line-height:1.2;}
-.g-brand-tag{font-size:10px;color:#475569;letter-spacing:.3px;}
+.g-brand-tag{font-size:10px;color:#8b949e;letter-spacing:.3px;}
 .g-nav{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto;}
 .g-nav::-webkit-scrollbar{display:none;}
 .g-link{padding:5px 11px;border-radius:6px;font-size:12px;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s;white-space:nowrap;border:none;background:none;cursor:pointer;}
@@ -238,6 +264,36 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
 .pg-id-dark .pg-id-title span{color:#6ab0ff;}
 .pg-id-dark .pg-id-desc{color:#3a6090;font-size:12px;}
 .hdr-tag{font-size:10px;color:#475569;letter-spacing:.3px;}
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:768px){
+  /* Header: brand+actions stay on one row, nav wraps to second row */
+  .g-hdr{flex-wrap:wrap;height:auto;padding:10px 16px 0;}
+  .g-brand{flex:1;margin-right:0;padding-bottom:10px;}
+  .g-actions{padding-bottom:10px;}
+  .g-nav{order:3;width:100%;border-top:1px solid rgba(255,255,255,.08);padding:6px 0 8px;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);}
+  .g-link{font-size:11px;padding:5px 10px;}
+  /* Page identity strips */
+  .pg-id{padding:16px 16px 12px;}
+  .pg-id-title{font-size:18px;}
+  .pg-id-desc{font-size:12px;}
+  .pg-id-dark{padding:12px 16px 10px;}
+  .pg-id-dark .pg-id-title{font-size:16px;}
+}
+@media(max-width:700px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .tab{padding:16px 14px;}
+  .frow{flex-wrap:wrap;}
+  .fsel{flex:1 1 calc(50% - 5px);}
+  .mfm th,.mfm td{padding:6px 8px;font-size:11px;}
+  .sg{grid-template-columns:1fr;}
+  .sf{grid-column:auto;}
+}
+@media(max-width:480px){
+  .stats{grid-template-columns:1fr;}
+  .stat-n{font-size:24px;}
+  .fsel{flex:1 1 100%;}
+}
 </style>
 </head>
 <body>
@@ -249,12 +305,11 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
   </a>
   <nav class="g-nav">
     <button class="g-link on" id="gnav-overview" onclick="sw(event,'overview')">Overview</button>
-    <button class="g-link" id="gnav-search" onclick="sw(event,'search')">Search</button>
+    <button class="g-link" id="gnav-search" onclick="sw(event,'search')">🔍 Search</button>
     <button class="g-link" id="gnav-models" onclick="sw(event,'models')">⚗️ Models</button>
     <a href="event.html" class="g-link">📡 Live Intel</a>
     <a href="model-tree.html" class="g-link">⬡ Model Tree</a>
     <a href="model-advisor.html" class="g-link">🤖 Advisor</a>
-    <a href="power-map.html" class="g-link">🔥 Power Map</a>
   </nav>
   <div class="g-actions">
     <span style="font-size:11px;color:#475569" id="hdr-meta"></span>
@@ -276,7 +331,7 @@ mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
         <span style="font-size:12px;color:var(--muted);font-weight:400" id="rel-map-subtitle">— entity relationships · hover to explore · click to highlight</span>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative">
-        <canvas id="rel-canvas" style="display:block;width:100%;cursor:default"></canvas>
+        <canvas id="rel-canvas" role="img" aria-label="AI entity relationship graph" style="display:block;width:100%;cursor:default"></canvas>
         <div id="rel-tooltip" style="position:absolute;display:none;background:#0f172a;color:#fff;padding:10px 14px;border-radius:8px;font-size:12px;pointer-events:none;z-index:20;max-width:240px;line-height:1.65;box-shadow:0 4px 16px rgba(0,0,0,.25)"></div>
         <div id="rel-legend" style="position:absolute;bottom:10px;right:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"></div>
       </div>
@@ -1358,22 +1413,16 @@ async function init() {
 
 init();
 
-// Hash-based tab activation — e.g. index.html#tree from model-advisor nav
+// Hash-based tab activation — e.g. index.html#search or index.html#models
 (function activateHashTab() {
   const hash = location.hash.replace('#','');
-  const valid = ['overview','search','models','intel','tree'];
+  const valid = ['overview','search','models'];
   if (!hash || !valid.includes(hash)) return;
-  // Wait for DOM to be ready then switch tab
   const trySwitch = () => {
-    const btn = [...document.querySelectorAll('.ntab')].find(b => {
-      const oc = b.getAttribute('onclick')||'';
-      return oc.includes(`'${hash}'`) || oc.includes(`"${hash}"`);
-    });
+    const btn = document.getElementById('gnav-' + hash);
     if (btn) btn.click();
   };
-  // Run after init completes (data may not be loaded yet, but tab UI can switch)
   trySwitch();
-  // Also re-try after data loads in case search/tree needs data
   document.addEventListener('DOMContentLoaded', trySwitch);
 })();
 
