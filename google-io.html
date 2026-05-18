@@ -2,41 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Google I/O 2026 Tracker — Live predictions, announcements, and watch items. Compare to I/O 2025 for longitudinal context.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Google I/O 2026 Tracker — What to expect, what's landing, and how it stacks up. A swipeable read for analysts and consultants.">
 <title>Google I/O 2026 Tracker</title>
 <style>
-/* ── CSS VARIABLES ── */
+/* ── VARIABLES ── */
 :root {
   --bg:#f8fafc; --card:#ffffff; --border:#e2e8f0;
   --text:#0f172a; --muted:#64748b; --accent:#4285f4;
   --warn:#d97706; --red:#dc2626; --indigo:#4f46e5;
   --google-blue:#4285f4; --google-green:#34a853;
   --google-yellow:#d97706; --google-red:#dc2626;
-  --hdr-h:56px; --edition-h:52px;
 }
 
 /* ── RESET + BASE ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
+html,body{height:100%;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:var(--bg); color:var(--text);
-  font-size:16px; line-height:1.6;
+  background:var(--bg);color:var(--text);
+  font-size:16px;line-height:1.6;
   -webkit-tap-highlight-color:transparent;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  overscroll-behavior:none;
 }
 
-/* ── STICKY HEADER (always single row) ── */
+/* ── HEADER ── */
 .hdr{
-  position:sticky;top:0;z-index:300;
-  height:var(--hdr-h);
-  background:#0f172a;
+  height:56px;background:#0f172a;
   display:flex;align-items:center;
-  padding:0 16px; gap:12px;
+  padding:0 16px;gap:12px;flex-shrink:0;
   box-shadow:0 2px 8px rgba(0,0,0,.4);
-  flex-shrink:0;
+  z-index:30;
 }
-.hdr-brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.hdr-brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0;text-decoration:none;}
 .hdr-icon{font-size:20px;flex-shrink:0;}
 .hdr-name{font-size:16px;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hdr-tag{font-size:10px;color:#8b949e;white-space:nowrap;}
@@ -48,24 +48,18 @@ body{
 }
 .hdr-btn:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3);}
 
-/* ── STICKY EDITION BAR ── */
+/* ── EDITION BAR ── */
 .edition-bar{
-  position:sticky;top:var(--hdr-h);z-index:200;
   background:var(--card);border-bottom:1px solid var(--border);
-  padding:10px 16px;
-  display:flex;align-items:center;gap:10px;
-  box-shadow:0 1px 4px rgba(0,0,0,.06);
-  min-height:var(--edition-h);
+  padding:10px 16px;display:flex;align-items:center;gap:10px;
+  flex-shrink:0;min-height:52px;z-index:25;
 }
 .esb-label{
   font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;
   color:var(--muted);white-space:nowrap;flex-shrink:0;
   padding-right:10px;border-right:1px solid var(--border);margin-right:4px;
 }
-.esb-pills{
-  display:flex;gap:8px;flex:1;
-  overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
-}
+.esb-pills{display:flex;gap:8px;flex:1;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
 .esb-pills::-webkit-scrollbar{display:none;}
 .event-pill{
   display:inline-flex;align-items:center;gap:6px;
@@ -80,8 +74,8 @@ body{
 /* ── LIVE BANNER ── */
 .live-banner{
   background:linear-gradient(90deg,#b91c1c,#991b1b);color:#fff;
-  padding:12px 16px;display:none;align-items:center;gap:12px;
-  font-size:14px;font-weight:700;
+  padding:10px 16px;display:none;align-items:center;gap:12px;
+  font-size:13px;font-weight:700;flex-shrink:0;
 }
 .live-banner.visible{display:flex;}
 .live-banner-pulse{width:8px;height:8px;border-radius:50%;background:#fff;flex-shrink:0;animation:pulse 1.5s ease-in-out infinite;}
@@ -89,17 +83,87 @@ body{
 .live-banner-text{flex:1;}
 .live-banner-dismiss{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.7;line-height:1;padding:0 4px;}
 
-/* ── HERO STRIP ── */
-.hero-strip{
-  background:linear-gradient(135deg,#ffffff 0%,#eff6ff 50%,#f0f9ff 100%);
-  border-bottom:1px solid var(--border);padding:20px 16px;
+/* ── SLIDE TABS ── */
+.slide-tabs{
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;flex-shrink:0;padding:0 4px;
+  overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
+  z-index:20;
 }
-.hero-main-title{font-size:22px;font-weight:800;line-height:1.2;color:#0f172a;margin-bottom:6px;}
-.hero-main-title span{color:var(--indigo);}
-.hero-sub-text{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.slide-tabs::-webkit-scrollbar{display:none;}
+.slide-tab{
+  padding:11px 14px;background:none;border:none;
+  border-bottom:2px solid transparent;
+  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
+  white-space:nowrap;margin-bottom:-1px;min-height:44px;
+  transition:all .15s;display:inline-flex;align-items:center;gap:5px;
+}
+.slide-tab:hover{color:var(--text);}
+.slide-tab.active{color:var(--google-blue);border-bottom-color:var(--google-blue);}
+.slide-tab .tab-badge{
+  background:#ea4335;color:#fff;font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:10px;line-height:1.4;
+}
+
+/* ── SLIDES (horizontal swipe deck) ── */
+.slides{
+  flex:1 1 auto;display:flex;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  scroll-behavior:smooth;min-height:0;
+}
+.slides::-webkit-scrollbar{display:none;}
+.slide{
+  flex:0 0 100%;width:100%;height:100%;
+  scroll-snap-align:start;scroll-snap-stop:always;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  background:var(--bg);
+  overscroll-behavior:contain;
+}
+.slide-inner{
+  padding:20px 16px 28px;
+  max-width:100%;
+}
+.slide-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.slide-title{
+  font-size:24px;font-weight:800;line-height:1.2;
+  color:var(--text);margin-bottom:8px;
+}
+.slide-sub{
+  font-size:14px;color:var(--muted);line-height:1.6;
+  margin-bottom:20px;
+}
+
+/* ── DOTS INDICATOR ── */
+.slide-dots{
+  display:flex;justify-content:center;align-items:center;gap:8px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+  background:var(--card);border-top:1px solid var(--border);
+  flex-shrink:0;z-index:20;
+}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--border);cursor:pointer;
+  transition:background .2s,transform .2s;
+  border:none;padding:0;
+}
+.dot.active{background:var(--google-blue);transform:scale(1.4);}
+.dots-hint{
+  font-size:10px;color:var(--muted);margin-left:10px;
+  letter-spacing:.5px;
+}
+
+/* ── HERO STATS (inside slide 0) ── */
 .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
 .hero-stat-card{
-  background:rgba(255,255,255,.85);border:1px solid var(--border);
+  background:var(--card);border:1px solid var(--border);
   border-radius:12px;padding:12px 14px;
 }
 .hero-stat-n{font-size:24px;font-weight:800;line-height:1;}
@@ -108,53 +172,20 @@ body{
   display:inline-flex;align-items:center;gap:7px;
   background:#dcfce7;border:1px solid #86efac;color:#166534;
   font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;
+  margin-bottom:24px;
 }
 .status-badge.live{background:#fee2e2;border-color:#fca5a5;color:#991b1b;}
 .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
 
-/* ── JUMP NAV ── */
-.jump-nav{
-  background:var(--card);border-bottom:2px solid var(--border);
-  padding:0 8px;display:flex;gap:0;
-  overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
-}
-.jump-nav::-webkit-scrollbar{display:none;}
-.jump-link{
-  padding:12px 14px;background:none;border:none;border-bottom:2px solid transparent;
-  font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;
-  white-space:nowrap;margin-bottom:-2px;transition:all .15s;min-height:46px;
-}
-.jump-link:hover{color:var(--text);}
-.jump-link.active{color:var(--google-blue);border-bottom-color:var(--google-blue);}
-
-/* ── ACCORDION SECTIONS ── */
-.sections{padding:12px 12px 40px;}
-.acc-section{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;margin-bottom:10px;overflow:hidden;
-}
-.acc-hdr{
-  display:flex;align-items:center;gap:12px;padding:16px;
-  cursor:pointer;user-select:none;min-height:56px;
-  background:var(--card);transition:background .15s;
-}
-.acc-hdr:hover{background:#f8fafc;}
-.acc-icon{font-size:18px;flex-shrink:0;}
-.acc-title-wrap{flex:1;min-width:0;}
-.acc-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.3;}
-.acc-title-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-.acc-chev{font-size:12px;color:var(--muted);transition:transform .2s;flex-shrink:0;}
-.acc-section.collapsed .acc-chev{transform:rotate(-90deg);}
-.acc-body{padding:0 16px 20px;}
-.acc-section.collapsed .acc-body{display:none;}
-.acc-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.65;}
-
-/* ── SECTION HEADERS (within body) ── */
-.sec-h{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px;}
+/* ── SECTION HEADERS WITHIN SLIDE ── */
+.sec-h{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:24px 0 12px;}
 
 /* ── CHIPS ── */
-.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
-.chip{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;flex:1;min-width:90px;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.chip{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;flex:1;min-width:130px;
+}
 .chip-n{font-size:22px;font-weight:800;}
 .chip-l{font-size:11px;color:var(--muted);margin-top:2px;}
 
@@ -172,17 +203,13 @@ body{
 .milestone.inferred{border-left-color:#9b59b6;}
 .ms-date{font-size:11px;color:var(--muted);font-weight:600;}
 .ms-event{font-size:14px;font-weight:600;margin:3px 0;line-height:1.4;}
-.ms-sig{font-size:12px;color:var(--muted);line-height:1.5;}
+.ms-sig{font-size:12px;color:var(--muted);line-height:1.55;}
 .ms-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
 
 /* ── BENCH TABLE ── */
 .bench-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -16px;padding:0 16px;}
 .bench{width:100%;border-collapse:collapse;min-width:520px;}
-.bench th{
-  background:#f8fafc;font-size:11px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.5px;color:var(--muted);padding:10px 12px;text-align:left;
-  border-bottom:1px solid var(--border);white-space:nowrap;
-}
+.bench th{background:#f8fafc;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
 .bench td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
 .bench tr:hover td{background:#f8fafc;}
 .bench .provider-google{color:#4285f4;font-weight:700;}
@@ -220,11 +247,7 @@ body{
 .lc-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
 
 /* ── SPOTLIGHT ── */
-.live-spotlight{
-  border-left:4px solid var(--google-blue);background:var(--card);
-  border:1px solid var(--border);border-left-width:4px;
-  border-radius:0 14px 14px 0;padding:16px;margin-bottom:16px;
-}
+.live-spotlight{border-left:4px solid var(--google-blue);background:var(--card);border:1px solid var(--border);border-left-width:4px;border-radius:0 14px 14px 0;padding:16px;margin-bottom:16px;}
 .sp-eyebrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
 .sp-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:3px 10px;border-radius:10px;color:#fff;}
 .sp-entity{font-size:11px;font-weight:600;padding:3px 9px;border-radius:8px;}
@@ -340,18 +363,9 @@ body{
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-msg{color:var(--muted);font-size:13px;padding:20px 0;}
 
-/* ── FOOTER ── */
-.footer{
-  border-top:1px solid var(--border);padding:24px 16px;
-  text-align:center;color:var(--muted);font-size:12px;
-  background:var(--card);
-  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
-}
-.footer a{color:#4285f4;text-decoration:none;}
-
 /* ── TOAST ── */
 .toast{
-  position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  position:fixed;bottom:calc(60px + env(safe-area-inset-bottom,0px));
   right:16px;left:16px;z-index:9999;
   background:#1e293b;color:#f1f5f9;border-radius:12px;
   padding:14px 18px;font-size:14px;font-weight:600;
@@ -365,21 +379,19 @@ body{
 
 /* ── DARK MODE ── */
 [data-theme="dark"]{
-  --bg:#0d1117; --card:#161b22; --border:#30363d;
-  --text:#c9d1d9; --muted:#8b949e; color-scheme:dark;
-  --indigo:#a5b4fc; --accent:#60a5fa; --google-blue:#60a5fa;
+  --bg:#0d1117;--card:#161b22;--border:#30363d;
+  --text:#c9d1d9;--muted:#8b949e;color-scheme:dark;
+  --indigo:#a5b4fc;--accent:#60a5fa;--google-blue:#60a5fa;
 }
 [data-theme="dark"] body{background:var(--bg);}
-[data-theme="dark"] .hero-strip{background:linear-gradient(135deg,#131d2e 0%,#1a2a40 100%);border-bottom-color:#30363d;}
-[data-theme="dark"] .hero-main-title{color:#e2e8f0;}
-[data-theme="dark"] .hero-stat-card{background:rgba(22,27,34,.9);border-color:#30363d;}
+[data-theme="dark"] .slide{background:var(--bg);}
 [data-theme="dark"] .edition-bar{background:#161b22;border-color:#30363d;}
 [data-theme="dark"] .esb-label{border-color:#30363d;}
-[data-theme="dark"] .jump-nav{background:#161b22;border-color:#30363d;}
-[data-theme="dark"] .jump-link:hover{color:#c9d1d9;}
-[data-theme="dark"] .acc-section{background:#0d1117;border-color:#30363d;}
-[data-theme="dark"] .acc-hdr{background:#161b22;}
-[data-theme="dark"] .acc-hdr:hover{background:#1c2128;}
+[data-theme="dark"] .slide-tabs{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .slide-tab:hover{color:#c9d1d9;}
+[data-theme="dark"] .slide-dots{background:#161b22;border-color:#30363d;}
+[data-theme="dark"] .dot{background:#30363d;}
+[data-theme="dark"] .hero-stat-card{background:#161b22;border-color:#30363d;}
 [data-theme="dark"] .chip{background:#1c2128;border-color:#30363d;}
 [data-theme="dark"] .status-badge{background:#1c2128;border-color:#30363d;color:#c9d1d9;}
 [data-theme="dark"] .status-badge.live{background:rgba(153,27,27,.25);border-color:#fca5a5;}
@@ -421,52 +433,44 @@ body{
 [data-theme="dark"] .tag-a{background:rgba(66,133,244,.2);color:#79c0ff;border-color:transparent;}
 [data-theme="dark"] .tag-i{background:rgba(188,100,255,.2);color:#d2a8ff;border-color:transparent;}
 [data-theme="dark"] .tag-new{background:rgba(220,160,10,.2);color:#e3b341;border-color:transparent;}
-[data-theme="dark"] .footer{background:#0d1117;border-color:#30363d;}
 [data-theme="dark"] .freshness-ts{background:rgba(255,255,255,.04);border-color:#30363d;}
 [data-theme="dark"] code{background:rgba(255,255,255,.08);color:#a5f3fc;border-radius:3px;padding:0 3px;}
 [data-theme="dark"] .winner{background:rgba(250,252,8,.05);}
 
-/* ── DESKTOP ENHANCEMENTS ── */
+/* ── DESKTOP ── */
 @media(min-width:768px){
   body{font-size:14px;}
-  .hero-strip{padding:32px 32px;}
-  .hero-main-title{font-size:30px;}
+  .slide-inner{padding:32px;max-width:1000px;margin:0 auto;}
+  .slide-title{font-size:32px;}
+  .slide-sub{font-size:15px;}
   .hero-stats{grid-template-columns:repeat(4,1fr);}
   .esb-meta{display:block;}
-  .sections{max-width:1000px;margin:0 auto;padding:20px 24px 40px;}
-  .acc-hdr{padding:18px 24px;}
-  .acc-body{padding:0 24px 24px;}
   .watch-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   .brief-stats{grid-template-columns:repeat(4,1fr);}
   .chain-row{grid-template-columns:1fr auto 1fr;}
   .chain-arrow{text-align:center;padding-left:0;}
   .cite-list{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;}
   .live-chips{grid-template-columns:repeat(4,1fr);}
-}
-@media(min-width:1100px){
-  .hero-strip{padding:40px 40px;}
-  .sections{max-width:1100px;padding:24px 40px 40px;}
+  .dots-hint{display:inline;}
 }
 </style>
 </head>
 <body>
 
-<!-- STICKY HEADER -->
 <header class="hdr">
-  <div class="hdr-brand">
+  <a href="index.html" class="hdr-brand">
     <span class="hdr-icon">🔵</span>
     <div>
       <div class="hdr-name">Google I/O Tracker</div>
       <div class="hdr-tag">2026 · Live Intel</div>
     </div>
-  </div>
+  </a>
   <div class="hdr-actions">
     <button class="hdr-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
     <button class="hdr-btn" id="reload-btn" onclick="reload()">↺ Refresh</button>
   </div>
 </header>
 
-<!-- STICKY EDITION BAR -->
 <div class="edition-bar">
   <span class="esb-label">🔵 Edition</span>
   <div class="esb-pills" id="event-pills">
@@ -475,108 +479,75 @@ body{
   <div class="esb-meta" id="esb-meta"></div>
 </div>
 
-<!-- LIVE BANNER -->
 <div class="live-banner" id="live-banner">
   <div class="live-banner-pulse"></div>
   <div class="live-banner-text" id="live-banner-text"></div>
   <button class="live-banner-dismiss" onclick="document.getElementById('live-banner').classList.remove('visible')" title="Dismiss">×</button>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- HERO STRIP -->
-<div class="hero-strip">
-  <div class="hero-main-title"><span>Google I/O 2026</span> Live Intel</div>
-  <div class="hero-sub-text">Predictions, watch items, and live announcement tracking. Toggle to I/O 2025 above to compare editions year-over-year.</div>
-  <div class="hero-stats">
-    <div class="hero-stat-card">
-      <div class="hero-stat-n" id="stat-milestones">—</div>
-      <div class="hero-stat-l">I/O 2026 milestones</div>
-    </div>
-    <div class="hero-stat-card">
-      <div class="hero-stat-n" id="stat-events">—</div>
-      <div class="hero-stat-l">Editions tracked</div>
-    </div>
-    <div class="hero-stat-card">
-      <div class="hero-stat-n" id="stat-ev-total">—</div>
-      <div class="hero-stat-l">Total items</div>
-    </div>
-    <div class="hero-stat-card">
-      <div class="hero-stat-n" id="stat-new">—</div>
-      <div class="hero-stat-l">New in 24 h</div>
-    </div>
-  </div>
-  <div class="status-badge" id="status-badge">
-    <div class="status-dot"></div>
-    <span id="status-text">Loading event data…</span>
-  </div>
-</div>
+<!-- TAB PILLS (click to jump to a slide) -->
+<nav class="slide-tabs" id="slide-tabs" aria-label="Sections">
+  <button class="slide-tab active" data-idx="0" onclick="goToSlide(0,this)">📊 Today</button>
+  <button class="slide-tab" data-idx="1" onclick="goToSlide(1,this)">🔭 To Watch</button>
+  <button class="slide-tab" data-idx="2" onclick="goToSlide(2,this)">⚡ Rankings</button>
+  <button class="slide-tab" data-idx="3" onclick="goToSlide(3,this)">🔴 Live <span id="live-count" class="tab-badge" style="display:none"></span></button>
+  <button class="slide-tab" data-idx="4" onclick="goToSlide(4,this)">📋 Story</button>
+  <button class="slide-tab" data-idx="5" onclick="goToSlide(5,this)">🌊 Pressure</button>
+</nav>
 
-<!-- JUMP NAV (scroll-to nav, not sticky) -->
-<div class="jump-nav" id="jump-nav">
-  <button class="jump-link active" onclick="jumpTo('sec-going-in',this)">📊 Going In</button>
-  <button class="jump-link" onclick="jumpTo('sec-watch',this)">🔭 Watch</button>
-  <button class="jump-link" onclick="jumpTo('sec-benchmarks',this)">⚡ Benchmarks</button>
-  <button class="jump-link" onclick="jumpTo('sec-live',this)">🔴 Live <span id="live-count" style="display:none;background:#ea4335;color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:3px;vertical-align:middle"></span></button>
-  <button class="jump-link" onclick="jumpTo('sec-brief',this)">📋 Brief</button>
-  <button class="jump-link" onclick="jumpTo('sec-impact',this)">🌊 Impact</button>
-</div>
+<!-- SWIPE DECK -->
+<div class="slides" id="slides">
 
-<!-- ACCORDION SECTIONS -->
-<div class="sections">
+  <!-- Slide 0: Today (Where Google Stands) -->
+  <section class="slide" id="slide-0" aria-labelledby="slide-0-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Pre-event context</div>
+      <h1 class="slide-title" id="slide-0-title">Where Google Stands</h1>
+      <p class="slide-sub" id="going-in-sub">A quick read on Google's recent moves — the backdrop for everything coming at I/O 2026.</p>
 
-  <!-- Going In -->
-  <div class="acc-section" id="sec-going-in">
-    <div class="acc-hdr" onclick="toggleSection('sec-going-in')" role="button" tabindex="0"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sec-going-in')}">
-      <span class="acc-icon">📊</span>
-      <div class="acc-title-wrap">
-        <div class="acc-title" id="going-in-title">Going In</div>
+      <div class="hero-stats">
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-milestones">—</div><div class="hero-stat-l">Announcements tracked</div></div>
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-events">—</div><div class="hero-stat-l">Editions covered</div></div>
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-ev-total">—</div><div class="hero-stat-l">Total items</div></div>
+        <div class="hero-stat-card"><div class="hero-stat-n" id="stat-new">—</div><div class="hero-stat-l">New in 24 h</div></div>
       </div>
-      <span class="acc-chev">▼</span>
-    </div>
-    <div class="acc-body">
-      <div class="acc-sub" id="going-in-sub">What the longitudinal record shows about the organizer's AI arc — the context behind every announcement.</div>
+      <div class="status-badge" id="status-badge">
+        <div class="status-dot"></div>
+        <span id="status-text">Loading event data…</span>
+      </div>
+
+      <h2 class="sec-h" id="going-in-title">Google's Recent Moves</h2>
       <div class="chips" id="google-chips"><div class="loading-msg"><span class="spinner"></span>Loading…</div></div>
-      <div class="sec-h">Recent Milestones</div>
+
+      <h2 class="sec-h">Latest announcements</h2>
       <div id="recent-milestones"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
-      <div class="sec-h" id="model-line-title">Model Line</div>
+
+      <h2 class="sec-h" id="model-line-title">Model line</h2>
       <div id="gemini-models"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
-      <div class="sec-h">Key Metrics</div>
+
+      <h2 class="sec-h">Key metrics</h2>
       <div id="google-metrics"><div class="loading-msg"><span class="spinner"></span>Fetching…</div></div>
     </div>
-  </div>
+  </section>
 
-  <!-- What To Watch -->
-  <div class="acc-section" id="sec-watch">
-    <div class="acc-hdr" onclick="toggleSection('sec-watch')" role="button" tabindex="0"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sec-watch')}">
-      <span class="acc-icon">🔭</span>
-      <div class="acc-title-wrap">
-        <div class="acc-title" id="watch-title">What To Watch</div>
-      </div>
-      <span class="acc-chev">▼</span>
-    </div>
-    <div class="acc-body">
-      <div class="acc-sub" id="watch-sub">Predicted focus areas — based on trajectory, competitor moves, and market gaps.</div>
+  <!-- Slide 1: To Watch (Predictions) -->
+  <section class="slide" id="slide-1" aria-labelledby="slide-1-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Predictions</div>
+      <h1 class="slide-title" id="slide-1-title"><span id="watch-title">What To Watch For</span></h1>
+      <p class="slide-sub" id="watch-sub">What's likely on the stage — based on past patterns, competitor pressure, and gaps in Google's lineup.</p>
       <div class="watch-grid" id="watch-cards"></div>
     </div>
-  </div>
+  </section>
 
-  <!-- Benchmarks (collapsed by default) -->
-  <div class="acc-section collapsed" id="sec-benchmarks">
-    <div class="acc-hdr" onclick="toggleSection('sec-benchmarks')" role="button" tabindex="0"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sec-benchmarks')}">
-      <span class="acc-icon">⚡</span>
-      <div class="acc-title-wrap">
-        <div class="acc-title">Benchmark Snapshot</div>
-        <div class="acc-title-meta">Current model standings across providers</div>
-      </div>
-      <span class="acc-chev">▼</span>
-    </div>
-    <div class="acc-body">
-      <div class="acc-sub">The baseline landscape competitors arrive at each conference — scroll the table horizontally.</div>
+  <!-- Slide 2: Rankings (Benchmarks) -->
+  <section class="slide" id="slide-2" aria-labelledby="slide-2-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Competitive landscape</div>
+      <h1 class="slide-title" id="slide-2-title">How Models Stack Up</h1>
+      <p class="slide-sub">Where Gemini sits versus Claude and GPT today — the field Google has to beat. Scroll the table sideways to see all columns.</p>
       <div class="bench-wrap">
         <table class="bench">
           <thead><tr><th>Model</th><th>Provider</th><th>GPQA</th><th>MATH</th><th>HumanEval</th><th>SWE-bench</th><th>Context</th><th>$/M out</th></tr></thead>
@@ -584,65 +555,50 @@ body{
         </table>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Live Updates -->
-  <div class="acc-section" id="sec-live">
-    <div class="acc-hdr" onclick="toggleSection('sec-live')" role="button" tabindex="0"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sec-live')}">
-      <span class="acc-icon">🔴</span>
-      <div class="acc-title-wrap">
-        <div class="acc-title">Live Updates <span id="live-active-label" style="font-size:11px;font-weight:500;color:var(--muted)"></span></div>
-        <div class="acc-title-meta"><span class="freshness-ts" id="freshness-ts" style="display:none">Updated just now</span></div>
-      </div>
-      <span class="acc-chev">▼</span>
-    </div>
-    <div class="acc-body">
-      <div class="acc-sub">Milestones for the selected edition, grouped by category and impact. Tap any card to expand.</div>
+  <!-- Slide 3: Live (real-time tracker) -->
+  <section class="slide" id="slide-3" aria-labelledby="slide-3-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Live tracker <span class="freshness-ts" id="freshness-ts" style="display:none">Updated just now</span></div>
+      <h1 class="slide-title" id="slide-3-title">Live Updates <span id="live-active-label" style="font-size:14px;font-weight:500;color:var(--muted)"></span></h1>
+      <p class="slide-sub">Announcements landing in real time, grouped by area. Tap any item to read why it matters.</p>
       <div id="live-updates"><div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Loading…</div></div></div>
     </div>
-  </div>
+  </section>
 
-  <!-- Brief (collapsed by default) -->
-  <div class="acc-section collapsed" id="sec-brief">
-    <div class="acc-hdr" onclick="toggleSection('sec-brief')" role="button" tabindex="0"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sec-brief')}">
-      <span class="acc-icon">📋</span>
-      <div class="acc-title-wrap">
-        <div class="acc-title">Synthesis Brief <span id="brief-active-label" style="font-size:11px;font-weight:500;color:var(--muted)"></span></div>
-        <div class="acc-title-meta">Analyst synthesis — themes, chains, displacement rollup</div>
-      </div>
-      <span class="acc-chev">▼</span>
-    </div>
-    <div class="acc-body">
+  <!-- Slide 4: Story (Synthesis Brief) -->
+  <section class="slide" id="slide-4" aria-labelledby="slide-4-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Synthesis <span id="brief-active-label" style="font-size:11px;color:var(--muted)"></span></div>
+      <h1 class="slide-title" id="slide-4-title">The Story So Far</h1>
+      <p class="slide-sub">An analyst read — what's big, what's a pattern, who's under pressure. Generated from the same announcements you see on the Live slide.</p>
       <div class="brief-status" id="brief-status"></div>
       <div id="brief-body"><div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Loading…</div></div></div>
     </div>
-  </div>
+  </section>
 
-  <!-- Impact Map (collapsed by default) -->
-  <div class="acc-section collapsed" id="sec-impact">
-    <div class="acc-hdr" onclick="toggleSection('sec-impact')" role="button" tabindex="0"
-      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sec-impact')}">
-      <span class="acc-icon">🌊</span>
-      <div class="acc-title-wrap">
-        <div class="acc-title" id="impact-title">Impact Map</div>
-        <div class="acc-title-meta">Displacement signals across all tracked companies</div>
-      </div>
-      <span class="acc-chev">▼</span>
+  <!-- Slide 5: Pressure (Impact Map) -->
+  <section class="slide" id="slide-5" aria-labelledby="slide-5-title">
+    <div class="slide-inner">
+      <div class="slide-eyebrow">Competitive pressure</div>
+      <h1 class="slide-title" id="slide-5-title"><span id="impact-title">Who's Pressuring Whom</span></h1>
+      <p class="slide-sub" id="impact-sub">Where Google is putting competitors on the back foot — and where rivals are pushing back. Pulled from competitive callouts across every tracked company.</p>
+      <div id="impact-map"><div class="loading-msg"><span class="spinner"></span>Loading…</div></div>
     </div>
-    <div class="acc-body">
-      <div class="acc-sub" id="impact-sub">Who the organizer is threatening — and who is threatening them — drawn from displacement_entities across all tracked companies.</div>
-      <div id="impact-map"><div class="loading-msg"><span class="spinner"></span>Loading displacement data…</div></div>
-    </div>
-  </div>
+  </section>
 
-</div><!-- /sections -->
+</div><!-- /slides -->
 
-<div class="footer">
-  Part of <a href="index.html">Nous Observatory</a> — AI Intelligence Knowledge Graph ·
-  <a href="index.html#models">Full Model Matrix</a> ·
-  Data last updated: <span id="last-updated">loading…</span>
+<!-- DOTS INDICATOR -->
+<div class="slide-dots" id="slide-dots">
+  <button class="dot active" onclick="goToSlide(0)" aria-label="Today"></button>
+  <button class="dot" onclick="goToSlide(1)" aria-label="To Watch"></button>
+  <button class="dot" onclick="goToSlide(2)" aria-label="Rankings"></button>
+  <button class="dot" onclick="goToSlide(3)" aria-label="Live"></button>
+  <button class="dot" onclick="goToSlide(4)" aria-label="Story"></button>
+  <button class="dot" onclick="goToSlide(5)" aria-label="Pressure"></button>
+  <span class="dots-hint">swipe or tap to navigate</span>
 </div>
 
 <script>
@@ -663,37 +619,63 @@ async function getAllMF(){
   return rows;
 }
 
-/* ── NAVIGATION ── */
-function toggleSection(id){
-  const sec = document.getElementById(id);
-  if(sec) sec.classList.toggle('collapsed');
+/* ── SLIDE NAVIGATION ── */
+const SLIDE_COUNT = 6;
+let _activeSlideIdx = 0;
+let _isManualScroll = false;
+
+function setActiveSlide(idx){
+  _activeSlideIdx = idx;
+  document.querySelectorAll('.slide-tab').forEach((b,i)=>b.classList.toggle('active', i===idx));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i===idx));
+  // Scroll the active tab pill into view in case it's offscreen
+  const activeTab = document.querySelector('.slide-tab.active');
+  if(activeTab) activeTab.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
 }
 
-function jumpTo(sectionId, btn){
-  const sec = document.getElementById(sectionId);
-  if(!sec) return;
-  if(sec.classList.contains('collapsed')) sec.classList.remove('collapsed');
-  // Offset for two sticky bars
-  const offset = 56 + 52 + 8;
-  const top = sec.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({top, behavior:'smooth'});
-  document.querySelectorAll('.jump-link').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
+function goToSlide(idx, btn){
+  const slides = document.getElementById('slides');
+  const slide = document.getElementById('slide-'+idx);
+  if(!slides || !slide) return;
+  _isManualScroll = true;
+  // scrollIntoView with inline:start scrolls horizontally to that slide
+  slide.scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+  setActiveSlide(idx);
+  setTimeout(()=>{ _isManualScroll = false; }, 600);
+}
+
+// Track active slide as user swipes
+function setupSlideObserver(){
+  const slides = document.getElementById('slides');
+  if(!slides) return;
+  // Use scroll event with throttle — IntersectionObserver with horizontal scroll
+  // root has some quirks across browsers, this is more reliable
+  let scrollTimer = null;
+  slides.addEventListener('scroll', ()=>{
+    if(_isManualScroll) return;
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{
+      const idx = Math.round(slides.scrollLeft / slides.clientWidth);
+      if(idx !== _activeSlideIdx && idx >= 0 && idx < SLIDE_COUNT){
+        setActiveSlide(idx);
+      }
+    }, 80);
+  }, {passive:true});
 }
 
 function claimTag(ct){
-  if(ct==='demonstrated') return `<span class="tag tag-d">demonstrated</span>`;
+  if(ct==='demonstrated') return `<span class="tag tag-d">shipped</span>`;
   if(ct==='announced')    return `<span class="tag tag-a">announced</span>`;
-  if(ct==='inferred')     return `<span class="tag tag-i">inferred</span>`;
+  if(ct==='inferred')     return `<span class="tag tag-i">expected</span>`;
   return '';
 }
 function scoreBar(val, max, color){
-  if(!val||val==='N/A') return '<span style="color:#475569">—</span>';
+  if(!val||val==='N/A') return '<span style="color:var(--muted)">—</span>';
   const n=parseFloat(val); if(isNaN(n)) return `<span style="font-size:12px">${esc(val)}</span>`;
   return `<div class="score-bar-wrap"><div class="score-bar" style="width:${Math.min(100,(n/max)*100)}px;max-width:80px;background:${color}"></div><span class="score-val" style="color:${color}">${n}%</span></div>`;
 }
 
-/* ── LIVE TAB ENGINE ── */
+/* ── EVENT DATA ── */
 const EVENTS = [
   { key:'google-io',      label:'Google I/O 2026', pattern:'I/O',      color:'#4285f4', icon:'🔵', date:'May 19–20, 2026',  liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
   { key:'google-io-2025', label:'Google I/O 2025', pattern:'I/O 2025', color:'#7c3aed', icon:'🟣', date:'May 20–21, 2025',  liveDates:[], organizer:'Google DeepMind' },
@@ -710,20 +692,20 @@ function daysUntilLive(ev){
 }
 
 const LIVE_CATS = {
-  'Model':           {icon:'🧠',color:'#4f46e5',tags:['model-release','frontier-model','reasoning','gemini','thinking','vision','coding','flash','pro','ultra']},
-  'Android & OS':    {icon:'📱',color:'#059669',tags:['android','android-17','gemini-intelligence','mobile','rambler','widget','os','chrome','gemini-nano']},
-  'Infrastructure':  {icon:'⚡',color:'#0891b2',tags:['tpu','hardware','inference','training','custom-silicon','silicon','a2a','protocol','standards','interoperability']},
-  'Enterprise':      {icon:'🏢',color:'#7c3aed',tags:['agent-platform','enterprise','vertex-ai','workspace','cloud','agentspace','governance','no-code','agent-gateway']},
-  'Developer Tools': {icon:'🔧',color:'#d97706',tags:['firebase','adk','mcp','sdk','api','tools','genkit','developer','studio']},
-  'Hardware & XR':   {icon:'🥽',color:'#dc2626',tags:['xr','glasses','device','googlebooks','beam','pixel','spatial']},
-  'Media & Creative':{icon:'🎨',color:'#be185d',tags:['veo','imagen','lyria','video','audio','generative-media','music']},
+  'Models':           {icon:'🧠',color:'#4f46e5',tags:['model-release','frontier-model','reasoning','gemini','thinking','vision','coding','flash','pro','ultra']},
+  'Android & OS':     {icon:'📱',color:'#059669',tags:['android','android-17','gemini-intelligence','mobile','rambler','widget','os','chrome','gemini-nano']},
+  'Infrastructure':   {icon:'⚡',color:'#0891b2',tags:['tpu','hardware','inference','training','custom-silicon','silicon','a2a','protocol','standards','interoperability']},
+  'Enterprise':       {icon:'🏢',color:'#7c3aed',tags:['agent-platform','enterprise','vertex-ai','workspace','cloud','agentspace','governance','no-code','agent-gateway']},
+  'Developer Tools':  {icon:'🔧',color:'#d97706',tags:['firebase','adk','mcp','sdk','api','tools','genkit','developer','studio']},
+  'Hardware & XR':    {icon:'🥽',color:'#dc2626',tags:['xr','glasses','device','googlebooks','beam','pixel','spatial']},
+  'Creative AI':      {icon:'🎨',color:'#be185d',tags:['veo','imagen','lyria','video','audio','generative-media','music']},
 };
 
 const PREDS = [
   {short:'Ultra',      tags:['gemini','ultra','flagship','frontier-model']},
   {short:'Agents',     tags:['agent','mariner','agentic','agent-platform','computer-use']},
-  {short:'Flash ↓$',   tags:['flash','pricing','cost','price-drop']},
-  {short:'Context',    tags:['long-context','context','million-token']},
+  {short:'Cheaper',    tags:['flash','pricing','cost','price-drop']},
+  {short:'Long memory',tags:['long-context','context','million-token']},
   {short:'Multimodal', tags:['multimodal','video','audio','live-api','native-audio']},
   {short:'Research',   tags:['research','veo','alphafold','lyria','deepmind-research']},
 ];
@@ -735,13 +717,13 @@ function inferCat(m){
   const tags=(m.tags||[]).map(t=>String(t).toLowerCase()); const ev=(m.event||'').toLowerCase();
   for(const [cat,cfg] of Object.entries(LIVE_CATS)) if(cfg.tags.some(t=>tags.includes(t)||ev.includes(t))) return cat;
   const sl=(m.stack_layer||'').toLowerCase();
-  return sl==='model'?'Model':sl==='infrastructure'?'Infrastructure':'Enterprise';
+  return sl==='model'?'Models':sl==='infrastructure'?'Infrastructure':'Enterprise';
 }
 function getPred(m){
   const tags=(m.tags||[]).map(t=>String(t).toLowerCase()); const ev=(m.event||'').toLowerCase();
   return PREDS.find(p=>p.tags.some(t=>tags.includes(t)||ev.includes(t)));
 }
-function pips(n){ return `<div class="pips">${Array.from({length:5},(_,i)=>`<div class="pip${i<(n||0)?' on':''}"></div>`).join('')}</div>`; }
+function pips(n){ return `<div class="pips" title="Impact ${n||0} of 5">${Array.from({length:5},(_,i)=>`<div class="pip${i<(n||0)?' on':''}"></div>`).join('')}</div>`; }
 function disTags(arr){ if(!arr||!arr.length) return ''; return `<div class="live-dis-row">${arr.map(e=>`<span class="live-dis-tag">⚠ ${esc(e)}</span>`).join('')}</div>`; }
 
 function msForEvent(ev){
@@ -821,8 +803,8 @@ function buildCard(m, evColor){
     ${hasDetail?`<div class="lc-detail">
       ${ent?`<div style="font-size:10px;font-weight:700;color:${evColor};text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">${esc(ent)}</div>`:''}
       ${m.significance?`<div class="lc-sig">${esc(m.significance)}</div>`:''}
-      ${m.strategic_signal?`<div class="lc-signal"><div class="lc-signal-lbl">💡 Strategic Signal</div>${esc(m.strategic_signal)}</div>`:''}
-      ${m.ripple_effects?`<div class="lc-ripple"><div class="lc-ripple-lbl">🌊 Ripple Effects</div>${esc(m.ripple_effects)}</div>`:''}
+      ${m.strategic_signal?`<div class="lc-signal"><div class="lc-signal-lbl">💡 Why it matters</div>${esc(m.strategic_signal)}</div>`:''}
+      ${m.ripple_effects?`<div class="lc-ripple"><div class="lc-ripple-lbl">🌊 Knock-on effects</div>${esc(m.ripple_effects)}</div>`:''}
       ${disTags(m.displacement_entities)}
       <div class="lc-footer">
         ${claimTag(m.claim_type)}
@@ -842,7 +824,7 @@ function filterCat(btn, cat, evColor){
   document.querySelectorAll('.live-cat-group').forEach(g=>g.classList.toggle('hidden', cat!=='all'&&g.dataset.cat!==cat));
 }
 
-/* ── BRIEF / SYNTHESIS ENGINE ── */
+/* ── SYNTHESIS HELPERS ── */
 const THEME_STOPWORDS = new Set([
   'gemini','google','model-release','announced','preview','experimental',
   'developer','sdk','api','tools','cloud-next'
@@ -892,8 +874,8 @@ function dominantCategory(ms){
 function liveStatusFor(ev){
   if(isLiveNow(ev)) return `<span class="live-now">● LIVE NOW</span> Auto-refresh every 5 min during ${esc(ev.date)}.`;
   const d=daysUntilLive(ev);
-  if(d!==null) return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} scheduled for ${esc(ev.date)}. Auto-refresh activates on conference day.`;
-  if(ev.liveDates?.length===0) return `Past event · ${esc(ev.date)}. Historical milestones only.`;
+  if(d!==null) return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} is scheduled for ${esc(ev.date)}. Auto-refresh kicks in on day one.`;
+  if(ev.liveDates?.length===0) return `Past event · ${esc(ev.date)}. Showing the historical record.`;
   return '';
 }
 
@@ -902,7 +884,7 @@ function renderBrief(ms, ev){
   const status=document.getElementById('brief-status');
   if(status) status.innerHTML = liveStatusFor(ev);
   if(!ms.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No milestones to synthesize yet</div><div class="empty-body">Seed milestones with <code>source_event</code> matching "${esc(ev?.pattern||'')}" — the brief will populate automatically.</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">Nothing to summarise yet</div><div class="empty-body">Announcements will populate this view as they land. Check the Live slide for real-time updates.</div></div>`;
     return;
   }
   const evColor=ev?.color||'#4f46e5';
@@ -914,21 +896,21 @@ function renderBrief(ms, ev){
   const dom=dominantCategory(ms);
 
   const exec=`<div class="brief-block">
-    <div class="brief-h">📌 Executive Summary <span class="brief-h-count" style="background:${evColor}">${ms.length}</span></div>
+    <div class="brief-h">📌 Headline <span class="brief-h-count" style="background:${evColor}">${ms.length}</span></div>
     <div class="brief-headline">${esc(top.event)}</div>
-    <div class="brief-prose">Across ${ms.length} milestones spanning ${esc(dateSpan)}, <strong>${esc(top.event.slice(0,80))}${top.event.length>80?'…':''}</strong> is the highest-signal anchor (FIS ${top.forward_implication_score||'?'}/5). The dominant theme is <strong style="color:${evColor}">${esc(dom?.[0]||'mixed')}</strong> (${dom?.[1]||0} of ${ms.length} milestones). ${highSig} milestone${highSig===1?'':'s'} cleared FIS≥4 — ${highSig===0?'none likely to':highSig===1?'one likely to':highSig+' likely to'} materially reshape the competitive landscape.</div>
+    <div class="brief-prose">Across ${ms.length} announcements between ${esc(dateSpan)}, <strong>${esc(top.event.slice(0,80))}${top.event.length>80?'…':''}</strong> is the biggest story (impact ${top.forward_implication_score||'?'}/5). The main thread running through everything is <strong style="color:${evColor}">${esc(dom?.[0]||'mixed')}</strong> (${dom?.[1]||0} of ${ms.length} items). ${highSig} ${highSig===1?'item is':'items are'} high-impact — meaning ${highSig===0?'nothing has yet':highSig===1?'one move is':highSig+' moves are'} likely to shift the competitive landscape.</div>
     <div class="brief-stats">
-      <div class="brief-stat"><div class="brief-stat-n" style="color:${evColor}">${ms.length}</div><div class="brief-stat-l">Milestones</div></div>
-      <div class="brief-stat"><div class="brief-stat-n" style="color:var(--warn)">${highSig}</div><div class="brief-stat-l">High-Signal (≥4)</div></div>
-      <div class="brief-stat"><div class="brief-stat-n" style="color:#34a853">${claimCounts.demonstrated}</div><div class="brief-stat-l">Demonstrated</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:${evColor}">${ms.length}</div><div class="brief-stat-l">Announcements</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:var(--warn)">${highSig}</div><div class="brief-stat-l">High-impact</div></div>
+      <div class="brief-stat"><div class="brief-stat-n" style="color:#34a853">${claimCounts.demonstrated}</div><div class="brief-stat-l">Shipped</div></div>
       <div class="brief-stat"><div class="brief-stat-n" style="color:#4285f4">${claimCounts.announced}</div><div class="brief-stat-l">Announced</div></div>
     </div>
   </div>`;
 
   const themes=clusterThemes(ms);
   const themesBlock=themes.length?`<div class="brief-block">
-    <div class="brief-h">🧭 Emergent Themes <span class="brief-h-count">${themes.length}</span></div>
-    <div class="brief-prose">Tags co-occurring across ≥2 milestones, surfacing the underlying narrative threads.</div>
+    <div class="brief-h">🧭 Recurring Themes <span class="brief-h-count">${themes.length}</span></div>
+    <div class="brief-prose">Topics that keep showing up across multiple announcements — the patterns that signal where Google is doubling down.</div>
     ${themes.map(t=>{
       const ex=t.milestones.slice(0,2).map(m=>esc((m.event||'').slice(0,50))+'…').join(' · ');
       return `<div class="theme-row"><div class="theme-bullet" style="background:${evColor}"></div><div class="theme-body"><div class="theme-name">${esc(humanizeTheme(t.tag))}<span class="theme-pop" style="background:${evColor}">${t.count}×</span></div><div class="theme-evidence">${ex}</div></div></div>`;
@@ -937,27 +919,27 @@ function renderBrief(ms, ev){
 
   const chains=hardwareToSoftwareChains(ms);
   const chainsBlock=chains.length?`<div class="brief-block">
-    <div class="brief-h">⚙️ Hardware → Software Chains <span class="brief-h-count">${chains.length}</span></div>
-    <div class="brief-prose">Infrastructure milestones connected to downstream Model / App / Developer-Tool milestones via shared tags.</div>
+    <div class="brief-h">⚙️ From New Chips To New Features <span class="brief-h-count">${chains.length}</span></div>
+    <div class="brief-prose">When Google ships custom silicon, here's what it enables higher up the stack — in models, apps, and developer tools.</div>
     ${chains.map(c=>`<div class="chain-row">
-      <div class="chain-cell"><div class="chain-cell-lbl">⚡ Infrastructure</div><div class="chain-cell-title">${esc(c.src.event.slice(0,80))}${c.src.event.length>80?'…':''}</div><div class="chain-cell-tags">${(c.src.tags||[]).slice(0,4).map(t=>esc(t)).join(' · ')}</div></div>
+      <div class="chain-cell"><div class="chain-cell-lbl">⚡ The chip / infra</div><div class="chain-cell-title">${esc(c.src.event.slice(0,80))}${c.src.event.length>80?'…':''}</div><div class="chain-cell-tags">${(c.src.tags||[]).slice(0,4).map(t=>esc(t)).join(' · ')}</div></div>
       <div class="chain-arrow">→</div>
-      <div class="chain-cell"><div class="chain-cell-lbl">${esc(c.dst.stack_layer||'Downstream')}</div><div class="chain-cell-title">${esc(c.dst.event.slice(0,80))}${c.dst.event.length>80?'…':''}</div><div class="chain-cell-tags">shared: ${c.overlap.slice(0,3).map(t=>esc(t)).join(', ')}</div></div>
+      <div class="chain-cell"><div class="chain-cell-lbl">What it powers</div><div class="chain-cell-title">${esc(c.dst.event.slice(0,80))}${c.dst.event.length>80?'…':''}</div><div class="chain-cell-tags">link: ${c.overlap.slice(0,3).map(t=>esc(t)).join(', ')}</div></div>
     </div>`).join('')}
   </div>`:'';
 
   const rollup=displacementRollup(ms);
   const max=rollup[0]?.count||1;
   const rollupBlock=rollup.length?`<div class="brief-block">
-    <div class="brief-h">🎯 Displacement Rollup <span class="brief-h-count" style="background:var(--red)">${rollup.length}</span></div>
-    <div class="brief-prose">Entities named as threatened across this event's milestones. Frequency ≈ competitive pressure.</div>
+    <div class="brief-h">🎯 Companies Under Pressure <span class="brief-h-count" style="background:var(--red)">${rollup.length}</span></div>
+    <div class="brief-prose">Names called out as being put on the back foot by Google's moves. More mentions = more pressure.</div>
     ${rollup.map(r=>`<div class="dis-rollup"><div class="dis-rollup-name">⚠ ${esc(r.name)}</div><div class="dis-rollup-bar"><div class="dis-rollup-fill" style="width:${(r.count/max)*100}%"></div></div><div class="dis-rollup-count">${r.count}×</div></div>`).join('')}
   </div>`:'';
 
   const sortedMs=[...ms].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
   const citeBlock=`<div class="brief-block">
-    <div class="brief-h">📚 Citation Index <span class="brief-h-count">${ms.length}</span></div>
-    <div class="brief-prose">All source milestones. Expand any card in Live Updates for full significance and strategic signal.</div>
+    <div class="brief-h">📚 All Announcements <span class="brief-h-count">${ms.length}</span></div>
+    <div class="brief-prose">Everything the summary above is built from. Swipe to the Live slide for the expandable, categorised view.</div>
     <div class="cite-list">${sortedMs.map(m=>`<div class="cite-item"><span class="cite-item-date">${esc(m.date||'????-??-??')}</span>${esc(m.event||'')}</div>`).join('')}</div>
   </div>`;
 
@@ -969,7 +951,7 @@ function renderLive(updates, ev){
   const el=document.getElementById('live-updates');
   const evColor=ev?.color||'#4285f4';
   if(!updates.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">No updates for ${esc(ev?.label||'this event')} yet</div><div class="empty-body">${ev?.date?`Scheduled: ${esc(ev.date)}. `:''}Milestones appear here when inserted with a <code>source_event</code> containing "${esc(ev?.pattern||'')}".</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-icon">📡</div><div class="empty-title">Nothing for ${esc(ev?.label||'this edition')} yet</div><div class="empty-body">${ev?.date?`Scheduled: ${esc(ev.date)}. `:''}New announcements will show up here as they land.</div></div>`;
     return;
   }
   const highSig=updates.filter(m=>(m.forward_implication_score||0)>=4).length;
@@ -978,23 +960,23 @@ function renderLive(updates, ev){
   const catCnt=new Set(updates.map(m=>inferCat(m))).size;
   const statsHtml=`<div class="live-chips">
     <div class="live-chip"><span class="lc-icon">🔴</span><div><div class="lc-val" style="color:${evColor}">${updates.length}</div><div class="lc-lbl">Updates</div></div></div>
-    <div class="live-chip"><span class="lc-icon">⭐</span><div><div class="lc-val" style="color:var(--warn)">${highSig}</div><div class="lc-lbl">High-Signal</div></div></div>
-    <div class="live-chip"><span class="lc-icon">🗂</span><div><div class="lc-val" style="color:var(--indigo)">${catCnt}</div><div class="lc-lbl">Categories</div></div></div>
-    ${topThreat?`<div class="live-chip threat"><span class="lc-icon">🎯</span><div><div class="lc-val">${esc(topThreat[0])}</div><div class="lc-lbl">Top threat · ${topThreat[1]}×</div></div></div>`:`<div class="live-chip" style="opacity:.35"><span class="lc-icon">🎯</span><div><div class="lc-val">—</div><div class="lc-lbl">No displacement</div></div></div>`}
+    <div class="live-chip"><span class="lc-icon">⭐</span><div><div class="lc-val" style="color:var(--warn)">${highSig}</div><div class="lc-lbl">High-impact</div></div></div>
+    <div class="live-chip"><span class="lc-icon">🗂</span><div><div class="lc-val" style="color:var(--indigo)">${catCnt}</div><div class="lc-lbl">Areas</div></div></div>
+    ${topThreat?`<div class="live-chip threat"><span class="lc-icon">🎯</span><div><div class="lc-val">${esc(topThreat[0])}</div><div class="lc-lbl">Most pressured · ${topThreat[1]}×</div></div></div>`:`<div class="live-chip" style="opacity:.35"><span class="lc-icon">🎯</span><div><div class="lc-val">—</div><div class="lc-lbl">No pressure data</div></div></div>`}
   </div>`;
   const sorted=[...updates].sort((a,b)=>(b.forward_implication_score||0)-(a.forward_implication_score||0));
   const sp=sorted[0]; const rest=sorted.slice(1);
   const spEnt=_eMap[sp.entity_id]?.name||'';
   const spHtml=`<div class="live-spotlight" style="border-left-color:${evColor}">
     <div class="sp-eyebrow">
-      <span class="sp-badge" style="background:${evColor}">⭐ Spotlight · Score ${sp.forward_implication_score||'?'}/5</span>
+      <span class="sp-badge" style="background:${evColor}">⭐ Top story · Impact ${sp.forward_implication_score||'?'}/5</span>
       ${spEnt?`<span class="sp-entity" style="background:${evColor}15;color:${evColor}">${esc(spEnt)}</span>`:''}
       <span class="sp-date">${esc(sp.date||'')}</span>
     </div>
     <div class="sp-title">${esc(sp.event)}</div>
     ${sp.significance?`<div class="sp-sig">${esc(sp.significance)}</div>`:''}
-    ${sp.strategic_signal?`<div class="signal-box" style="background:${evColor}08;border-color:${evColor}30;border-left-color:${evColor}"><div class="signal-box-label" style="color:${evColor}">💡 Strategic Signal</div><div class="signal-box-text" style="color:${evColor}cc">${esc(sp.strategic_signal)}</div></div>`:''}
-    ${sp.ripple_effects?`<div class="ripple-box"><div class="ripple-box-label">🌊 Ripple Effects</div><div class="ripple-box-text">${esc(sp.ripple_effects)}</div></div>`:''}
+    ${sp.strategic_signal?`<div class="signal-box" style="background:${evColor}08;border-color:${evColor}30;border-left-color:${evColor}"><div class="signal-box-label" style="color:${evColor}">💡 Why it matters</div><div class="signal-box-text" style="color:${evColor}cc">${esc(sp.strategic_signal)}</div></div>`:''}
+    ${sp.ripple_effects?`<div class="ripple-box"><div class="ripple-box-label">🌊 Knock-on effects</div><div class="ripple-box-text">${esc(sp.ripple_effects)}</div></div>`:''}
     ${disTags(sp.displacement_entities)}
   </div>`;
   const grouped={}; rest.forEach(m=>{ const c=inferCat(m); if(!grouped[c]) grouped[c]=[]; grouped[c].push(m); });
@@ -1009,18 +991,18 @@ function renderLive(updates, ev){
   el.innerHTML=statsHtml+spHtml+filterHtml+groupsHtml;
 }
 
-/* ── WATCH PREDS ── */
+/* ── WATCH PREDS (plain English) ── */
 const WATCH_PREDS = {
   'google-io': [
-    {area:'🧠 Gemini 4 — flagship upgrade to answer Claude Mythos & GPT-5.5',conf:94,context:'A major Gemini model upgrade is the expected centrepiece of the May 19 keynote. Reporting describes it as "Gemini 4" or a significant 3.x major revision — meaningfully stronger reasoning, coding, and multimodal capabilities. Early benchmarks place it around GPT-5.5 tier, still behind Anthropic Claude Mythos but a significant step up from Gemini 2.5 Ultra.',signal:'Every Google I/O since 2023 opened with a flagship model reveal. Gemini 2.5 Ultra launched at I/O 2025; Gemini 4 is needed to re-establish competitiveness after Claude Opus 4.7 and GPT-5.5 shifted the frontier.'},
-    {area:'🥽 Android XR smart glasses — Google-confirmed consumer preview',conf:93,context:'Google officially confirmed it will preview Android XR glasses at I/O 2026. Following prototype demos at Cloud Next, expect partner hardware reveals, a developer SDK, and launch-partner pricing signals. Hardware partners mirroring the Googlebook model (Acer, ASUS, etc.) are likely.',signal:'Google confirmed this category directly. The XR preview at I/O is the developer-focused SDK launch; consumer availability follows. Direct competitive response to Meta Ray-Ban II.'},
-    {area:'📱 Android 17 "Aluminium" + Gemini Intelligence — developer depth',conf:90,context:'Android Show (May 12) confirmed Gemini Intelligence: cross-app agentic AI, AI-generated widgets, Gboard Rambler dictation, Android Auto upgrades, and Googlebook (Android-powered laptops by Acer/ASUS/Dell/HP/Lenovo). I/O keynote goes deeper — Gemini Nano v3 on-device specs, developer APIs for Gemini Intelligence, Android 17 stable timeline.',signal:'Gemini Intelligence is confirmed announced. I/O pivots to developer hooks: cross-app automation APIs, on-device model specs (Pixel 10 = Gemini Nano v3), and Googlebook SDK for laptop-class Gemini.'},
-    {area:'🤖 Project Astra — proactive ambient AI assistant, broad preview',conf:87,context:'Project Astra has been teased since I/O 2024 as a universal AI assistant operating without explicit prompts. I/O 2026 expected to unveil GA or broad preview: proactive task completion across Gmail, Calendar, Shopping, real-time visual context via phone and XR glasses camera.',signal:'Gemini Intelligence handles on-device Android tasks; Project Astra is the cloud ambient layer. Together they form Google\'s answer to Anthropic Managed Agents and OpenAI Operator.'},
-    {area:'🎬 Veo 4 + Lyria — creative AI suite generational jump',conf:82,context:'Veo 3 shipped at I/O 2025 with native audio generation. Veo 4 expected with higher resolution (1080p+), longer clip duration, and tighter Gemini 4 integration for prompt-to-video. Lyria 2 music generation and Imagen 4 image synthesis upgrades also expected.',signal:'Google\'s creative AI stack (Veo, Lyria, Imagen) is the strongest differentiator vs OpenAI Sora, ElevenLabs, and Midjourney. Each I/O has delivered a generational Veo jump.'},
-    {area:'⚡ Gemini Flash — renewed price floor cut & ADK v2',conf:79,context:'TPU 8i (80% better inference $/perf vs prior gen) gives Google margin to drop Gemini Flash pricing again. ADK v1.0 GA shipped at Cloud Next; I/O expected to deliver ADK v2 with on-device Gemini Nano runtime for edge-first agentic workflows without cloud round-trips.',signal:'Flash pricing dropped ~70% per generation. A new Flash tier at sub-$0.05/M input would undercut self-hosted open models and accelerate enterprise agent deployment.'},
+    {area:'🧠 Gemini 4 — a flagship model to answer Claude and GPT',conf:94,context:'A big Gemini upgrade is the expected centrepiece of the May 19 keynote. Reporting calls it "Gemini 4" or a major 3.x revision — meaningfully better at reasoning, coding, and multimodal tasks. Early benchmarks put it around GPT-5.5 territory, still trailing Anthropic\'s Claude Mythos but a clear step up from Gemini 2.5 Ultra.',signal:'Every I/O since 2023 has opened with a flagship model. Gemini 2.5 Ultra launched at I/O 2025; a Gemini 4 is what Google needs to stay competitive after Claude Opus 4.7 and GPT-5.5 moved the goalposts.'},
+    {area:'🥽 Android XR smart glasses — first developer preview',conf:93,context:'Google has officially confirmed it will preview Android XR glasses at I/O 2026. After prototype demos at Cloud Next, expect partner hardware reveals, a developer SDK, and signals on launch pricing. Hardware partners (Acer, ASUS, etc.) likely mirror the Googlebook playbook.',signal:'Google flagged this category directly. I/O is the developer-focused SDK launch; consumer availability follows. This is the direct competitive answer to Meta\'s Ray-Ban II.'},
+    {area:'📱 Android 17 + Gemini Intelligence — built-in AI for everything',conf:90,context:'The Android Show (May 12) already confirmed Gemini Intelligence: cross-app AI agents, AI-generated widgets, Gboard Rambler dictation, Android Auto upgrades, and Googlebook (Android-powered laptops by Acer/ASUS/Dell/HP/Lenovo). I/O goes deeper — Gemini Nano v3 on-device specs, developer APIs, and the Android 17 stable timeline.',signal:'Gemini Intelligence is the consumer story; I/O is where the developer hooks land. Pixel 10 will run Gemini Nano v3 on-device, and there will be SDKs for laptop-class Gemini.'},
+    {area:'🤖 Project Astra — proactive AI assistant gets wider rollout',conf:87,context:'Project Astra has been teased since I/O 2024 as a universal assistant that acts without explicit prompts. I/O 2026 is expected to unveil GA or broad preview: proactive tasks across Gmail, Calendar, Shopping, plus real-time visual context via phone and XR glasses cameras.',signal:'Gemini Intelligence handles on-device Android tasks; Project Astra is the cloud-side ambient layer. Together they\'re Google\'s answer to Anthropic\'s Managed Agents and OpenAI Operator.'},
+    {area:'🎬 Veo 4 + Lyria — a big jump for creative AI',conf:82,context:'Veo 3 shipped at I/O 2025 with native audio. Veo 4 is expected with higher resolution (1080p+), longer clips, and tighter Gemini 4 integration. Lyria 2 (music) and Imagen 4 (image) upgrades are also expected to round out the creative suite.',signal:'Google\'s creative stack (Veo, Lyria, Imagen) is its strongest differentiator versus OpenAI Sora, ElevenLabs, and Midjourney. Each I/O has delivered a generational Veo jump.'},
+    {area:'⚡ Gemini Flash — cheaper prices and ADK v2',conf:79,context:'New TPU 8i silicon (80% better inference price/performance vs the prior gen) gives Google room to cut Gemini Flash pricing again. ADK v1.0 shipped at Cloud Next; I/O is expected to bring ADK v2 with on-device Gemini Nano runtime — edge agentic workflows without round-trips to the cloud.',signal:'Flash pricing has dropped ~70% per generation. A new tier under $0.05/M input would undercut self-hosted open models and accelerate enterprise agent rollouts.'},
   ],
   'google-io-2025': [
-    {area:'📊 Retrospective view',conf:0,context:'This is the I/O 2025 retrospective. Use the Live Updates tab to browse milestones that landed at this event, and the Brief tab for analyst synthesis.',signal:'Predictions tab is forward-looking; for past events the Live and Brief tabs carry the analytical weight.'},
+    {area:'📊 Retrospective view',conf:0,context:'This is the I/O 2025 retrospective. Swipe to the Live slide to browse what landed at this event, and to the Story slide for the analyst summary.',signal:'Predictions are forward-looking; for past events the Live and Story slides do the analytical lifting.'},
   ],
 };
 
@@ -1028,11 +1010,11 @@ function renderWatch(ev){
   const el=document.getElementById('watch-cards');
   const title=document.getElementById('watch-title');
   const sub=document.getElementById('watch-sub');
-  if(title) title.innerHTML = `What To Watch <span style="font-size:12px;font-weight:500;color:var(--muted);margin-left:6px">· ${esc(ev?.label||'')}</span>`;
-  if(sub) sub.textContent = ev?.organizer ? `Predicted focus areas for ${ev.label} — drawn from ${ev.organizer}'s trajectory, competitor moves, and market gaps.` : 'Pick an event above to see predictions.';
+  if(title) title.textContent = ev ? `What To Watch For — ${ev.label}` : 'What To Watch For';
+  if(sub) sub.textContent = ev?.organizer ? `What's likely to show up on stage at ${ev.label}, based on ${ev.organizer}'s recent moves, competitor pressure, and gaps in the lineup.` : 'Pick an event above to see predictions.';
   const preds=(ev && WATCH_PREDS[ev.key]) || null;
   if(!preds || !preds.length){
-    el.innerHTML=`<div class="empty"><div class="empty-icon">🔭</div><div class="empty-title">No curated predictions for ${esc(ev?.label||'this event')} yet</div><div class="empty-body">The Live Updates and Brief tabs show what actually landed at this event.</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-icon">🔭</div><div class="empty-title">No predictions for ${esc(ev?.label||'this event')} yet</div><div class="empty-body">The Live and Story slides show what actually landed.</div></div>`;
     return;
   }
   el.innerHTML=preds.map(w=>`<div class="watch-card"><div class="watch-area">${w.area}</div>${w.conf?`<div class="conf-bar"><div class="conf-fill" style="width:${w.conf}%;background:${w.conf>80?ev.color:w.conf>70?'#d97706':'#94a3b8'}"></div></div><div class="conf-label">Confidence: ${w.conf}%</div>`:''}<div class="watch-context">${esc(w.context)}</div><div class="watch-signal" style="background:${ev.color}10;border-color:${ev.color}40;color:${ev.color}">💡 ${esc(w.signal)}</div></div>`).join('');
@@ -1049,11 +1031,11 @@ function renderGoingIn(ev){
   const orgColor=ev?.color||'#4285f4';
   const title=document.getElementById('going-in-title');
   const sub=document.getElementById('going-in-sub');
-  if(title) title.innerHTML=`Going In — ${esc(orgName)}'s Trajectory`;
-  if(sub) sub.textContent=`What the longitudinal record shows about ${orgName}'s AI arc — the context behind every ${ev?.label||'event'} announcement.`;
+  if(title) title.textContent=`${orgName}'s Recent Moves`;
+  if(sub) sub.textContent=`A quick read on ${orgName}'s track record — the backdrop for everything coming at ${ev?.label||'the event'}.`;
   const eid=entityIdForOrganizer(orgName);
   if(!eid){
-    document.getElementById('google-chips').innerHTML=`<div class="empty" style="padding:20px"><div class="empty-body">No tracked entity for <b>${esc(orgName)}</b> in the knowledge graph yet.</div></div>`;
+    document.getElementById('google-chips').innerHTML=`<div class="empty" style="padding:20px"><div class="empty-body">No data for <b>${esc(orgName)}</b> in the knowledge graph yet.</div></div>`;
     document.getElementById('recent-milestones').innerHTML='';
     document.getElementById('google-metrics').innerHTML='';
     document.getElementById('gemini-models').innerHTML='';
@@ -1063,19 +1045,19 @@ function renderGoingIn(ev){
     let orgMs=[], off=0;
     while(true){ const b=await get('milestones',`entity_id=eq.${eid}&select=*&order=date.desc&limit=200&offset=${off}`); orgMs=orgMs.concat(b); if(b.length<200) break; off+=200; }
     document.getElementById('google-chips').innerHTML=`
-      <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.length}</div><div class="chip-l">Total milestones</div></div>
-      <div class="chip"><div class="chip-n" style="color:#34a853">${orgMs.filter(m=>m.claim_type==='demonstrated').length}</div><div class="chip-l">Demonstrated</div></div>
+      <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.length}</div><div class="chip-l">Total announcements</div></div>
+      <div class="chip"><div class="chip-n" style="color:#34a853">${orgMs.filter(m=>m.claim_type==='demonstrated').length}</div><div class="chip-l">Shipped</div></div>
       <div class="chip"><div class="chip-n" style="color:${orgColor}">${orgMs.filter(m=>m.claim_type==='announced').length}</div><div class="chip-l">Announced</div></div>
-      <div class="chip"><div class="chip-n" style="color:#d97706">${orgMs.filter(m=>m.forward_implication_score===5).length}</div><div class="chip-l">Score-5 signals</div></div>`;
+      <div class="chip"><div class="chip-n" style="color:#d97706">${orgMs.filter(m=>m.forward_implication_score===5).length}</div><div class="chip-l">Top-impact moves</div></div>`;
     document.getElementById('recent-milestones').innerHTML=orgMs.length
-      ? orgMs.slice(0,8).map(m=>`<div class="milestone ${m.claim_type||''}"><div class="ms-date">${m.date}</div><div class="ms-event">${esc(m.event)}</div><div class="ms-sig">${esc(m.significance||'')}</div><div class="ms-tags">${m.claim_type?claimTag(m.claim_type):''}${m.forward_implication_score>=4?`<span class="tag tag-new">Signal ${m.forward_implication_score}/5</span>`:''}${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}</div></div>`).join('')
-      : `<div class="empty"><div class="empty-body">No milestones for ${esc(orgName)} yet.</div></div>`;
+      ? orgMs.slice(0,8).map(m=>`<div class="milestone ${m.claim_type||''}"><div class="ms-date">${m.date}</div><div class="ms-event">${esc(m.event)}</div><div class="ms-sig">${esc(m.significance||'')}</div><div class="ms-tags">${m.claim_type?claimTag(m.claim_type):''}${m.forward_implication_score>=4?`<span class="tag tag-new">High-impact ${m.forward_implication_score}/5</span>`:''}${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.15);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}</div></div>`).join('')
+      : `<div class="empty"><div class="empty-body">No announcements for ${esc(orgName)} yet.</div></div>`;
     const metrics=await get('key_metrics',`entity_id=eq.${eid}&select=metric_name,metric_value,as_of_date&order=as_of_date.desc&limit=20`);
     document.getElementById('google-metrics').innerHTML=metrics.length
       ? metrics.map(m=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted);font-size:13px">${esc(m.metric_name)}</span><span style="font-weight:700;font-size:14px">${esc(m.metric_value)}</span></div>`).join('')
       : `<div class="loading-msg">No metrics tracked for ${esc(orgName)} yet.</div>`;
     const mlTitle=document.getElementById('model-line-title');
-    if(mlTitle) mlTitle.textContent=`${orgName} Model Line`;
+    if(mlTitle) mlTitle.textContent=`${orgName} model line`;
     const orgModels=_allModels.filter(m=>m.entity_id===eid);
     document.getElementById('gemini-models').innerHTML=orgModels.length
       ? orgModels.map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div><span style="font-weight:700;font-size:14px">${esc(m.display_name)}</span><span style="font-size:11px;color:var(--muted);margin-left:6px">${m.api_version||''}</span></div><span style="font-size:11px;background:${orgColor}1f;color:${orgColor};padding:2px 8px;border-radius:4px">${esc(m.tier||'')}</span></div>`).join('')
@@ -1088,23 +1070,23 @@ function renderImpactMap(ev){
   const orgColor=ev?.color||'#4285f4';
   const title=document.getElementById('impact-title');
   const sub=document.getElementById('impact-sub');
-  if(title) title.innerHTML=`Impact Map — Who ${esc(orgName)} Is Threatening`;
-  if(sub) sub.textContent=`Milestones where ${orgName} threatens others, and where others threaten ${orgName} — drawn from displacement_entities across all tracked companies.`;
+  if(title) title.textContent=`Who ${orgName} Is Pressuring`;
+  if(sub) sub.textContent=`Where ${orgName}'s moves are putting competitors on the back foot — and where rivals are pushing back.`;
   const eid=entityIdForOrganizer(orgName);
   const el=document.getElementById('impact-map');
-  if(!eid){ el.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No tracked entity for ${esc(orgName)}</div></div>`; return; }
+  if(!eid){ el.innerHTML=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No data for ${esc(orgName)}</div></div>`; return; }
   const gDis=_allMsDis.filter(m=>m.entity_id===eid&&(m.displacement_entities||[]).length>0);
   const thrG=_allMsDis.filter(m=>m.entity_id!==eid&&(m.displacement_entities||[]).includes(orgName));
   let imp='';
   if(gDis.length){
-    imp+=`<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">${esc(orgName)} Threatening Others</div>`;
+    imp+=`<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Where ${esc(orgName)} is pushing</div>`;
     gDis.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow">→</div><div class="dis-targets">${m.displacement_entities.map(d=>`<div class="dis-chip">${esc(d)}</div>`).join('')}</div></div>`; });
   }
   if(thrG.length){
-    imp+=`<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Others Threatening ${esc(orgName)}</div>`;
+    imp+=`<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:24px 0 12px">Where others are pushing back</div>`;
     thrG.slice(0,8).forEach(m=>{ imp+=`<div class="displacement-row"><div class="dis-source"><div style="font-size:11px;color:var(--muted)">${_eMap[m.entity_id]?.name||'?'} · ${m.date}</div>${esc(m.event.slice(0,70))}${m.event.length>70?'…':''}</div><div class="dis-arrow" style="color:${orgColor}">←</div><div class="dis-targets"><div class="dis-chip" style="background:${orgColor}1f;border-color:${orgColor}66;color:${orgColor}">${esc(orgName)}</div></div></div>`; });
   }
-  if(!imp) imp=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No displacement data for ${esc(orgName)} yet</div></div>`;
+  if(!imp) imp=`<div class="empty"><div class="empty-icon">🗺</div><div class="empty-title">No pressure data for ${esc(orgName)} yet</div></div>`;
   el.innerHTML=imp;
 }
 
@@ -1130,12 +1112,12 @@ async function init(){
     const sourceEvents=new Set(evMs.map(m=>m.source_event).filter(Boolean));
     if(evMs.length>0){
       badge.classList.add('live');
-      stxt.textContent=`${evMs.length} event milestones across ${sourceEvents.size} conferences`;
+      stxt.textContent=`${evMs.length} announcements tracked across ${sourceEvents.size} events`;
       const liveCount=document.getElementById('live-count');
       liveCount.textContent=evMs.length;
       liveCount.style.display='inline';
     } else {
-      stxt.textContent='No event milestones yet · Select a conference below';
+      stxt.textContent='No announcements yet · check back soon';
     }
 
     _allModels=await get('models','select=*&order=release_date&limit=100');
@@ -1160,7 +1142,6 @@ async function init(){
     buildEventPills();
     setEvent(_activeEv);
 
-    document.getElementById('last-updated').textContent=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   } catch(e){ console.error(e); }
 }
 
@@ -1191,14 +1172,19 @@ function showLiveBanner(){
   if(!liveEvs.length){ banner.classList.remove('visible'); return; }
   const day1=liveEvs[0]; const today=todayISO();
   const dayNum=(day1.liveDates||[]).indexOf(today)+1;
-  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · Auto-refreshing every 5 min`;
+  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · auto-refreshing every 5 min`;
   banner.classList.add('visible');
 }
 
+/* ── RELOAD (preserves the active slide + its vertical scroll position) ── */
 async function reload(){
   const btn=document.getElementById('reload-btn');
   if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span>…'; }
   const prevCount=_prevEvMsCount;
+  const prevIdx=_activeSlideIdx;
+  const prevSlideEl=document.getElementById('slide-'+prevIdx);
+  const prevScrollTop=prevSlideEl?prevSlideEl.scrollTop:0;
+
   ['stat-milestones','stat-events','stat-ev-total','stat-new'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='—'; });
   document.getElementById('status-text').textContent='Reloading…';
   document.getElementById('event-pills').innerHTML=`<div class="loading-msg"><span class="spinner"></span>Loading…</div>`;
@@ -1207,23 +1193,56 @@ async function reload(){
   if(btn){ btn.disabled=false; btn.textContent='↺ Refresh'; }
   const newCount=_allEvMs.length;
   const diff=newCount-prevCount;
-  if(diff>0) showToast(`<span class="toast-icon">✦</span>${diff} new milestone${diff!==1?'s':''} loaded`);
-  else showToast('<span class="toast-icon">✓</span>Up to date');
+  if(diff>0) showToast(`<span class="toast-icon">✦</span>${diff} new announcement${diff!==1?'s':''} loaded`);
+  else if(_prevEvMsCount>0) showToast('<span class="toast-icon">✓</span>Up to date');
   _prevEvMsCount=newCount;
+
+  // Restore which slide the user was on, and its vertical scroll position
+  requestAnimationFrame(()=>{
+    if(prevIdx>0){
+      const slides=document.getElementById('slides');
+      if(slides){
+        _isManualScroll=true;
+        slides.scrollLeft = prevIdx * slides.clientWidth;
+        setActiveSlide(prevIdx);
+        setTimeout(()=>{ _isManualScroll=false; }, 400);
+      }
+    }
+    const slideEl=document.getElementById('slide-'+prevIdx);
+    if(slideEl) slideEl.scrollTop = prevScrollTop;
+  });
 }
 
-/* ── AUTO-REFRESH (conference days only) ── */
+/* ── AUTO-REFRESH (conference days only — May 19/20, 2026) ── */
 let _autoRefreshTimer = null;
 function setupAutoRefresh(){
   if(_autoRefreshTimer){ clearInterval(_autoRefreshTimer); _autoRefreshTimer=null; }
   const liveEvents=EVENTS.filter(isLiveNow);
   if(!liveEvents.length) return;
-  _autoRefreshTimer=setInterval(()=>{ reload(); }, 5*60*1000);
+  console.log('[auto-refresh] enabled — live event in progress');
+  _autoRefreshTimer=setInterval(()=>{
+    console.log('[auto-refresh] polling milestones…');
+    reload();
+  }, 5*60*1000);
   const stxt=document.getElementById('status-text');
   if(stxt){
     const labels=liveEvents.map(e=>e.label).join(' · ');
     stxt.innerHTML=`<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} in progress · auto-refresh every 5 min`;
   }
+}
+
+// Re-evaluate auto-refresh at midnight in case the user keeps the tab open
+// across the conference start. Schedules one re-check at next local midnight.
+function scheduleMidnightRecheck(){
+  const now=new Date();
+  const tmrw=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,30);
+  const ms=tmrw-now;
+  setTimeout(()=>{
+    console.log('[auto-refresh] midnight re-check — today is', todayISO());
+    showLiveBanner();      // banner appears/disappears as live status changes
+    setupAutoRefresh();    // start polling if today is now a live date
+    scheduleMidnightRecheck();
+  }, ms);
 }
 
 setInterval(updateFreshnessTs, 30000);
@@ -1249,7 +1268,9 @@ setInterval(updateFreshnessTs, 30000);
   else document.addEventListener('DOMContentLoaded',syncBtn);
 })();
 
-init().then(setupAutoRefresh);
+// Setup slide observer, then init + auto-refresh + midnight scheduler
+setupSlideObserver();
+init().then(()=>{ setupAutoRefresh(); scheduleMidnightRecheck(); });
 </script>
 </body>
 </html>
