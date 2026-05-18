@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Model Advisor — Nous Observatory. Describe what you're building and get instant AI model recommendations, task architecture, and monthly cost breakdown.">
 <title>Model Advisor — Nous Observatory</title>
 <style>
 :root {
@@ -202,6 +203,12 @@ input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0; }
 [data-theme="dark"] .arch-box { background:#161b22; border-color:#30363d; }
 [data-theme="dark"] .tweak-item { background:#1c2128; border-color:#30363d; }
 [data-theme="dark"] .cost-row { border-color:#30363d; }
+[data-theme="dark"] .pg-id { background:#0d1117; border-color:#30363d; }
+[data-theme="dark"] .pg-id-title { color:#c9d1d9; }
+[data-theme="dark"] .pg-id-desc { color:#8b949e; }
+[data-theme="dark"] .input-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .ex-pill { background:#1c2128; border-color:#30363d; color:#8b949e; }
+[data-theme="dark"] .ex-pill:hover { background:rgba(79,70,229,.15); border-color:var(--accent); color:var(--accent); }
 
 /* ── THEME TOGGLE ── */
 .theme-toggle { background:none; border:1px solid rgba(148,163,184,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; color:#94a3b8; }
@@ -301,12 +308,12 @@ Or: I need to analyze large codebases, auto-generate documentation, and run nigh
 Or: Building a research assistant that searches the web, reads long reports, and generates structured summaries in Chinese and English…"></textarea>
 
     <div class="examples" id="examples">
-      <span class="ex-pill" onclick="fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')">Customer support</span>
-      <span class="ex-pill" onclick="fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')">Code assistant</span>
-      <span class="ex-pill" onclick="fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')">Research &amp; docs</span>
-      <span class="ex-pill" onclick="fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')">Voice / real-time</span>
-      <span class="ex-pill" onclick="fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')">Agentic automation</span>
-      <span class="ex-pill" onclick="fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')">High-volume / cheap</span>
+      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')}">Customer support</span>
+      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')}">Code assistant</span>
+      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')}">Research &amp; docs</span>
+      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')}">Voice / real-time</span>
+      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')}">Agentic automation</span>
+      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')}">High-volume / cheap</span>
     </div>
 
     <div class="constraints">

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Event Intelligence — Nous Observatory. Live predictions, watch items, and analysis for major AI conferences including Google I/O, WWDC, and more.">
 <title>Event Intelligence — Nous Observatory</title>
 <style>
 :root {
@@ -681,7 +682,7 @@ function buildCard(m, evColor){
   const pred=getPred(m); const ent=_eMap[m.entity_id]?.name||'';
   const hasDetail=!!(m.significance||m.strategic_signal||m.ripple_effects||(m.displacement_entities||[]).length);
   const isNew=isNewMilestone(m);
-  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`onclick="toggleCard('${id}')"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
+  return `<div class="live-card${isNew?' new-milestone':''}" id="${id}" ${hasDetail?`role="button" tabindex="0" onclick="toggleCard('${id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCard('${id}')}"`:'style="cursor:default"'}${isNew?' style="border-color:#fde68a;box-shadow:0 0 0 2px rgba(250,204,21,.25)"':''}>
     <div class="lc-row">
       <div class="lc-stripe" style="background:${cfg.color}"></div>
       <span class="lc-date">${(m.date||'').slice(5,10)}</span>
