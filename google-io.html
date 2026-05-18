@@ -768,7 +768,7 @@ const EVENTS = [
   { key:'google-io', label:'Google I/O 2026', pattern:'I/O 2026', color:'#4285f4', icon:'🔵', date:'May 19–20, 2026', liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
 ];
 
-function todayISO(){ return new Date().toISOString().slice(0,10); }
+function todayISO(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function isLiveNow(ev){ return (ev.liveDates||[]).includes(todayISO()); }
 function daysUntilLive(ev){
   if(!ev.liveDates?.length) return null;
@@ -925,7 +925,10 @@ function pitchBoss(e, cardId){
   const busi=busiEl?busiEl.textContent.trim():'';
   const angle=_activePersona==='insurance'?'Insurance angle':_activePersona==='data'?'Data take':'Business case';
   const lines=[`📌 Google I/O 2026 — ${headline}`,why?`• Why it matters: ${why}`:'',busi?`• ${angle}: ${busi}`:''].filter(Boolean);
-  navigator.clipboard.writeText(lines.join('\n')).then(()=>showToast('<span class="toast-icon">📋</span>Copied to clipboard!')).catch(()=>showToast('<span class="toast-icon">⚠️</span>Copy failed — try selecting text manually'));
+  const text=lines.join('\n');
+  const fallbackToast=()=>showToast('<span class="toast-icon">⚠️</span>Copy failed — try selecting text manually');
+  if(!navigator.clipboard||!navigator.clipboard.writeText){ fallbackToast(); return; }
+  navigator.clipboard.writeText(text).then(()=>showToast('<span class="toast-icon">📋</span>Copied to clipboard!')).catch(fallbackToast);
 }
 
 /* ── SYNTHESIS HELPERS ── */
