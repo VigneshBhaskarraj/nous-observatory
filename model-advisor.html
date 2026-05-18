@@ -86,14 +86,50 @@ textarea::placeholder { color: #c1c9d8; }
   color: var(--accent); font-weight: 600; }
 .c-opt:hover:not(.on) { border-color: #a5b4fc; color: var(--accent); }
 
-.analyze-btn { width: 100%; margin-top: 18px; padding: 12px;
-  background: var(--accent); border: none; border-radius: 8px; color: #fff;
-  font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; }
-.analyze-btn:hover { background: #4338ca; box-shadow: 0 4px 14px rgba(79,70,229,.3); }
+/* ── Mode tabs ── */
+.mode-tabs { display: flex; gap: 2px; margin-bottom: 20px; }
+.mode-tab { padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; border: 1px solid var(--border);
+  background: var(--bg); color: var(--muted); }
+.mode-tab.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── Use-case grid ── */
+.uc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media(max-width:640px){ .uc-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.uc-card { width: 100%; text-align: left; cursor: pointer; border: 1px solid var(--border);
+  background: var(--card); border-radius: 10px; padding: 14px; transition: all .15s;
+  display: block; }
+.uc-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(79,70,229,.12); }
+.uc-card.on { border-color: var(--accent); background: var(--accent-bg);
+  box-shadow: 0 0 0 3px var(--accent-bg); }
+.uc-icon { font-size: 26px; margin-bottom: 6px; display: block; }
+.uc-label { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.uc-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* ── Loading chip ── */
+.loading-chip { display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--muted); background: var(--bg);
+  border: 1px solid var(--border); border-radius: 20px; padding: 3px 10px;
+  margin-bottom: 16px; }
+.loading-dot { width: 6px; height: 6px; border-radius: 50%;
+  background: var(--yellow); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── Live indicator ── */
+.live-indicator { display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--green); font-weight: 600; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 
 /* ── Section header ── */
 .sh { font-size: 15px; font-weight: 600; margin-bottom: 16px;
   display: flex; align-items: center; gap: 8px; }
+
+/* ── UC context label ── */
+.uc-context-label { font-size: 12px; color: var(--muted); margin-bottom: 12px;
+  padding: 6px 12px; background: var(--accent-bg); border-radius: 6px;
+  border-left: 3px solid var(--accent); display: none; }
+.uc-context-label.show { display: block; }
 
 /* ── Model cards ── */
 .model-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
@@ -214,6 +250,12 @@ input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0; }
 [data-theme="dark"] textarea::placeholder { color:#3d4f61; }
 [data-theme="dark"] .c-opt:hover:not(.on) { border-color:#818cf8; }
 [data-theme="dark"] .tweak-tag:hover:not(.on) { border-color:#818cf8; }
+[data-theme="dark"] .uc-card { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .uc-card.on { background:rgba(129,140,248,.15); border-color:#818cf8; }
+[data-theme="dark"] .mode-tab { background:#161b22; border-color:#30363d; color:#8b949e; }
+[data-theme="dark"] .mode-tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+[data-theme="dark"] .loading-chip { background:#161b22; border-color:#30363d; }
+[data-theme="dark"] .uc-context-label { background:rgba(129,140,248,.1); }
 
 /* ── THEME TOGGLE ── */
 .theme-toggle { background:none; border:1px solid rgba(148,163,184,.3); border-radius:6px; font-size:14px; cursor:pointer; padding:5px 8px; line-height:1; transition:all .15s; color:#94a3b8; }
@@ -298,29 +340,79 @@ input[type=range] { width: 100%; accent-color: var(--accent); margin: 4px 0; }
 <div class="pg-id">
   <div class="pg-id-label">🤖 Model Advisor</div>
   <div class="pg-id-title">Find your <span>perfect AI stack</span></div>
-  <div class="pg-id-desc">Describe what you're building and get instant model recommendations, a task architecture showing which model handles what, and a monthly cost breakdown you can tune.</div>
+  <div class="pg-id-desc">Pick a use case or describe what you're building — get instant model recommendations, a task architecture, and a monthly cost breakdown you can tune. <span id="live-indicator-pg" style="display:none" class="live-indicator"><span class="live-dot"></span> Live data</span></div>
 </div>
 
 <div class="page">
 
   <!-- Input card -->
   <div class="input-card">
-    <div class="input-label">Describe your use case</div>
-    <textarea id="uc-input" placeholder="e.g. I want to build a customer support bot that can handle complex queries, read uploaded PDFs, and escalate to a human when needed…
+    <!-- Loading state -->
+    <div class="loading-chip" id="loading-chip">
+      <span class="loading-dot"></span> Loading live model data…
+    </div>
+
+    <!-- Mode tab strip -->
+    <div class="mode-tabs">
+      <button class="mode-tab on" id="tab-guide" onclick="switchMode('guide')">🧩 Guide me</button>
+      <button class="mode-tab" id="tab-text" onclick="switchMode('text')">✏️ Describe it</button>
+    </div>
+
+    <!-- Guide mode panel -->
+    <div id="panel-guide">
+      <div class="uc-grid" id="uc-grid">
+        <button class="uc-card" data-uc="customer" onclick="selectUC('customer')">
+          <span class="uc-icon">🤝</span>
+          <div class="uc-label">Customer support</div>
+          <div class="uc-desc">Ticket routing, reply generation, escalation</div>
+        </button>
+        <button class="uc-card" data-uc="code" onclick="selectUC('code')">
+          <span class="uc-icon">💻</span>
+          <div class="uc-label">Code &amp; DevTools</div>
+          <div class="uc-desc">PR review, test gen, debugging, code analysis</div>
+        </button>
+        <button class="uc-card" data-uc="research" onclick="selectUC('research')">
+          <span class="uc-icon">🔬</span>
+          <div class="uc-label">Research &amp; Analysis</div>
+          <div class="uc-desc">Long docs, synthesis, deep report generation</div>
+        </button>
+        <button class="uc-card" data-uc="agent" onclick="selectUC('agent')">
+          <span class="uc-icon">🤖</span>
+          <div class="uc-label">Agentic workflow</div>
+          <div class="uc-desc">Multi-step automation, browser/tool use, pipelines</div>
+        </button>
+        <button class="uc-card" data-uc="multimodal" onclick="selectUC('multimodal')">
+          <span class="uc-icon">🎥</span>
+          <div class="uc-label">Multimodal</div>
+          <div class="uc-desc">Images, voice, video, PDFs, mixed media</div>
+        </button>
+        <button class="uc-card" data-uc="content" onclick="selectUC('content')">
+          <span class="uc-icon">✍️</span>
+          <div class="uc-label">Content creation</div>
+          <div class="uc-desc">Drafts, blogs, summaries, copy at scale</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Text mode panel -->
+    <div id="panel-text" style="display:none">
+      <textarea id="uc-input" placeholder="e.g. I want to build a customer support bot that can handle complex queries, read uploaded PDFs, and escalate to a human when needed…
 
 Or: I need to analyze large codebases, auto-generate documentation, and run nightly code review on pull requests…
 
 Or: Building a research assistant that searches the web, reads long reports, and generates structured summaries in Chinese and English…"></textarea>
 
-    <div class="examples" id="examples">
-      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')}">Customer support</span>
-      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')}">Code assistant</span>
-      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')}">Research &amp; docs</span>
-      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')}">Voice / real-time</span>
-      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')}">Agentic automation</span>
-      <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')}">High-volume / cheap</span>
+      <div class="examples" id="examples">
+        <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('customer support bot that reads tickets, classifies intent, and drafts replies at high volume')}">Customer support</span>
+        <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('coding agent that reviews pull requests, generates unit tests, and explains complex code')}">Code assistant</span>
+        <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('research tool that reads long PDF reports, extracts key findings, and writes structured summaries')}">Research &amp; docs</span>
+        <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('real-time voice assistant that answers questions quickly and handles conversations in multiple languages')}">Voice / real-time</span>
+        <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('autonomous agent that browses the web, fills forms, and completes multi-step workflows without human input')}">Agentic automation</span>
+        <span class="ex-pill" role="button" tabindex="0" onclick="fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();fillExample('budget-conscious classification pipeline processing 100,000 short texts per day')}">High-volume / cheap</span>
+      </div>
     </div>
 
+    <!-- Constraints — always visible -->
     <div class="constraints">
       <div class="constraint">
         <div class="c-label">Priority</div>
@@ -348,8 +440,6 @@ Or: Building a research assistant that searches the web, reads long reports, and
         </div>
       </div>
     </div>
-
-    <button class="analyze-btn" onclick="analyze()">Analyze My Use Case →</button>
   </div>
 
   <!-- Results -->
@@ -358,6 +448,8 @@ Or: Building a research assistant that searches the web, reads long reports, and
       <span class="tweak-label">Refine:</span>
       <div id="tweak-tags" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
+
+    <div class="uc-context-label" id="uc-context-label"></div>
 
     <div class="sh">Recommended Stack</div>
     <div class="model-cards" id="model-cards"></div>
@@ -399,88 +491,130 @@ Or: Building a research assistant that searches the web, reads long reports, and
   <!-- Empty hint -->
   <div class="empty-hint" id="empty-hint">
     <div class="empty-icon">🤖</div>
-    <div class="empty-text">Describe your use case above — or pick an example —<br>and get instant model recommendations with cost breakdown.</div>
+    <div class="empty-text">Pick a use case above — or switch to "Describe it" and type freely —<br>to get instant model recommendations with cost breakdown.</div>
   </div>
 
 </div><!-- /page -->
 
 <script>
 // ═══════════════════════════════════════════════════════════
-//  MODEL DATA
+//  SUPABASE
 // ═══════════════════════════════════════════════════════════
-const MODELS = [
-  { id:'claude-haiku-4-5',    name:'Haiku 4.5',         provider:'Anthropic', provColor:'#c0622f',
-    priceIn:0.80, priceOut:4,    ctx:200,  speed:1, oss:false, usOnly:true,
+const SB  = 'https://yjupiuxuoxmycehkbmwl.supabase.co';
+const KEY = 'sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr';
+const HDR = { apikey: KEY, Authorization: 'Bearer ' + KEY };
+async function get(table, qs='') {
+  const r = await fetch(`${SB}/rest/v1/${table}?${qs}`, { headers: HDR });
+  if (!r.ok) throw new Error(table + ' ' + r.status);
+  return r.json();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CAP_META — keyed by api_version
+// ═══════════════════════════════════════════════════════════
+const CAP_META = {
+  'claude-haiku-4-5': {
     caps:['vision','tools','agent'],
-    strengths:['fast','cheap','volume','simple','chat','classification','triage','routing'],
-    badge:'⚡ Fastest Claude', tier:'fast',
-    pitch:'Ultra-low latency for high-volume simple tasks. Best for routing, triage, and classification pipelines.' },
-  { id:'claude-sonnet-4-6',   name:'Sonnet 4.6',        provider:'Anthropic', provColor:'#c0622f',
-    priceIn:3,    priceOut:15,   ctx:200,  speed:2, oss:false, usOnly:true,
+    strengths:['fast','cheap','volume','simple','chat','classification','triage','routing','customer'],
+    badge:'⚡ Fastest Claude', tier_label:'fast', provColor:'#c0622f',
+    pitch:'Ultra-low latency for high-volume simple tasks. Best for routing, triage, and classification pipelines.',
+    priceIn:0.80, priceOut:4, speed:1, oss:false, usOnly:true,
+  },
+  'claude-sonnet-4-6': {
     caps:['vision','tools','think','code','agent'],
-    strengths:['coding','reasoning','analysis','vision','writing','balanced','tools','complex','agentic','review'],
-    badge:'⭐ Best Balance',   tier:'balanced',
-    pitch:'The default workhorse — strong reasoning, vision, coding, and tool use at a price that scales.' },
-  { id:'claude-opus-4-6',     name:'Opus 4.6',          provider:'Anthropic', provColor:'#c0622f',
-    priceIn:15,   priceOut:75,   ctx:200,  speed:3, oss:false, usOnly:true,
+    strengths:['coding','reasoning','analysis','vision','writing','balanced','tools','complex','agentic','review','code','agent','research'],
+    badge:'⭐ Best Balance', tier_label:'balanced', provColor:'#c0622f',
+    pitch:'The default workhorse — strong reasoning, vision, coding, and tool use at a price that scales.',
+    priceIn:3, priceOut:15, speed:2, oss:false, usOnly:true,
+  },
+  'claude-opus-4-6': {
     caps:['vision','tools','think'],
-    strengths:['research','complex','judgment','nuanced','legal','medical','critical','flagship','best'],
-    badge:'🏆 Highest Quality', tier:'flagship',
-    pitch:'When quality is non-negotiable. Complex judgment, nuanced analysis, high-stakes decisions.' },
-  { id:'gpt-4o-mini',         name:'GPT-4o mini',       provider:'OpenAI',    provColor:'#1d8a52',
-    priceIn:0.15, priceOut:0.60, ctx:128,  speed:1, oss:false, usOnly:true,
+    strengths:['research','complex','judgment','nuanced','legal','medical','critical','flagship','best','think'],
+    badge:'🏆 Highest Quality', tier_label:'flagship', provColor:'#c0622f',
+    pitch:'When quality is non-negotiable. Complex judgment, nuanced analysis, high-stakes decisions.',
+    priceIn:15, priceOut:75, speed:3, oss:false, usOnly:true,
+  },
+  'gpt-4o-mini': {
     caps:['vision','tools'],
-    strengths:['cheap','fast','volume','simple','classification','extraction'],
-    badge:'💰 Cheapest Vision', tier:'fast',
-    pitch:'Cheapest model with vision. Ideal for classification, extraction, and simple tasks at massive scale.' },
-  { id:'gpt-4o',              name:'GPT-4o',            provider:'OpenAI',    provColor:'#1d8a52',
-    priceIn:2.50, priceOut:10,   ctx:128,  speed:2, oss:false, usOnly:true,
+    strengths:['cheap','fast','volume','simple','classification','extraction','customer'],
+    badge:'💰 Cheapest Vision', tier_label:'fast', provColor:'#1d8a52',
+    pitch:'Cheapest model with vision. Ideal for classification, extraction, and simple tasks at massive scale.',
+    priceIn:0.15, priceOut:0.60, speed:1, oss:false, usOnly:true,
+  },
+  'gpt-4o': {
     caps:['vision','audio','tools','code'],
     strengths:['multimodal','voice','audio','vision','coding','balanced','realtime','speech'],
-    badge:'🎙 Best Multimodal', tier:'balanced',
-    pitch:'Native audio + vision together. Best for voice apps, live transcription, or mixed media pipelines.' },
-  { id:'o4-mini',             name:'o4-mini',           provider:'OpenAI',    provColor:'#1d8a52',
-    priceIn:1.10, priceOut:4.40, ctx:200,  speed:2, oss:false, usOnly:true,
+    badge:'🎙 Best Multimodal', tier_label:'balanced', provColor:'#1d8a52',
+    pitch:'Native audio + vision together. Best for voice apps, live transcription, or mixed media pipelines.',
+    priceIn:2.50, priceOut:10, speed:2, oss:false, usOnly:true,
+  },
+  'o4-mini': {
     caps:['vision','think','code'],
-    strengths:['reasoning','coding','math','logic','analysis','affordable','affordable-reasoning'],
-    badge:'⚡ Fast Reasoning',  tier:'reasoning',
-    pitch:'80% of o3 quality at 1/10th the cost. Best value for reasoning and hard coding tasks.' },
-  { id:'o3',                  name:'o3',                provider:'OpenAI',    provColor:'#1d8a52',
-    priceIn:10,   priceOut:40,   ctx:200,  speed:3, oss:false, usOnly:true,
+    strengths:['reasoning','coding','math','logic','analysis','affordable','affordable-reasoning','think','code'],
+    badge:'⚡ Fast Reasoning', tier_label:'reasoning', provColor:'#1d8a52',
+    pitch:'80% of o3 quality at 1/10th the cost. Best value for reasoning and hard coding tasks.',
+    priceIn:1.10, priceOut:4.40, speed:2, oss:false, usOnly:true,
+  },
+  'o3': {
     caps:['vision','think','code','agent'],
-    strengths:['research','hard','frontier','science','math','engineering','phd'],
-    badge:'🔬 Frontier Reasoning', tier:'flagship',
-    pitch:'OpenAI\'s current frontier. For problems that have stumped every other model. GPQA 87.7%.' },
-  { id:'gemini-2.5-flash',    name:'Gemini 2.5 Flash',  provider:'Google',    provColor:'#3a85c8',
-    priceIn:0.15, priceOut:0.60, ctx:1000, speed:2, oss:false, usOnly:false,
+    strengths:['research','hard','frontier','science','math','engineering','phd','think','agent'],
+    badge:'🔬 Frontier Reasoning', tier_label:'flagship', provColor:'#1d8a52',
+    pitch:'OpenAI\'s current frontier. For problems that have stumped every other model. GPQA 87.7%.',
+    priceIn:10, priceOut:40, speed:3, oss:false, usOnly:true,
+  },
+  'gemini-2.5-flash': {
     caps:['vision','think','tools','code'],
-    strengths:['long-context','documents','cheap','coding','search','grounding','large-context'],
-    badge:'📄 Best Value',       tier:'balanced',
-    pitch:'1M context window + thinking mode at $0.15/M input. Best value for long-document tasks.' },
-  { id:'gemini-2.5-pro',      name:'Gemini 2.5 Pro',    provider:'Google',    provColor:'#3a85c8',
-    priceIn:1.25, priceOut:10,   ctx:1000, speed:3, oss:false, usOnly:false,
+    strengths:['long-context','documents','cheap','coding','search','grounding','large-context','context','research'],
+    badge:'📄 Best Value', tier_label:'balanced', provColor:'#3a85c8',
+    pitch:'1M context window + thinking mode at $0.15/M input. Best value for long-document tasks.',
+    priceIn:0.15, priceOut:0.60, speed:2, oss:false, usOnly:false,
+  },
+  'gemini-2.5-pro': {
     caps:['vision','audio','think','tools','code'],
-    strengths:['long-context','video','research','frontier','google','deep-research','grounding'],
-    badge:'📚 Best Long Context', tier:'flagship',
-    pitch:'Google\'s flagship. 1M context + thinking + video understanding for deep research workflows.' },
-  { id:'deepseek-chat',       name:'DeepSeek-V3',       provider:'DeepSeek',  provColor:'#1e7a8a',
-    priceIn:0.27, priceOut:1.10, ctx:128,  speed:2, oss:true, usOnly:false,
+    strengths:['long-context','video','research','frontier','google','deep-research','grounding','context','think'],
+    badge:'📚 Best Long Context', tier_label:'flagship', provColor:'#3a85c8',
+    pitch:'Google\'s flagship. 1M context + thinking + video understanding for deep research workflows.',
+    priceIn:1.25, priceOut:10, speed:3, oss:false, usOnly:false,
+  },
+  'deepseek-chat': {
     caps:['oss','tools','code'],
-    strengths:['coding','cheap','open','efficient','instruction','budget'],
-    badge:'🔓 Best Open Source', tier:'balanced',
-    pitch:'GPT-4o class quality at $0.27/M — MIT licensed, open weights, excellent at code and instructions.' },
-  { id:'deepseek-reasoner',   name:'DeepSeek-R1',       provider:'DeepSeek',  provColor:'#1e7a8a',
-    priceIn:0.55, priceOut:2.19, ctx:128,  speed:3, oss:true, usOnly:false,
+    strengths:['coding','cheap','open','efficient','instruction','budget','code'],
+    badge:'🔓 Best Open Source', tier_label:'balanced', provColor:'#1e7a8a',
+    pitch:'GPT-4o class quality at $0.27/M — MIT licensed, open weights, excellent at code and instructions.',
+    priceIn:0.27, priceOut:1.10, speed:2, oss:true, usOnly:false,
+  },
+  'deepseek-reasoner': {
     caps:['oss','think','code'],
-    strengths:['reasoning','math','coding','open','cheap-reasoning','distillable','mit'],
-    badge:'🧠 Open Reasoning',   tier:'reasoning',
-    pitch:'MIT-licensed reasoning model matching o1 on STEM benchmarks. Fully distillable for self-hosting.' },
-  { id:'qwen3-235b-a22b',     name:'Qwen3-235B',        provider:'Alibaba',   provColor:'#e07830',
-    priceIn:0.22, priceOut:0.88, ctx:128,  speed:2, oss:true, usOnly:false,
+    strengths:['reasoning','math','coding','open','cheap-reasoning','distillable','mit','think','code'],
+    badge:'🧠 Open Reasoning', tier_label:'reasoning', provColor:'#1e7a8a',
+    pitch:'MIT-licensed reasoning model matching o1 on STEM benchmarks. Fully distillable for self-hosting.',
+    priceIn:0.55, priceOut:2.19, speed:3, oss:true, usOnly:false,
+  },
+  'qwen3-235b-a22b': {
     caps:['oss','think','tools','code','multi'],
-    strengths:['multilingual','chinese','japanese','cheap','reasoning','open','translate','bilingual'],
-    badge:'🌏 Best Multilingual', tier:'flagship',
-    pitch:'Cheapest frontier-class model. Best-in-class Chinese/multilingual + thinking mode at $0.22/M.' },
+    strengths:['multilingual','chinese','japanese','cheap','reasoning','open','translate','bilingual','multi'],
+    badge:'🌏 Best Multilingual', tier_label:'flagship', provColor:'#e07830',
+    pitch:'Cheapest frontier-class model. Best-in-class Chinese/multilingual + thinking mode at $0.22/M.',
+    priceIn:0.22, priceOut:0.88, speed:2, oss:true, usOnly:false,
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+//  HARDCODED FALLBACK MODELS (same data as CAP_META)
+// ═══════════════════════════════════════════════════════════
+const MODELS_FALLBACK = [
+  { id:'claude-haiku-4-5',  name:'Haiku 4.5',        provider:'Anthropic', ctx:200,  ctxK:200,  ...CAP_META['claude-haiku-4-5'],  tier:CAP_META['claude-haiku-4-5'].tier_label },
+  { id:'claude-sonnet-4-6', name:'Sonnet 4.6',        provider:'Anthropic', ctx:200,  ctxK:200,  ...CAP_META['claude-sonnet-4-6'], tier:CAP_META['claude-sonnet-4-6'].tier_label },
+  { id:'claude-opus-4-6',   name:'Opus 4.6',          provider:'Anthropic', ctx:200,  ctxK:200,  ...CAP_META['claude-opus-4-6'],   tier:CAP_META['claude-opus-4-6'].tier_label },
+  { id:'gpt-4o-mini',       name:'GPT-4o mini',       provider:'OpenAI',    ctx:128,  ctxK:128,  ...CAP_META['gpt-4o-mini'],       tier:CAP_META['gpt-4o-mini'].tier_label },
+  { id:'gpt-4o',            name:'GPT-4o',             provider:'OpenAI',    ctx:128,  ctxK:128,  ...CAP_META['gpt-4o'],            tier:CAP_META['gpt-4o'].tier_label },
+  { id:'o4-mini',           name:'o4-mini',            provider:'OpenAI',    ctx:200,  ctxK:200,  ...CAP_META['o4-mini'],           tier:CAP_META['o4-mini'].tier_label },
+  { id:'o3',                name:'o3',                 provider:'OpenAI',    ctx:200,  ctxK:200,  ...CAP_META['o3'],                tier:CAP_META['o3'].tier_label },
+  { id:'gemini-2.5-flash',  name:'Gemini 2.5 Flash',  provider:'Google',    ctx:1000, ctxK:1000, ...CAP_META['gemini-2.5-flash'],  tier:CAP_META['gemini-2.5-flash'].tier_label },
+  { id:'gemini-2.5-pro',    name:'Gemini 2.5 Pro',    provider:'Google',    ctx:1000, ctxK:1000, ...CAP_META['gemini-2.5-pro'],    tier:CAP_META['gemini-2.5-pro'].tier_label },
+  { id:'deepseek-chat',     name:'DeepSeek-V3',        provider:'DeepSeek',  ctx:128,  ctxK:128,  ...CAP_META['deepseek-chat'],     tier:CAP_META['deepseek-chat'].tier_label },
+  { id:'deepseek-reasoner', name:'DeepSeek-R1',        provider:'DeepSeek',  ctx:128,  ctxK:128,  ...CAP_META['deepseek-reasoner'], tier:CAP_META['deepseek-reasoner'].tier_label },
+  { id:'qwen3-235b-a22b',   name:'Qwen3-235B',         provider:'Alibaba',   ctx:128,  ctxK:128,  ...CAP_META['qwen3-235b-a22b'],   tier:CAP_META['qwen3-235b-a22b'].tier_label },
 ];
 
 // ═══════════════════════════════════════════════════════════
@@ -517,6 +651,27 @@ const KW = {
 };
 
 // ═══════════════════════════════════════════════════════════
+//  USE-CASE NEEDS MAP (guided mode)
+// ═══════════════════════════════════════════════════════════
+const UC_NEEDS_MAP = {
+  customer:   new Set(['customer','fast','cheap']),
+  code:       new Set(['code','think','agent']),
+  research:   new Set(['research','think','context']),
+  agent:      new Set(['agent','think','code']),
+  multimodal: new Set(['vision','audio']),
+  content:    new Set(['writing','research','fast']),
+};
+
+const UC_LABELS = {
+  customer:   'Customer support',
+  code:       'Code & DevTools',
+  research:   'Research & Analysis',
+  agent:      'Agentic workflow',
+  multimodal: 'Multimodal',
+  content:    'Content creation',
+};
+
+// ═══════════════════════════════════════════════════════════
 //  TASK ARCHITECTURES
 // ═══════════════════════════════════════════════════════════
 const ARCHS = {
@@ -550,18 +705,21 @@ const ARCHS = {
       { name:'Verification & Error Recovery',   tier:'reasoning', why:'Catch failures, retry intelligently, escalate when stuck.' },
     ]},
   multimodal: { label:'Multimodal Processing Architecture',
+    desc:'Native multimodal model leads, balanced handles structuring, fast generates at volume.',
     tasks:[
       { name:'Image / Audio / PDF Processing', tier:'vision',   why:'Native multimodal understanding of images, voice, and scans.' },
       { name:'Content Analysis & Structuring', tier:'balanced', why:'Extract structured data and meaning from processed media.' },
       { name:'Output Generation',              tier:'fast',     why:'Generate summaries or structured reports at volume.' },
     ]},
   content: { label:'Content Creation Pipeline',
+    desc:'Balanced model leads drafting; flagship polishes; fast handles boilerplate tasks.',
     tasks:[
       { name:'Research & Outline', tier:'balanced', why:'Structure the piece, gather references, plan sections.' },
       { name:'Draft Generation',   tier:'balanced', why:'Write full drafts with consistent voice and style.' },
       { name:'Edit & Polish',      tier:'flagship', why:'Final quality review — improve clarity, flow, and accuracy.' },
     ]},
   generic: { label:'Recommended Stack',
+    desc:'General-purpose architecture: balanced model for core work, flagship for edge cases.',
     tasks:[
       { name:'Primary Tasks',           tier:'balanced', why:'Your core workload — balanced quality and cost.' },
       { name:'High-Stakes Decisions',   tier:'flagship', why:'Where quality matters most — complex judgment.' },
@@ -572,9 +730,91 @@ const ARCHS = {
 // ═══════════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════════
-let _results = [];
+let _results    = [];
 let _constraints = { priority:'balanced', deploy:'any', ctx:'normal' };
 let _activeTweaks = new Set();
+let _mode       = 'guide';   // 'guide' | 'text'
+let _ucType     = null;      // selected use-case key
+let _models     = MODELS_FALLBACK; // populated by Supabase or fallback
+let _debounceTimer = null;
+
+// ═══════════════════════════════════════════════════════════
+//  CONTEXT WINDOW FORMATTER
+// ═══════════════════════════════════════════════════════════
+function fmtCtx(n) {
+  if (!n) return '128K';
+  if (n >= 1000000) return Math.round(n / 1000000) + 'M';
+  if (n >= 1000)    return Math.round(n / 1000) + 'K';
+  return String(n);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE META LOOKUP
+// ═══════════════════════════════════════════════════════════
+function findMeta(apiVersion) {
+  if (!apiVersion) return null;
+  // Exact match
+  if (CAP_META[apiVersion]) return CAP_META[apiVersion];
+  // Prefix match: first 3 hyphen-parts
+  const prefix = apiVersion.split('-').slice(0, 3).join('-');
+  for (const key of Object.keys(CAP_META)) {
+    if (key.split('-').slice(0, 3).join('-') === prefix) return CAP_META[key];
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE LOAD
+// ═══════════════════════════════════════════════════════════
+async function loadLiveModels() {
+  try {
+    const [sbModels, entities] = await Promise.all([
+      get('models', 'select=id,display_name,api_version,tier,context_window,entity_id,is_current&is_current=eq.true&order=release_date.desc&limit=60'),
+      get('entities', 'select=id,name&limit=50')
+    ]);
+
+    const entityMap = {};
+    for (const e of entities) entityMap[e.id] = e.name;
+
+    const merged = [];
+    for (const m of sbModels) {
+      const meta = findMeta(m.api_version);
+      if (!meta) continue;
+      const ctxRaw = m.context_window || 128000;
+      const ctxK   = Math.round(ctxRaw / 1000);
+      merged.push({
+        id:        m.id,
+        name:      m.display_name || m.api_version,
+        provider:  entityMap[m.entity_id] || 'Unknown',
+        ctx:       ctxK,
+        ctxK:      ctxK,
+        ctxFmt:    fmtCtx(ctxRaw),
+        tier:      meta.tier_label,
+        ...meta,
+      });
+    }
+
+    if (merged.length >= 4) {
+      _models = merged;
+      // Show live indicator
+      const chip = document.getElementById('loading-chip');
+      if (chip) chip.style.display = 'none';
+      const livePg = document.getElementById('live-indicator-pg');
+      if (livePg) livePg.style.display = 'inline-flex';
+    } else {
+      hideLanding();
+    }
+  } catch(e) {
+    // silent fallback — _models stays as MODELS_FALLBACK
+    const chip = document.getElementById('loading-chip');
+    if (chip) chip.style.display = 'none';
+  }
+}
+
+function hideLanding() {
+  const chip = document.getElementById('loading-chip');
+  if (chip) chip.style.display = 'none';
+}
 
 // ═══════════════════════════════════════════════════════════
 //  CONSTRAINT TOGGLES
@@ -582,56 +822,145 @@ let _activeTweaks = new Set();
 ['c-priority','c-deploy','c-ctx'].forEach(id=>{
   document.getElementById(id).addEventListener('click', e=>{
     const opt = e.target.closest('.c-opt');
-    if(!opt) return;
+    if (!opt) return;
     document.querySelectorAll(`#${id} .c-opt`).forEach(o=>o.classList.remove('on'));
     opt.classList.add('on');
     _constraints[id.replace('c-','')] = opt.dataset.val;
+    runAnalysis();
   });
 });
 
-function fillExample(txt){ document.getElementById('uc-input').value=txt; analyze(); }
+// ═══════════════════════════════════════════════════════════
+//  MODE SWITCHING
+// ═══════════════════════════════════════════════════════════
+function switchMode(mode) {
+  _mode = mode;
+  document.getElementById('tab-guide').classList.toggle('on', mode === 'guide');
+  document.getElementById('tab-text').classList.toggle('on', mode === 'text');
+  document.getElementById('panel-guide').style.display = mode === 'guide' ? '' : 'none';
+  document.getElementById('panel-text').style.display  = mode === 'text'  ? '' : 'none';
+  if (mode === 'guide' && !_ucType) {
+    hideResults();
+  } else {
+    runAnalysis();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  USE-CASE CARD SELECTION
+// ═══════════════════════════════════════════════════════════
+function selectUC(key) {
+  _ucType = key;
+  document.querySelectorAll('.uc-card').forEach(c => {
+    c.classList.toggle('on', c.dataset.uc === key);
+  });
+  runAnalysis();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EXAMPLE PILLS — switches to text mode
+// ═══════════════════════════════════════════════════════════
+function fillExample(txt) {
+  switchMode('text');
+  document.getElementById('uc-input').value = txt;
+  runAnalysis();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TEXT INPUT — live debounced scoring
+// ═══════════════════════════════════════════════════════════
+document.getElementById('uc-input').addEventListener('input', () => {
+  clearTimeout(_debounceTimer);
+  _debounceTimer = setTimeout(runAnalysis, 350);
+});
 
 // ═══════════════════════════════════════════════════════════
 //  DETECTION + SCORING
 // ═══════════════════════════════════════════════════════════
-function detectNeeds(text){
-  const lower=text.toLowerCase(), detected=new Set();
-  for(const [need,words] of Object.entries(KW)){
-    if(words.some(w=>lower.includes(w))) detected.add(need);
+function detectNeeds(text) {
+  const lower = text.toLowerCase(), detected = new Set();
+  for (const [need, words] of Object.entries(KW)) {
+    if (words.some(w => lower.includes(w))) detected.add(need);
   }
   return detected;
 }
 
-function archType(needs){
-  if(needs.has('customer')) return 'customer';
-  if(needs.has('code'))     return 'code';
-  if(needs.has('agent'))    return 'agent';
-  if(needs.has('vision') && !needs.has('code')) return 'multimodal';
-  if(needs.has('research')) return 'research';
-  if(needs.has('writing'))  return 'content';
+function archType(needs) {
+  if (needs.has('customer')) return 'customer';
+  if (needs.has('code'))     return 'code';
+  if (needs.has('agent'))    return 'agent';
+  if (needs.has('vision') && !needs.has('code')) return 'multimodal';
+  if (needs.has('research')) return 'research';
+  if (needs.has('writing'))  return 'content';
   return 'generic';
 }
 
-function scoreModels(needs, tweaks, constraints){
-  const all=new Set([...needs,...tweaks]);
-  return MODELS
-    .filter(m=>{
-      if(constraints.deploy==='oss' && !m.oss) return false;
-      if(constraints.deploy==='us' && !m.usOnly) return false;
-      if(constraints.ctx==='ultra' && m.ctx<500) return false;
-      if(constraints.ctx==='long' && m.ctx<100) return false;
+function scoreModels(needs, tweaks, constraints, models) {
+  const all = new Set([...needs, ...tweaks]);
+  return models
+    .filter(m => {
+      if (constraints.deploy === 'oss' && !m.oss) return false;
+      if (constraints.deploy === 'us'  && !m.usOnly) return false;
+      if (constraints.ctx === 'ultra'  && m.ctxK < 500) return false;
+      if (constraints.ctx === 'long'   && m.ctxK < 100) return false;
       return true;
     })
-    .map(m=>{
-      let s=0;
-      for(const n of all){ if(m.caps.includes(n)) s+=3; if(m.strengths.includes(n)) s+=2; }
-      if(constraints.priority==='cost')    s+=(1/(m.priceIn+m.priceOut))*0.5;
-      if(constraints.priority==='speed')   s+=(3-m.speed)*2;
-      if(constraints.priority==='quality') s+=m.tier==='flagship'?4:m.tier==='reasoning'?3:0;
-      if(!all.has('oss') && m.oss && constraints.deploy!=='oss') s-=0.5;
-      return {...m, score:s};
+    .map(m => {
+      let s = 0;
+      for (const n of all) { if (m.caps.includes(n)) s += 3; if (m.strengths.includes(n)) s += 2; }
+      if (constraints.priority === 'cost')    s += (1 / (m.priceIn + m.priceOut)) * 0.5;
+      if (constraints.priority === 'speed')   s += (3 - m.speed) * 2;
+      if (constraints.priority === 'quality') s += m.tier === 'flagship' ? 4 : m.tier === 'reasoning' ? 3 : 0;
+      if (!all.has('oss') && m.oss && constraints.deploy !== 'oss') s -= 0.5;
+      return { ...m, score: s };
     })
-    .sort((a,b)=>b.score-a.score).slice(0,4);
+    .sort((a, b) => b.score - a.score).slice(0, 4);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SHOW / HIDE RESULTS
+// ═══════════════════════════════════════════════════════════
+function showResults() {
+  document.getElementById('results').classList.add('show');
+  document.getElementById('empty-hint').style.display = 'none';
+}
+function hideResults() {
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('empty-hint').style.display = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN ANALYSIS
+// ═══════════════════════════════════════════════════════════
+function runAnalysis() {
+  let needs;
+  if (_mode === 'guide' && _ucType) {
+    needs = UC_NEEDS_MAP[_ucType];
+  } else if (_mode === 'text') {
+    const text = document.getElementById('uc-input').value.trim();
+    if (text.length < 12) { hideResults(); return; }
+    needs = detectNeeds(text);
+  } else {
+    return;
+  }
+
+  _results = scoreModels(needs, _activeTweaks, _constraints, _models);
+  if (!_results.length) return;
+  renderCards(_results, needs);
+  renderArch(_mode === 'guide' ? _ucType : archType(needs), _results);
+  renderTweaks(needs);
+  updateCost();
+
+  // UC context label
+  const lbl = document.getElementById('uc-context-label');
+  if (_mode === 'guide' && _ucType) {
+    lbl.textContent = 'Showing recommendations for: ' + UC_LABELS[_ucType];
+    lbl.classList.add('show');
+  } else {
+    lbl.classList.remove('show');
+  }
+
+  showResults();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -639,20 +968,21 @@ function scoreModels(needs, tweaks, constraints){
 // ═══════════════════════════════════════════════════════════
 const RANK_LABELS = ['Primary','Fallback','Alternative','Budget pick'];
 
-function renderCards(models, needs){
-  document.getElementById('model-cards').innerHTML = models.map((m,i)=>{
-    const capsBadges = m.caps.map(c=>{
-      const d=CAP_DEF[c];
-      return d?`<span class="mc-cap" style="background:${d.bg};color:${d.color}">${d.icon} ${d.label}</span>`:'';
+function renderCards(models, needs) {
+  document.getElementById('model-cards').innerHTML = models.map((m, i) => {
+    const capsBadges = m.caps.map(c => {
+      const d = CAP_DEF[c];
+      return d ? `<span class="mc-cap" style="background:${d.bg};color:${d.color}">${d.icon} ${d.label}</span>` : '';
     }).join('');
-    const matched=[...needs].filter(n=>m.caps.includes(n)||m.strengths.includes(n));
+    const matched = [...needs].filter(n => m.caps.includes(n) || m.strengths.includes(n));
     const why = matched.length
-      ? `Matches: <strong>${matched.slice(0,4).join(', ')}</strong> — ${m.pitch}`
+      ? `Matches: <strong>${matched.slice(0, 4).join(', ')}</strong> — ${m.pitch}`
       : m.pitch;
+    const ctxDisplay = m.ctxFmt || (m.ctxK + 'K');
     return `
     <div class="model-card" style="border-left:3px solid ${m.provColor}">
       <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${m.provColor};border-radius:12px 12px 0 0;opacity:.5"></div>
-      <div class="mc-rank">${RANK_LABELS[i]||'Option'}</div>
+      <div class="mc-rank">${RANK_LABELS[i] || 'Option'}</div>
       <span class="mc-badge" style="background:${m.provColor}18;color:${m.provColor};border-color:${m.provColor}40">${m.badge}</span>
       <div class="mc-name">${m.name}</div>
       <div class="mc-provider" style="color:${m.provColor}aa">${m.provider}</div>
@@ -661,8 +991,8 @@ function renderCards(models, needs){
       <div class="mc-pricing">
         <span class="mc-price-item">⬆ <span class="mc-price-val">$${m.priceIn}/M</span> input</span>
         <span class="mc-price-item">⬇ <span class="mc-price-val">$${m.priceOut}/M</span> output</span>
-        <span class="mc-price-item">📏 <span class="mc-price-val">${m.ctx}K</span> context</span>
-        <span class="mc-price-item"><span class="mc-price-val">${['Fast','Med','Slow'][m.speed-1]}</span> speed</span>
+        <span class="mc-price-item">📏 <span class="mc-price-val">${ctxDisplay}</span> context</span>
+        <span class="mc-price-item"><span class="mc-price-val">${['Fast','Med','Slow'][m.speed - 1]}</span> speed</span>
       </div>
     </div>`;
   }).join('');
@@ -671,29 +1001,29 @@ function renderCards(models, needs){
 // ═══════════════════════════════════════════════════════════
 //  RENDER ARCHITECTURE
 // ═══════════════════════════════════════════════════════════
-function tierModel(tier, models){
-  const map={
-    fast:models.find(m=>m.speed===1)||models[models.length-1],
-    balanced:models.find(m=>m.tier==='balanced')||models[0],
-    flagship:models.find(m=>m.tier==='flagship'||m.tier==='reasoning')||models[0],
-    reasoning:models.find(m=>m.tier==='reasoning')||models[0],
-    longctx:models.find(m=>m.ctx>=500)||models.find(m=>m.ctx>=200)||models[0],
-    vision:models.find(m=>m.caps.includes('vision'))||models[0],
+function tierModel(tier, models) {
+  const map = {
+    fast:      models.find(m => m.speed === 1) || models[models.length - 1],
+    balanced:  models.find(m => m.tier === 'balanced') || models[0],
+    flagship:  models.find(m => m.tier === 'flagship' || m.tier === 'reasoning') || models[0],
+    reasoning: models.find(m => m.tier === 'reasoning') || models[0],
+    longctx:   models.find(m => m.ctxK >= 500) || models.find(m => m.ctxK >= 200) || models[0],
+    vision:    models.find(m => m.caps.includes('vision')) || models[0],
   };
-  return map[tier]||models[0];
+  return map[tier] || models[0];
 }
 
-function renderArch(archKey, models){
-  const a=ARCHS[archKey];
+function renderArch(archKey, models) {
+  const a = ARCHS[archKey] || ARCHS['generic'];
   document.getElementById('arch-title').textContent = a.label;
-  document.getElementById('arch-desc').textContent  = a.desc||'';
-  document.getElementById('arch-flow').innerHTML = a.tasks.map((t,i)=>`
-    ${i>0?'<div class="arch-arrow">↓</div>':''}
+  document.getElementById('arch-desc').textContent  = a.desc || '';
+  document.getElementById('arch-flow').innerHTML = a.tasks.map((t, i) => `
+    ${i > 0 ? '<div class="arch-arrow">↓</div>' : ''}
     <div class="arch-task">
-      <div class="at-num">${i+1}</div>
+      <div class="at-num">${i + 1}</div>
       <div class="at-body">
         <div class="at-name">${t.name}</div>
-        <span class="at-model" style="background:${tierModel(t.tier,models).provColor}15;color:${tierModel(t.tier,models).provColor};border:1px solid ${tierModel(t.tier,models).provColor}30">${tierModel(t.tier,models).name}</span>
+        <span class="at-model" style="background:${tierModel(t.tier, models).provColor}15;color:${tierModel(t.tier, models).provColor};border:1px solid ${tierModel(t.tier, models).provColor}30">${tierModel(t.tier, models).name}</span>
         <div class="at-why">${t.why}</div>
       </div>
     </div>`).join('');
@@ -702,115 +1032,100 @@ function renderArch(archKey, models){
 // ═══════════════════════════════════════════════════════════
 //  COST
 // ═══════════════════════════════════════════════════════════
-const VOL_STEPS   = [100,500,1000,5000,10000,50000,100000];
+const VOL_STEPS   = [100, 500, 1000, 5000, 10000, 50000, 100000];
 const TOK_PRESETS = [
-  {in:200, out:100, label:'~200 in / 100 out'},
-  {in:500, out:300, label:'~500 in / 300 out'},
-  {in:1000,out:600, label:'~1K in / 600 out'},
-  {in:2000,out:1000,label:'~2K in / 1K out'},
-  {in:5000,out:2000,label:'~5K in / 2K out'},
+  { in:200,  out:100,  label:'~200 in / 100 out' },
+  { in:500,  out:300,  label:'~500 in / 300 out' },
+  { in:1000, out:600,  label:'~1K in / 600 out' },
+  { in:2000, out:1000, label:'~2K in / 1K out' },
+  { in:5000, out:2000, label:'~5K in / 2K out' },
 ];
 
-function updateCost(){
-  if(!_results.length) return;
-  const vol=VOL_STEPS[+document.getElementById('vol-slider').value];
-  const tok=TOK_PRESETS[+document.getElementById('tok-slider').value];
-  document.getElementById('vol-label').textContent = vol.toLocaleString()+' / day';
+function updateCost() {
+  if (!_results.length) return;
+  const vol = VOL_STEPS[+document.getElementById('vol-slider').value];
+  const tok = TOK_PRESETS[+document.getElementById('tok-slider').value];
+  document.getElementById('vol-label').textContent = vol.toLocaleString() + ' / day';
   document.getElementById('tok-label').textContent = tok.label;
 
-  const weights=[0.55,0.30,0.10,0.05];
-  let totalDaily=0;
-  const breakdown=_results.map((m,i)=>{
-    const w=weights[i]||0.05;
-    const cost=vol*w*(m.priceIn*tok.in/1e6+m.priceOut*tok.out/1e6);
-    totalDaily+=cost;
-    return {name:m.name,share:Math.round(w*100),cost,provColor:m.provColor};
+  const weights = [0.55, 0.30, 0.10, 0.05];
+  let totalDaily = 0;
+  const breakdown = _results.map((m, i) => {
+    const w    = weights[i] || 0.05;
+    const cost = vol * w * (m.priceIn * tok.in / 1e6 + m.priceOut * tok.out / 1e6);
+    totalDaily += cost;
+    return { name: m.name, share: Math.round(w * 100), cost, provColor: m.provColor };
   });
 
-  const monthly=totalDaily*30, per1k=(totalDaily/vol)*1000;
-  document.getElementById('cost-daily').textContent   = totalDaily<0.01?'<$0.01':'$'+totalDaily.toFixed(2);
-  document.getElementById('cost-monthly').textContent = monthly<1?'<$1':'$'+monthly.toFixed(monthly<100?1:0);
-  document.getElementById('cost-per1k').textContent   = per1k<0.01?'<$0.01':'$'+per1k.toFixed(3);
+  const monthly = totalDaily * 30, per1k = (totalDaily / vol) * 1000;
+  document.getElementById('cost-daily').textContent   = totalDaily < 0.01 ? '<$0.01' : '$' + totalDaily.toFixed(2);
+  document.getElementById('cost-monthly').textContent = monthly < 1 ? '<$1' : '$' + monthly.toFixed(monthly < 100 ? 1 : 0);
+  document.getElementById('cost-per1k').textContent   = per1k < 0.01 ? '<$0.01' : '$' + per1k.toFixed(3);
 
-  document.getElementById('cost-stack-breakdown').innerHTML = breakdown.map(b=>`
+  document.getElementById('cost-stack-breakdown').innerHTML = breakdown.map(b => `
     <div class="cost-stack-row">
       <span style="color:${b.provColor};font-weight:500">${b.name}</span>
       <span style="color:var(--muted);font-size:11px">${b.share}% of volume</span>
-      <span style="color:var(--green);font-weight:600">$${b.cost.toFixed(b.cost<0.01?4:2)}/day</span>
+      <span style="color:var(--green);font-weight:600">$${b.cost.toFixed(b.cost < 0.01 ? 4 : 2)}/day</span>
     </div>`).join('');
 
   document.getElementById('cost-note').textContent =
-    `Based on ${vol.toLocaleString()} msgs/day × ${tok.label} tokens. `+
-    `Primary model handles ~${weights[0]*100}% of volume, fallback ~${weights[1]*100}%, remainder spread across alternatives. `+
+    `Based on ${vol.toLocaleString()} msgs/day × ${tok.label} tokens. ` +
+    `Primary model handles ~${weights[0] * 100}% of volume, fallback ~${weights[1] * 100}%, remainder spread across alternatives. ` +
     `Actual costs vary with real token usage.`;
 }
 
 // ═══════════════════════════════════════════════════════════
 //  TWEAK TAGS
 // ═══════════════════════════════════════════════════════════
-const TWEAKS=[
-  {key:'vision',label:'👁 Add Vision'}, {key:'audio',label:'🎙 Add Audio'},
-  {key:'think',label:'🧠 Better Reasoning'}, {key:'fast',label:'⚡ Prioritize Speed'},
-  {key:'cheap',label:'💰 Reduce Cost'}, {key:'oss',label:'🔓 Open Source Only'},
-  {key:'multi',label:'🌐 Multilingual'}, {key:'context',label:'📄 Long Context'},
-  {key:'code',label:'💻 More Coding'}, {key:'agent',label:'🤖 Agentic'},
+const TWEAKS = [
+  { key:'vision',  label:'👁 Add Vision' },     { key:'audio',   label:'🎙 Add Audio' },
+  { key:'think',   label:'🧠 Better Reasoning'},  { key:'fast',    label:'⚡ Prioritize Speed' },
+  { key:'cheap',   label:'💰 Reduce Cost' },      { key:'oss',     label:'🔓 Open Source Only' },
+  { key:'multi',   label:'🌐 Multilingual' },     { key:'context', label:'📄 Long Context' },
+  { key:'code',    label:'💻 More Coding' },      { key:'agent',   label:'🤖 Agentic' },
 ];
 
-function renderTweaks(){
-  document.getElementById('tweak-tags').innerHTML = TWEAKS.map(t=>`
-    <span class="tweak-tag ${_activeTweaks.has(t.key)?'on':''}" data-key="${t.key}">${t.label}</span>
+function renderTweaks(needs) {
+  document.getElementById('tweak-tags').innerHTML = TWEAKS.map(t => `
+    <span class="tweak-tag ${_activeTweaks.has(t.key) ? 'on' : ''}" data-key="${t.key}">${t.label}</span>
   `).join('');
-  document.querySelectorAll('.tweak-tag').forEach(tag=>{
-    tag.addEventListener('click',()=>{
-      const k=tag.dataset.key;
-      _activeTweaks.has(k)?_activeTweaks.delete(k):_activeTweaks.add(k);
-      runAnalysis(document.getElementById('uc-input').value);
+  document.querySelectorAll('.tweak-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const k = tag.dataset.key;
+      _activeTweaks.has(k) ? _activeTweaks.delete(k) : _activeTweaks.add(k);
+      runAnalysis();
     });
   });
 }
 
 // ═══════════════════════════════════════════════════════════
-//  MAIN
+//  THEME TOGGLE
 // ═══════════════════════════════════════════════════════════
-function analyze(){
-  const text=document.getElementById('uc-input').value.trim();
-  if(!text){return;}
-  _activeTweaks.clear();
-  runAnalysis(text);
-}
-
-function runAnalysis(text){
-  const needs=detectNeeds(text);
-  _results=scoreModels(needs,_activeTweaks,_constraints);
-  if(!_results.length) return;
-  renderCards(_results,needs);
-  renderArch(archType(needs),_results);
-  renderTweaks();
-  updateCost();
-  document.getElementById('empty-hint').style.display='none';
-  document.getElementById('results').classList.add('show');
-}
-
-// ── THEME TOGGLE ──────────────────────────────────────────────────────────
 (function(){
-  const saved=localStorage.getItem('nous_theme');
-  if(saved) document.documentElement.setAttribute('data-theme',saved);
-  function syncBtn(){
-    const btn=document.getElementById('theme-toggle'); if(!btn) return;
-    const t=document.documentElement.getAttribute('data-theme')||'light';
-    btn.textContent=t==='dark'?'☀️':'🌙';
-    btn.title=t==='dark'?'Switch to light mode':'Switch to dark mode';
+  const saved = localStorage.getItem('nous_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  function syncBtn() {
+    const btn = document.getElementById('theme-toggle'); if (!btn) return;
+    const t = document.documentElement.getAttribute('data-theme') || 'light';
+    btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    btn.title = t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
   }
-  window.toggleTheme=function(){
-    const current=document.documentElement.getAttribute('data-theme')||'light';
-    const next=current==='dark'?'light':'dark';
-    document.documentElement.setAttribute('data-theme',next);
-    localStorage.setItem('nous_theme',next);
+  window.toggleTheme = function() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('nous_theme', next);
     syncBtn();
   };
-  if(document.readyState!=='loading') syncBtn();
-  else document.addEventListener('DOMContentLoaded',syncBtn);
+  if (document.readyState !== 'loading') syncBtn();
+  else document.addEventListener('DOMContentLoaded', syncBtn);
 })();
+
+// ═══════════════════════════════════════════════════════════
+//  INIT — load Supabase data on page load
+// ═══════════════════════════════════════════════════════════
+loadLiveModels();
 </script>
 </body>
 </html>
