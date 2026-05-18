@@ -159,9 +159,13 @@ body{
 .dots-signature{
   font-size:10px;color:var(--muted);
   letter-spacing:.4px;font-weight:500;
-  text-align:center;
+  text-align:center;line-height:1.4;
 }
-.dots-signature b{color:var(--text);font-weight:600;}
+.dots-signature b{color:var(--text);font-weight:700;letter-spacing:.6px;}
+.dots-signature .sig-name{
+  display:block;font-size:9px;font-weight:400;
+  opacity:.75;letter-spacing:.3px;margin-top:1px;
+}
 
 /* ── HERO STATS (inside slide 0) ── */
 .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
@@ -602,7 +606,7 @@ body{
     <button class="dot" onclick="goToSlide(4)" aria-label="Story"></button>
     <button class="dot" onclick="goToSlide(5)" aria-label="Pressure"></button>
   </div>
-  <div class="dots-signature">Curated by <b>Vignesh Bhaskarraj</b></div>
+  <div class="dots-signature">Curated by <b>Novice AI</b><span class="sig-name">Vignesh Bhaskarraj</span></div>
 </div>
 
 <script>
@@ -681,8 +685,7 @@ function scoreBar(val, max, color){
 
 /* ── EVENT DATA ── */
 const EVENTS = [
-  { key:'google-io',      label:'Google I/O 2026', pattern:'I/O',      color:'#4285f4', icon:'🔵', date:'May 19–20, 2026',  liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
-  { key:'google-io-2025', label:'Google I/O 2025', pattern:'I/O 2025', color:'#7c3aed', icon:'🟣', date:'May 20–21, 2025',  liveDates:[], organizer:'Google DeepMind' },
+  { key:'google-io', label:'Google I/O 2026', pattern:'I/O 2026', color:'#4285f4', icon:'🔵', date:'May 19–20, 2026', liveDates:['2026-05-19','2026-05-20'], organizer:'Google DeepMind' },
 ];
 
 function todayISO(){ return new Date().toISOString().slice(0,10); }
@@ -1004,9 +1007,6 @@ const WATCH_PREDS = {
     {area:'🤖 Project Astra — proactive AI assistant gets wider rollout',conf:87,context:'Project Astra has been teased since I/O 2024 as a universal assistant that acts without explicit prompts. I/O 2026 is expected to unveil GA or broad preview: proactive tasks across Gmail, Calendar, Shopping, plus real-time visual context via phone and XR glasses cameras.',signal:'Gemini Intelligence handles on-device Android tasks; Project Astra is the cloud-side ambient layer. Together they\'re Google\'s answer to Anthropic\'s Managed Agents and OpenAI Operator.'},
     {area:'🎬 Veo 4 + Lyria — a big jump for creative AI',conf:82,context:'Veo 3 shipped at I/O 2025 with native audio. Veo 4 is expected with higher resolution (1080p+), longer clips, and tighter Gemini 4 integration. Lyria 2 (music) and Imagen 4 (image) upgrades are also expected to round out the creative suite.',signal:'Google\'s creative stack (Veo, Lyria, Imagen) is its strongest differentiator versus OpenAI Sora, ElevenLabs, and Midjourney. Each I/O has delivered a generational Veo jump.'},
     {area:'⚡ Gemini Flash — cheaper prices and ADK v2',conf:79,context:'New TPU 8i silicon (80% better inference price/performance vs the prior gen) gives Google room to cut Gemini Flash pricing again. ADK v1.0 shipped at Cloud Next; I/O is expected to bring ADK v2 with on-device Gemini Nano runtime — edge agentic workflows without round-trips to the cloud.',signal:'Flash pricing has dropped ~70% per generation. A new tier under $0.05/M input would undercut self-hosted open models and accelerate enterprise agent rollouts.'},
-  ],
-  'google-io-2025': [
-    {area:'📊 Retrospective view',conf:0,context:'This is the I/O 2025 retrospective. Swipe to the Live slide to browse what landed at this event, and to the Story slide for the analyst summary.',signal:'Predictions are forward-looking; for past events the Live and Story slides do the analytical lifting.'},
   ],
 };
 
