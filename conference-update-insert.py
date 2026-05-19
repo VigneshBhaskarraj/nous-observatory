@@ -15,13 +15,26 @@ This script:
 """
 
 import json
+import os
 import sys
 import urllib.request
 import urllib.parse
 import urllib.error
 
 SUPABASE_URL = "https://yjupiuxuoxmycehkbmwl.supabase.co"
-API_KEY = "sb_publishable_RUyNAQRYQq37O0IvOJ9kbQ_Cj8V0Yrr"
+
+# Server-side key (service_role or sb_secret_*). Required for INSERT — the
+# publishable key is origin-allowlisted to the GitHub Pages domain and will
+# return 403 "Host not in allowlist" from any server. Read from env var so
+# the secret never lives in the repo.
+API_KEY = os.environ.get("SUPABASE_SECRET_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+if not API_KEY:
+    sys.stderr.write(
+        "ERROR: SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY) env var is not set.\n"
+        "Find a service_role / sb_secret_* key in Supabase Dashboard → Project Settings → API Keys,\n"
+        "then run: SUPABASE_SECRET_KEY=<key> python3 conference-update-insert.py\n"
+    )
+    sys.exit(2)
 
 BASE_HEADERS = {
     "apikey": API_KEY,
