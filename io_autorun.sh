@@ -9,5 +9,6 @@ LOG="$REPO/logs/io_autorun.log"
 mkdir -p "$REPO/logs"
 echo "──────────────────────────────────────────" >> "$LOG"
 echo "Run: $(date '+%Y-%m-%d %H:%M:%S %Z')" >> "$LOG"
+[ -f "$HOME/.nous-observatory.env" ] && source "$HOME/.nous-observatory.env"
 python3 "$REPO/conference-update-insert.py" >> "$LOG" 2>&1
 echo "Exit: $?" >> "$LOG"
