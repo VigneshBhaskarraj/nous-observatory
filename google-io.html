@@ -979,7 +979,7 @@ function dominantCategory(ms){
 }
 
 function liveStatusFor(ev){
-  if(isLiveNow(ev)) return `<span class="live-now">● LIVE NOW</span> Updates at 11 AM, 2 PM &amp; 7 PM PDT — ${esc(ev.date)}.`;
+  if(isLiveNow(ev)) return `<span class="live-now">● LIVE NOW</span> Updates at 12 PM, 3 PM &amp; 8 PM CDT — ${esc(ev.date)}.`;
   const d=daysUntilLive(ev);
   if(d!==null) return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} is scheduled for ${esc(ev.date)}. Auto-refresh kicks in on day one.`;
   if(ev.liveDates?.length===0) return `Past event · ${esc(ev.date)}. Showing the historical record.`;
@@ -1469,7 +1469,7 @@ function showLiveBanner(){
   if(!liveEvs.length){ banner.classList.remove('visible'); return; }
   const day1=liveEvs[0]; const today=todayISO();
   const dayNum=(day1.liveDates||[]).indexOf(today)+1;
-  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · Updates at 11 AM, 2 PM &amp; 7 PM PDT`;
+  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · Updates at 12 PM, 3 PM &amp; 8 PM CDT`;
   banner.classList.add('visible');
 }
 
@@ -1546,7 +1546,7 @@ function setupAutoRefresh(){
   const stxt=document.getElementById('status-text');
   if(stxt){
     const labels=liveEvents.map(e=>e.label).join(' · ');
-    stxt.innerHTML=`<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} · Updates at 11 AM, 2 PM &amp; 7 PM PDT`;
+    stxt.innerHTML=`<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} · Updates at 12 PM, 3 PM &amp; 8 PM CDT`;
   }
 }
 
