@@ -445,7 +445,7 @@ body{
 [data-theme="dark"] .winner{background:rgba(250,252,8,.05);}
 [data-theme="dark"] .persona-bar{background:#0d1117;}
 [data-theme="dark"] .lc-busi{background:rgba(13,148,136,.1);border-color:#0f766e;}
-[data-theme="dark"] .per-b,[data-theme="dark"] .per-i,[data-theme="dark"] .per-d{color:#99f6e4;}
+[data-theme="dark"] .lc-busi-text{color:#99f6e4;}
 [data-theme="dark"] .pitch-btn{background:rgba(66,133,244,.12);color:#60a5fa;}
 [data-theme="dark"] .pitch-btn:hover{background:rgba(66,133,244,.22);}
 
@@ -484,11 +484,7 @@ body{
   font-size:9px;text-transform:uppercase;letter-spacing:.6px;
   font-weight:700;color:#0d9488;margin-bottom:3px;
 }
-.per-b,.per-i,.per-d{display:none;color:var(--text);line-height:1.6;}
-body[data-persona="business"] .per-b{display:block;}
-body[data-persona="insurance"] .per-i{display:block;}
-body[data-persona="data"] .per-d{display:block;}
-body:not([data-persona]) .lc-busi{display:none;}
+.lc-busi-text{color:var(--text);line-height:1.6;}
 
 /* ── PITCH BTN ── */
 .pitch-btn{
@@ -498,7 +494,6 @@ body:not([data-persona]) .lc-busi{display:none;}
   transition:background .12s;white-space:nowrap;
 }
 .pitch-btn:hover{background:rgba(66,133,244,.2);}
-body:not([data-persona]) .pitch-btn{display:none;}
 
 /* ── WATCH PERSONA LABEL ── */
 .watch-persona-label{
@@ -892,13 +887,18 @@ function buildCard(m, evColor){
       ${m.significance?`<div class="lc-sig">${esc(m.significance)}</div>`:''}
       ${m.strategic_signal?`<div class="lc-signal"><div class="lc-signal-lbl">💡 Why it matters</div>${esc(m.strategic_signal)}</div>`:''}
       ${m.ripple_effects?`<div class="lc-ripple"><div class="lc-ripple-lbl">🌊 Knock-on effects</div>${esc(m.ripple_effects)}</div>`:''}
-      ${(()=>{ const bc=getBusiContent(m); return bc?`<div class="lc-busi"><div class="lc-busi-lbl">💼 Business case</div><div class="per-b">${esc(bc.business)}</div><div class="per-i">${esc(bc.insurance)}</div><div class="per-d">${esc(bc.data)}</div></div>`:''; })()}
+      ${(()=>{
+        if(!_activePersona) return '';
+        const bc=getBusiContent(m); if(!bc) return '';
+        const text=_activePersona==='business'?bc.business:_activePersona==='insurance'?bc.insurance:bc.data;
+        return `<div class="lc-busi"><div class="lc-busi-lbl">💼 Business case</div><div class="lc-busi-text">${esc(text)}</div></div>`;
+      })()}
       ${disTags(m.displacement_entities)}
       <div class="lc-footer">
         ${claimTag(m.claim_type)}
         ${m.stack_layer?`<span class="tag" style="background:rgba(100,116,139,.1);color:var(--muted)">${esc(m.stack_layer)}</span>`:''}
         ${m.sentiment_at_time?`<span class="tag tag-d">${esc(m.sentiment_at_time)}</span>`:''}
-        <button class="pitch-btn" onclick="pitchBoss(event,'${id}')">📋 Pitch boss</button>
+        ${_activePersona?`<button class="pitch-btn" onclick="pitchBoss(event,'${id}')">📋 Pitch boss</button>`:''}
       </div>
     </div>`:''}
   </div>`;
@@ -919,7 +919,7 @@ function pitchBoss(e, cardId){
   const card=document.getElementById(cardId); if(!card) return;
   const titleEl=card.querySelector('.lc-title');
   const sigEl=card.querySelector('.lc-sig');
-  const busiEl=card.querySelector(_activePersona==='business'?'.per-b':_activePersona==='insurance'?'.per-i':'.per-d');
+  const busiEl=card.querySelector('.lc-busi-text');
   const headline=(titleEl?titleEl.textContent:'').replace('new','').trim();
   const why=sigEl?sigEl.textContent.trim():'';
   const busi=busiEl?busiEl.textContent.trim():'';
