@@ -979,7 +979,7 @@ function dominantCategory(ms){
 }
 
 function liveStatusFor(ev){
-  if(isLiveNow(ev)) return `<span class="live-now">● LIVE NOW</span> Auto-refresh every 5 min during ${esc(ev.date)}.`;
+  if(isLiveNow(ev)) return `<span class="live-now">● LIVE NOW</span> Updates at 11 AM, 2 PM &amp; 7 PM PDT — ${esc(ev.date)}.`;
   const d=daysUntilLive(ev);
   if(d!==null) return `<span class="upcoming">T-${d} days</span> ${esc(ev.label)} is scheduled for ${esc(ev.date)}. Auto-refresh kicks in on day one.`;
   if(ev.liveDates?.length===0) return `Past event · ${esc(ev.date)}. Showing the historical record.`;
@@ -1469,7 +1469,7 @@ function showLiveBanner(){
   if(!liveEvs.length){ banner.classList.remove('visible'); return; }
   const day1=liveEvs[0]; const today=todayISO();
   const dayNum=(day1.liveDates||[]).indexOf(today)+1;
-  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · auto-refreshing every 5 min`;
+  btxt.innerHTML=`🔴 LIVE — ${esc(day1.label)}${dayNum>0?' · Day '+dayNum:''} · Updates at 11 AM, 2 PM &amp; 7 PM PDT`;
   banner.classList.add('visible');
 }
 
@@ -1510,21 +1510,43 @@ async function reload(){
   });
 }
 
-/* ── AUTO-REFRESH (conference days only — May 19/20, 2026) ── */
-let _autoRefreshTimer = null;
+/* ── AUTO-REFRESH (windowed — fires only near data-push times) ── */
+// Cron pushes to Supabase at: 17:00 UTC · 20:00 UTC · 01:00 UTC
+// = 11 AM / 2 PM / 7 PM PDT  =  12 PM / 3 PM / 8 PM CDT
+const PUSH_TIMES_UTC=[{h:17,m:0},{h:20,m:0},{h:1,m:0}];
+const WIN_BEFORE=10, WIN_AFTER=20; // minutes around each push time
+function isInRefreshWindow(){
+  const t=new Date().getUTCHours()*60+new Date().getUTCMinutes();
+  return PUSH_TIMES_UTC.some(({h,m})=>{
+    const c=h*60+m, s=c-WIN_BEFORE, e=c+WIN_AFTER;
+    if(s<0)     return t>=(s+1440)||t<=e;
+    if(e>=1440) return t>=s||t<=(e-1440);
+    return t>=s&&t<=e;
+  });
+}
+let _autoRefreshTimer=null, _windowCheckTimer=null;
 function setupAutoRefresh(){
-  if(_autoRefreshTimer){ clearInterval(_autoRefreshTimer); _autoRefreshTimer=null; }
+  if(_autoRefreshTimer){clearInterval(_autoRefreshTimer);_autoRefreshTimer=null;}
+  if(_windowCheckTimer){clearInterval(_windowCheckTimer);_windowCheckTimer=null;}
   const liveEvents=EVENTS.filter(isLiveNow);
   if(!liveEvents.length) return;
-  console.log('[auto-refresh] enabled — live event in progress');
-  _autoRefreshTimer=setInterval(()=>{
-    console.log('[auto-refresh] polling milestones…');
-    reload();
-  }, 5*60*1000);
+  function tick(){
+    if(isInRefreshWindow()){
+      if(!_autoRefreshTimer){
+        console.log('[auto-refresh] window open — polling every 2 min');
+        _autoRefreshTimer=setInterval(()=>{console.log('[auto-refresh] polling…');reload();},2*60*1000);
+        reload();
+      }
+    } else {
+      if(_autoRefreshTimer){console.log('[auto-refresh] window closed');clearInterval(_autoRefreshTimer);_autoRefreshTimer=null;}
+    }
+  }
+  tick();
+  _windowCheckTimer=setInterval(tick,60*1000);
   const stxt=document.getElementById('status-text');
   if(stxt){
     const labels=liveEvents.map(e=>e.label).join(' · ');
-    stxt.innerHTML=`<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} in progress · auto-refresh every 5 min`;
+    stxt.innerHTML=`<span class="live-indicator"><span class="live-pulse"></span>LIVE</span> &nbsp;${esc(labels)} · Updates at 11 AM, 2 PM &amp; 7 PM PDT`;
   }
 }
 
